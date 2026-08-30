@@ -1,0 +1,149 @@
+generated: '2026-08-27'
+method: searched
+source: https://localai.io/reference/api-errors
+docs: https://localai.io/reference/api-errors
+spec: openapi/localai-api-openapi.yml
+format: vendor
+rfc9457: false
+note: >-
+  LocalAI does not emit application/problem+json (RFC 9457). It emits three different vendor error
+  envelopes depending on which upstream API a given endpoint is imitating, which is itself the defining
+  characteristic of a compatibility layer: an agent must select the parser by endpoint, not by content
+  type. All three are documented. Response-code coverage derived from the published Swagger document:
+  400 on 20 operations, 404 on 26, 413 on 1, 500 on 10, 503 on 1.
+envelopes:
+- id: openai
+  name: OpenAI-compatible
+  applies_to:
+  - POST /v1/chat/completions
+  - POST /v1/completions
+  - POST /v1/embeddings
+  - POST /v1/images/generations
+  - POST /v1/audio/transcriptions
+  - GET /v1/models
+  - other OpenAI-compatible endpoints
+  shape:
+    error:
+      code: integer or string — HTTP status code or error code string
+      message: string — human-readable error description
+      type: string — error category, e.g. invalid_request_error
+      param: string or null — the parameter that caused the error
+- id: anthropic
+  name: Anthropic-compatible
+  applies_to:
+  - POST /v1/messages
+  shape:
+    type: always the literal "error"
+    error:
+      type: invalid_request_error or api_error
+      message: string — human-readable error description
+- id: open-responses
+  name: Open Responses
+  applies_to:
+  - POST /v1/responses
+  shape:
+    error:
+      type: one of invalid_request, not_found, server_error, model_error, invalid_request_error
+      message: string
+      code: string — optional error code
+      param: string — the parameter that caused the error
+status_codes:
+- code: 400
+  title: Bad Request
+  meaning: Invalid input, missing required fields, malformed JSON.
+  spec_occurrences: 20
+- code: 401
+  title: Unauthorized
+  meaning: Missing or invalid API key.
+  remediation: >-
+    Supply credentials via Authorization: Bearer, x-api-key, xi-api-key, a session cookie or a token
+    cookie. The response carries the header WWW-Authenticate: Bearer.
+- code: 403
+  title: Forbidden
+  meaning: Authenticated non-admin user calling an admin-only endpoint under the user auth system.
+- code: 404
+  title: Not Found
+  meaning: Model or resource does not exist; also returned for undefined routes.
+  spec_occurrences: 26
+- code: 409
+  title: Conflict
+  meaning: Resource already exists (for example a duplicate token).
+- code: 413
+  title: Payload Too Large
+  meaning: Declared on one upload operation in the published Swagger document.
+  spec_occurrences: 1
+- code: 422
+  title: Unprocessable Entity
+  meaning: Validation failed, e.g. an invalid parameter range.
+- code: 500
+  title: Internal Server Error
+  meaning: Backend inference failure or unexpected server error.
+  spec_occurrences: 10
+- code: 503
+  title: Service Unavailable
+  meaning: >-
+    Model-load cooldown, and the response when LOCALAI_DISABLE_ASSISTANT=true and a chat request carries
+    metadata.localai_assistant=true.
+  spec_occurrences: 1
+problem_types:
+- id: authentication-required
+  status: 401
+  title: An authentication key is required
+  message: An authentication key is required
+  type: invalid_request_error
+  remediation: Include a valid API key, user API key or session identifier on the request.
+- id: request-parse-failure
+  status: 400
+  title: failed parsing request body
+  message: 'failed parsing request body: <details>'
+  remediation: Send well-formed JSON matching the endpoint's schema.
+- id: resource-not-found
+  status: 404
+  title: Resource not found
+  message: Resource not found
+  remediation: Check the route; undefined routes return this envelope.
+- id: model-not-found
+  status: 400
+  title: Model not found in configuration
+  message: Bad Request
+  remediation: Install or define the model before addressing it; list with GET /v1/models.
+- id: backend-inference-failure
+  status: 500
+  title: Backend inference failure
+  message: Internal Server Error
+  remediation: Inspect backend logs (GET /api/backend-logs/{modelId}) and the runtime-error reference.
+- id: missing-image-file
+  status: 400
+  title: missing image file
+  message: missing image file
+  applies_to: POST /v1/images/edits
+- id: missing-mask-file
+  status: 400
+  title: missing mask file
+  message: missing mask file
+  applies_to: POST /v1/images/edits
+- id: storage-preparation-failure
+  status: 500
+  title: failed to prepare storage
+  message: failed to prepare storage
+  applies_to: POST /v1/images/edits
+- id: pii-blocked
+  status: 400
+  title: pii_blocked
+  message: pii_blocked
+  applies_to: POST /api/pii/redact
+  remediation: The request body matched a PII block policy; adjust the policy or the payload.
+hardening:
+  opaque_errors:
+    env: LOCALAI_OPAQUE_ERRORS
+    default: 'false'
+    effect: >-
+      When true, every error response returns an empty body carrying only the HTTP status code. This is a
+      deliberate security-hardening option that prevents information leaks — and it also removes every
+      machine-readable error signal, so an agent operating against a hardened instance gets a bare status.
+related:
+  runtime_errors: https://localai.io/reference/runtime-errors
+  note: >-
+    Backend and runtime failure messages (a model that will not load, "could not load model",
+    "grpc service not ready", SIGILL, VRAM out of memory, the model-load cooldown 503) are documented
+    separately from these API-envelope errors.

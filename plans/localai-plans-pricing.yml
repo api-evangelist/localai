@@ -1,0 +1,32 @@
+generated: '2026-08-27'
+method: searched
+source: https://localai.io/ and https://github.com/mudler/LocalAI/blob/master/LICENSE
+plan_count: 0
+note: >-
+  LocalAI publishes no plans, tiers or prices, and there is no paid edition, hosted offering, enterprise
+  SKU or "contact us" sales gate to record. The entire product is MIT-licensed open-source software the
+  operator downloads and runs on their own hardware; probing localai.io found no /pricing, /plans,
+  /terms or /privacy page (all 404). Cost is the operator's own compute, which is the explicit point of
+  the project. An honest zero, not a gap.
+license:
+  spdx: MIT
+  url: https://github.com/mudler/LocalAI/blob/master/LICENSE
+  note: >-
+    The Swagger document itself declares info.license MIT pointing at the repository LICENSE file, which
+    is also the strongest single ownership signal for the contract.
+plans: []
+commercial_surfaces_probed:
+- url: https://localai.io/terms/
+  status: 404
+- url: https://localai.io/privacy/
+  status: 404
+- url: https://localai.io/roadmap/
+  status: 404
+free_hosted_surfaces:
+- name: Agent Hub
+  url: https://agenthub.localai.io
+  status: 200
+  description: >-
+    A vendor-hosted gallery of ready-made agent configurations to browse and download into a local
+    instance. Free, no account documented, and not an API surface — it publishes no /.well-known document,
+    no llms.txt and no agent card (all probed 404).

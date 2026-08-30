@@ -1,0 +1,229 @@
+openapi: 3.2.0
+info:
+  description: The LocalAI Rest API.
+  title: LocalAI Nodes API
+  contact:
+    name: LocalAI
+    url: https://localai.io
+  license:
+    name: MIT
+    url: https://raw.githubusercontent.com/mudler/LocalAI/master/LICENSE
+  version: 2.0.0
+servers:
+- url: /
+tags:
+- name: Nodes
+paths:
+  /api/nodes/models:
+    get:
+      tags:
+      - Nodes
+      summary: List all loaded models cluster-wide
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/nodes.NodeModel'
+  /api/nodes/{id}/max-replicas-per-model:
+    put:
+      tags:
+      - Nodes
+      summary: Update a node's max replicas per model
+      parameters:
+      - description: Node ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+        '400':
+          description: value must be >= 1
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '404':
+          description: node not found
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/localai.UpdateMaxReplicasPerModelRequest'
+        description: New value
+        required: true
+    delete:
+      tags:
+      - Nodes
+      summary: Reset a node's max replicas per model to the worker default
+      parameters:
+      - description: Node ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: boolean
+        '404':
+          description: node not found
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /api/nodes/{id}/vram-budget:
+    put:
+      tags:
+      - Nodes
+      summary: Update a node's VRAM allocation budget
+      parameters:
+      - description: Node ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        '400':
+          description: invalid budget
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '404':
+          description: node not found
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/localai.UpdateVRAMBudgetRequest'
+        description: New value (\
+        required: true
+    delete:
+      tags:
+      - Nodes
+      summary: Reset a node's VRAM budget to the worker default
+      parameters:
+      - description: Node ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: boolean
+        '404':
+          description: node not found
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+components:
+  schemas:
+    localai.UpdateVRAMBudgetRequest:
+      type: object
+      properties:
+        value:
+          description: Value is the VRAM cap ("80%" or "12GB"). Empty string clears the cap.
+          type: string
+    localai.UpdateMaxReplicasPerModelRequest:
+      type: object
+      properties:
+        value:
+          description: Value is the new per-model replica cap on this node. Must be >= 1.
+          type: integer
+    nodes.NodeModel:
+      type: object
+      properties:
+        address:
+          description: gRPC address for this replica's backend process
+          type: string
+        backend_type:
+          description: e.g. "llama-cpp"; used by reconciler to replicate loads
+          type: string
+        cleanup_attempts:
+          type: integer
+        cleanup_error:
+          type: string
+        cleanup_next_retry_at:
+          type: string
+        config_revision:
+          type: string
+        created_at:
+          type: string
+        effective_options_hash:
+          type: string
+        id:
+          type: string
+        in_flight:
+          description: number of active requests on this replica
+          type: integer
+        last_used:
+          type: string
+        loading_by:
+          description: frontend ID that triggered loading
+          type: string
+        model_name:
+          type: string
+        node_id:
+          type: string
+        replica_index:
+          type: integer
+        state:
+          description: staging, loading, loaded, unloading, idle
+          type: string
+        updated_at:
+          type: string
+  securitySchemes:
+    BearerAuth:
+      type: apiKey
+      name: Authorization
+      in: header

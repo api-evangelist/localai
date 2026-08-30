@@ -1,0 +1,533 @@
+openapi: 3.2.0
+info:
+  description: The LocalAI Rest API.
+  title: LocalAI Models API
+  contact:
+    name: LocalAI
+    url: https://localai.io
+  license:
+    name: MIT
+    url: https://raw.githubusercontent.com/mudler/LocalAI/master/LICENSE
+  version: 2.0.0
+servers:
+- url: /
+tags:
+- name: models
+paths:
+  /api/aliases:
+    get:
+      tags:
+      - models
+      summary: List model aliases
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/localai.AliasInfo'
+  /api/models/{id}/load-status:
+    get:
+      description: Returns the live state of a distributed cold load — phase, node, byte progress and ETA — or 404 when no load is running for the model. This is the same `loading` object the 503 response carries while a model is still staging.
+      tags:
+      - models
+      summary: Report the progress of an in-flight model load.
+      parameters:
+      - description: Model ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Live load progress
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.ModelLoadingStatus'
+        '404':
+          description: No load is running for this model
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.ErrorResponse'
+  /models/apply:
+    post:
+      tags:
+      - models
+      summary: Install models to LocalAI.
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.GalleryResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/localai.GalleryModel'
+        description: query params
+        required: true
+  /models/available:
+    get:
+      tags:
+      - models
+      summary: List installable models.
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/gallery.Metadata'
+  /models/delete/{name}:
+    post:
+      tags:
+      - models
+      summary: delete models to LocalAI.
+      parameters:
+      - description: Model name
+        name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.GalleryResponse'
+  /models/galleries:
+    get:
+      tags:
+      - models
+      summary: List all Galleries
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/config.Gallery'
+  /models/jobs:
+    get:
+      tags:
+      - models
+      summary: Returns all the jobs status progress
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/galleryop.OpStatus'
+  /models/jobs/{uuid}:
+    get:
+      tags:
+      - models
+      summary: Returns the job status
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/galleryop.OpStatus'
+  /v1/models:
+    get:
+      tags:
+      - models
+      summary: List and describe the various models available in the API.
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.ModelsDataResponse'
+  /v1/models/capabilities:
+    get:
+      tags:
+      - models
+      summary: List available models enriched with capabilities and input/output modalities.
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.ModelCapabilitiesResponse'
+components:
+  schemas:
+    galleryop.OpStatus:
+      type: object
+      properties:
+        cancellable:
+          description: Cancellable is true if the operation can be cancelled
+          type: boolean
+        cancelled:
+          description: Cancelled is true if the operation was cancelled
+          type: boolean
+        current_bytes:
+          type: integer
+        deletion:
+          description: Deletion is true if the operation is a deletion
+          type: boolean
+        downloaded_size:
+          type: string
+        file_name:
+          type: string
+        file_size:
+          type: string
+        gallery_element_name:
+          type: string
+        message:
+          type: string
+        nodes:
+          description: 'Nodes is the per-node breakdown for a fanned-out backend install.
+
+            Populated by DistributedBackendManager (per-node terminal status)
+
+            and by the Phase 2 progress bridge (per-byte ticks). The
+
+            /api/operations handler surfaces this so the UI can render an
+
+            expandable per-node view of an in-flight install.'
+          type: array
+          items:
+            $ref: '#/components/schemas/galleryop.NodeProgress'
+        phase:
+          type: string
+        processed:
+          type: boolean
+        progress:
+          type: number
+        total_bytes:
+          type: integer
+    schema.ModelCapabilitiesResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.ModelCapabilities'
+        object:
+          type: string
+    schema.ModelsDataResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.OpenAIModel'
+        object:
+          type: string
+    gallery.Variant:
+      type: object
+      properties:
+        model:
+          description: Model is the name of a gallery entry that declares no variants of its own.
+          type: string
+    config.GalleryVerification:
+      type: object
+      properties:
+        identity:
+          type: string
+        identity_regex:
+          type: string
+        issuer:
+          type: string
+        issuer_regex:
+          type: string
+        not_before:
+          description: NotBefore is an RFC3339 timestamp. Empty disables the time check.
+          type: string
+    schema.ErrorResponse:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/schema.APIError'
+    localai.GalleryModel:
+      type: object
+      properties:
+        backend:
+          description: 'Backend is the resolved backend engine for this model (e.g. "llama-cpp").
+
+            Populated at load time from overrides, inline config, or the URL-referenced config file.'
+          type: string
+        config_file:
+          description: config_file is read in the situation where URL is blank - and therefore this is a base config.
+          type: object
+          additionalProperties: {}
+        description:
+          type: string
+        files:
+          description: AdditionalFiles are used to add additional files to the model
+          type: array
+          items:
+            $ref: '#/components/schemas/gallery.File'
+        gallery:
+          description: Gallery is a reference to the gallery which contains the model
+          allOf:
+          - $ref: '#/components/schemas/config.Gallery'
+        icon:
+          type: string
+        id:
+          type: string
+        installed:
+          description: Installed is used to indicate if the model is installed or not
+          type: boolean
+        license:
+          type: string
+        name:
+          type: string
+        overrides:
+          description: Overrides are used to override the configuration of the model located at URL
+          type: object
+          additionalProperties: {}
+        size:
+          description: 'Size is an optional hardcoded model size string (e.g. "500MB", "14.5GB").
+
+            Used when the size cannot be estimated automatically.'
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        url:
+          type: string
+        urls:
+          type: array
+          items:
+            type: string
+        variant:
+          description: 'Variant installs one specific build of an entry that declares variants,
+
+            named as it appears in the entry''s `variants` list (see the `variants`
+
+            and `auto_variant` fields of the gallery listing). Leave it empty to let
+
+            LocalAI auto-select the largest build this host can actually run.'
+          type: string
+        variants:
+          description: 'Variants is an optional, UNORDERED list of alternative builds of the same
+
+            model (other backends such as MLX or vLLM, other quantizations) that the
+
+            installer may pick instead of this entry''s own payload. Authoring is
+
+            deliberately dumb: name the models, and the selector works out which one
+
+            this host should get.
+
+
+            The entry itself is always the last resort, so an entry carrying variants
+
+            stays a complete, installable entry and older LocalAI releases, which drop
+
+            this key, install it exactly as before.'
+          type: array
+          items:
+            $ref: '#/components/schemas/gallery.Variant'
+    schema.GalleryResponse:
+      type: object
+      properties:
+        estimated_size_bytes:
+          type: integer
+        estimated_size_display:
+          type: string
+        estimated_vram_bytes:
+          type: integer
+        estimated_vram_display:
+          type: string
+        status:
+          type: string
+        uuid:
+          type: string
+    gallery.Metadata:
+      type: object
+      properties:
+        backend:
+          description: 'Backend is the resolved backend engine for this model (e.g. "llama-cpp").
+
+            Populated at load time from overrides, inline config, or the URL-referenced config file.'
+          type: string
+        description:
+          type: string
+        files:
+          description: AdditionalFiles are used to add additional files to the model
+          type: array
+          items:
+            $ref: '#/components/schemas/gallery.File'
+        gallery:
+          description: Gallery is a reference to the gallery which contains the model
+          allOf:
+          - $ref: '#/components/schemas/config.Gallery'
+        icon:
+          type: string
+        installed:
+          description: Installed is used to indicate if the model is installed or not
+          type: boolean
+        license:
+          type: string
+        name:
+          type: string
+        size:
+          description: 'Size is an optional hardcoded model size string (e.g. "500MB", "14.5GB").
+
+            Used when the size cannot be estimated automatically.'
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        url:
+          type: string
+        urls:
+          type: array
+          items:
+            type: string
+    schema.APIError:
+      type: object
+      properties:
+        code: {}
+        message:
+          type: string
+        param:
+          type: string
+        type:
+          type: string
+    gallery.File:
+      type: object
+      properties:
+        filename:
+          type: string
+        sha256:
+          type: string
+        uri:
+          type: string
+    config.Gallery:
+      type: object
+      properties:
+        mirrors:
+          description: 'Mirrors are tried in order when URL cannot be fetched. They are a
+
+            fallback for availability, not a load-balancing pool: the primary is
+
+            always preferred, and a mirror is only consulted after the one before
+
+            it fails. Any URI the gallery loader understands works here
+
+            (https://, github:, file://).'
+          type: array
+          items:
+            type: string
+        name:
+          type: string
+        url:
+          type: string
+        verification:
+          $ref: '#/components/schemas/config.GalleryVerification'
+    localai.AliasInfo:
+      type: object
+      properties:
+        name:
+          type: string
+        target:
+          type: string
+    schema.ModelLoadingStatus:
+      type: object
+      properties:
+        bytes_sent:
+          type: integer
+        eta_seconds:
+          description: 'ETASeconds is omitted rather than guessed until enough bytes have moved
+
+            for the observed rate to mean anything. A confidently wrong ETA on a
+
+            twenty-minute wait is worse than none.'
+          type: integer
+        file_index:
+          type: integer
+        model:
+          type: string
+        node:
+          type: string
+        progress:
+          type: number
+        state:
+          type: string
+        total_bytes:
+          type: integer
+        total_files:
+          type: integer
+    schema.OpenAIModel:
+      type: object
+      properties:
+        id:
+          type: string
+        object:
+          type: string
+    galleryop.NodeProgress:
+      type: object
+      properties:
+        current:
+          type: string
+        error:
+          type: string
+        file_name:
+          type: string
+        node_id:
+          type: string
+        node_name:
+          type: string
+        percentage:
+          type: number
+        phase:
+          type: string
+        status:
+          type: string
+        total:
+          type: string
+    schema.ModelCapabilities:
+      type: object
+      properties:
+        capabilities:
+          description: 'Capabilities are canonical usecase strings (e.g. chat, vision, transcript,
+
+            tts, embeddings, image, video) plus the modifiers "tools" and "thinking".'
+          type: array
+          items:
+            type: string
+        id:
+          type: string
+        input_modalities:
+          description: InputModalities is the subset of {text,image,audio,video} the model accepts.
+          type: array
+          items:
+            type: string
+        object:
+          type: string
+        output_modalities:
+          description: OutputModalities is the subset of {text,image,audio,video} the model produces.
+          type: array
+          items:
+            type: string
+  securitySchemes:
+    BearerAuth:
+      type: apiKey
+      name: Authorization
+      in: header

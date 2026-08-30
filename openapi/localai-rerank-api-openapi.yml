@@ -1,0 +1,89 @@
+openapi: 3.2.0
+info:
+  description: The LocalAI Rest API.
+  title: LocalAI Rerank API
+  contact:
+    name: LocalAI
+    url: https://localai.io
+  license:
+    name: MIT
+    url: https://raw.githubusercontent.com/mudler/LocalAI/master/LICENSE
+  version: 2.0.0
+servers:
+- url: /
+tags:
+- name: rerank
+paths:
+  /v1/rerank:
+    post:
+      tags:
+      - rerank
+      summary: Reranks a list of phrases by relevance to a given text query.
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.JINARerankResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.JINARerankRequest'
+        description: query params
+        required: true
+components:
+  schemas:
+    schema.JINARerankRequest:
+      type: object
+      properties:
+        backend:
+          type: string
+        documents:
+          type: array
+          items:
+            type: string
+        model:
+          type: string
+        query:
+          type: string
+        top_n:
+          type: integer
+    schema.JINAUsageInfo:
+      type: object
+      properties:
+        prompt_tokens:
+          type: integer
+        total_tokens:
+          type: integer
+    schema.JINARerankResponse:
+      type: object
+      properties:
+        model:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.JINADocumentResult'
+        usage:
+          $ref: '#/components/schemas/schema.JINAUsageInfo'
+    schema.JINAText:
+      type: object
+      properties:
+        text:
+          type: string
+    schema.JINADocumentResult:
+      type: object
+      properties:
+        document:
+          $ref: '#/components/schemas/schema.JINAText'
+        index:
+          type: integer
+        relevance_score:
+          type: number
+  securitySchemes:
+    BearerAuth:
+      type: apiKey
+      name: Authorization
+      in: header

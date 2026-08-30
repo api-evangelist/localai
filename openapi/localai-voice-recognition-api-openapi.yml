@@ -1,0 +1,291 @@
+openapi: 3.2.0
+info:
+  description: The LocalAI Rest API.
+  title: LocalAI Voice Recognition API
+  contact:
+    name: LocalAI
+    url: https://localai.io
+  license:
+    name: MIT
+    url: https://raw.githubusercontent.com/mudler/LocalAI/master/LICENSE
+  version: 2.0.0
+servers:
+- url: /
+tags:
+- name: voice-recognition
+paths:
+  /v1/voice/analyze:
+    post:
+      tags:
+      - voice-recognition
+      summary: Analyze demographic attributes (age, gender, emotion) from a voice clip.
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.VoiceAnalyzeResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.VoiceAnalyzeRequest'
+        description: query params
+        required: true
+  /v1/voice/embed:
+    post:
+      tags:
+      - voice-recognition
+      summary: Extract a speaker embedding from an audio clip.
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.VoiceEmbedResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.VoiceEmbedRequest'
+        description: query params
+        required: true
+  /v1/voice/forget:
+    post:
+      tags:
+      - voice-recognition
+      summary: Remove a previously-registered speaker by ID.
+      responses:
+        '204':
+          description: No Content
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.VoiceForgetRequest'
+        description: query params
+        required: true
+  /v1/voice/identify:
+    post:
+      tags:
+      - voice-recognition
+      summary: Identify a speaker against the registered database (1:N recognition).
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.VoiceIdentifyResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.VoiceIdentifyRequest'
+        description: query params
+        required: true
+  /v1/voice/register:
+    post:
+      tags:
+      - voice-recognition
+      summary: Register a speaker for 1:N identification.
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.VoiceRegisterResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.VoiceRegisterRequest'
+        description: query params
+        required: true
+  /v1/voice/verify:
+    post:
+      tags:
+      - voice-recognition
+      summary: Verify that two audio clips were spoken by the same person.
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.VoiceVerifyResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.VoiceVerifyRequest'
+        description: query params
+        required: true
+components:
+  schemas:
+    schema.VoiceIdentifyResponse:
+      type: object
+      properties:
+        matches:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.VoiceIdentifyMatch'
+    schema.VoiceAnalyzeResponse:
+      type: object
+      properties:
+        segments:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.VoiceAnalysis'
+    schema.VoiceIdentifyRequest:
+      type: object
+      properties:
+        audio:
+          type: string
+        model:
+          type: string
+        store:
+          type: string
+        threshold:
+          type: number
+        top_k:
+          type: integer
+    schema.VoiceForgetRequest:
+      type: object
+      properties:
+        id:
+          type: string
+        model:
+          type: string
+        store:
+          type: string
+    schema.VoiceVerifyRequest:
+      type: object
+      properties:
+        anti_spoofing:
+          type: boolean
+        audio1:
+          type: string
+        audio2:
+          type: string
+        model:
+          type: string
+        threshold:
+          type: number
+    schema.VoiceAnalyzeRequest:
+      type: object
+      properties:
+        actions:
+          description: subset of {"age","gender","emotion"}
+          type: array
+          items:
+            type: string
+        audio:
+          type: string
+        model:
+          type: string
+    schema.VoiceEmbedResponse:
+      type: object
+      properties:
+        dim:
+          type: integer
+        embedding:
+          type: array
+          items:
+            type: number
+        model:
+          type: string
+    schema.VoiceRegisterResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        registered_at:
+          type: string
+    schema.VoiceVerifyResponse:
+      type: object
+      properties:
+        confidence:
+          type: number
+        distance:
+          type: number
+        model:
+          type: string
+        processing_time_ms:
+          type: number
+        threshold:
+          type: number
+        verified:
+          type: boolean
+    schema.VoiceAnalysis:
+      type: object
+      properties:
+        age:
+          type: number
+        dominant_emotion:
+          type: string
+        dominant_gender:
+          type: string
+        emotion:
+          type: object
+          additionalProperties:
+            type: number
+            format: float32
+        end:
+          type: number
+        gender:
+          type: object
+          additionalProperties:
+            type: number
+            format: float32
+        start:
+          type: number
+    schema.VoiceIdentifyMatch:
+      type: object
+      properties:
+        confidence:
+          type: number
+        distance:
+          type: number
+        id:
+          type: string
+        labels:
+          type: object
+          additionalProperties:
+            type: string
+        match:
+          type: boolean
+        name:
+          type: string
+    schema.VoiceRegisterRequest:
+      type: object
+      properties:
+        audio:
+          type: string
+        labels:
+          type: object
+          additionalProperties:
+            type: string
+        model:
+          type: string
+        name:
+          type: string
+        store:
+          type: string
+    schema.VoiceEmbedRequest:
+      type: object
+      properties:
+        audio:
+          type: string
+        model:
+          type: string
+  securitySchemes:
+    BearerAuth:
+      type: apiKey
+      name: Authorization
+      in: header

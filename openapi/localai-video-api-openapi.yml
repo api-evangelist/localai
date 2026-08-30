@@ -1,0 +1,269 @@
+openapi: 3.2.0
+info:
+  description: The LocalAI Rest API.
+  title: LocalAI Video API
+  contact:
+    name: LocalAI
+    url: https://localai.io
+  license:
+    name: MIT
+    url: https://raw.githubusercontent.com/mudler/LocalAI/master/LICENSE
+  version: 2.0.0
+servers:
+- url: /
+tags:
+- name: video
+paths:
+  /video:
+    post:
+      tags:
+      - video
+      summary: Creates a video from a prompt and optional image or audio conditioning.
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.OpenAIResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.VideoRequest'
+        description: query params
+        required: true
+components:
+  schemas:
+    schema.InputTokensDetails:
+      type: object
+      properties:
+        image_tokens:
+          type: integer
+        text_tokens:
+          type: integer
+    schema.Choice:
+      type: object
+      properties:
+        delta:
+          $ref: '#/components/schemas/schema.Message'
+        finish_reason:
+          type: string
+        index:
+          type: integer
+        logprobs:
+          $ref: '#/components/schemas/schema.Logprobs'
+        message:
+          $ref: '#/components/schemas/schema.Message'
+        text:
+          type: string
+    schema.ToolCall:
+      type: object
+      properties:
+        function:
+          $ref: '#/components/schemas/schema.FunctionCall'
+        id:
+          type: string
+        index:
+          type: integer
+        type:
+          type: string
+    schema.Message:
+      type: object
+      properties:
+        content:
+          description: The message content
+        function_call:
+          description: A result of a function call
+        name:
+          description: The message name (used for tools calls)
+          type: string
+        reasoning:
+          description: Reasoning content extracted from <thinking>...</thinking> tags
+          type: string
+        role:
+          description: The message role
+          type: string
+        tool_call_id:
+          type: string
+        tool_calls:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.ToolCall'
+    schema.LogprobContent:
+      type: object
+      properties:
+        bytes:
+          type: array
+          items:
+            type: integer
+        id:
+          type: integer
+        logprob:
+          type: number
+        token:
+          type: string
+        top_logprobs:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.LogprobContent'
+    schema.Item:
+      type: object
+      properties:
+        b64_json:
+          type: string
+        index:
+          type: integer
+        object:
+          type: string
+        url:
+          description: Images
+          type: string
+    schema.OpenAIUsage:
+      type: object
+      properties:
+        completion_tokens:
+          type: integer
+        compression_meta:
+          $ref: '#/components/schemas/schema.CompressionMetadata'
+        input_tokens:
+          description: Fields for image generation API compatibility
+          type: integer
+        input_tokens_details:
+          $ref: '#/components/schemas/schema.InputTokensDetails'
+        output_tokens:
+          type: integer
+        prompt_tokens:
+          type: integer
+        timing_prompt_processing:
+          description: Extra timing data, disabled by default as is't not a part of OpenAI specification
+          type: number
+        timing_token_generation:
+          type: number
+        total_tokens:
+          type: integer
+    schema.VideoRequest:
+      type: object
+      properties:
+        audio:
+          description: URL or base64 audio for audio-conditioned generation
+          type: string
+        cfg_scale:
+          description: classifier-free guidance scale
+          type: number
+        end_image:
+          description: URL or base64 of the last frame
+          type: string
+        fps:
+          description: frames per second
+          type: integer
+        height:
+          description: output height in pixels
+          type: integer
+        input_reference:
+          description: reference image or video URL
+          type: string
+        model:
+          type: string
+        negative_prompt:
+          description: things to avoid in the output
+          type: string
+        num_frames:
+          description: total number of frames to generate
+          type: integer
+        params:
+          description: backend-specific generation parameters
+          type: object
+          additionalProperties:
+            type: string
+        prompt:
+          description: text description of the video to generate
+          type: string
+        response_format:
+          description: output format (url or b64_json)
+          type: string
+        seconds:
+          description: duration in seconds (alternative to num_frames)
+          type: string
+        seed:
+          description: random seed for reproducibility
+          type: integer
+        size:
+          description: WxH shorthand (e.g. "512x512")
+          type: string
+        start_image:
+          description: URL or base64 of the first frame
+          type: string
+        step:
+          description: number of diffusion steps
+          type: integer
+        width:
+          description: output width in pixels
+          type: integer
+    schema.OpenAIResponse:
+      type: object
+      properties:
+        choices:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.Choice'
+        created:
+          type: integer
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.Item'
+        id:
+          type: string
+        model:
+          type: string
+        object:
+          type: string
+        usage:
+          description: 'Usage is intentionally a pointer with omitempty: per the OpenAI
+
+            chat-completion streaming spec, intermediate chunks must not carry
+
+            a `usage` field. Marshalling a value-typed usage would emit
+
+            `"usage":{"prompt_tokens":0,...}` on every chunk and break
+
+            OpenAI-SDK consumers that filter on a truthy `result.usage`
+
+            (continuedev/continue, Kilo Code, Roo Code, etc.).'
+          allOf:
+          - $ref: '#/components/schemas/schema.OpenAIUsage'
+    schema.FunctionCall:
+      type: object
+      properties:
+        arguments:
+          type: string
+        name:
+          type: string
+    schema.Logprobs:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.LogprobContent'
+    schema.CompressionMetadata:
+      type: object
+      properties:
+        compressed_tokens:
+          type: integer
+        compressor:
+          type: string
+        dropped_turns:
+          type: integer
+        original_tokens:
+          type: integer
+        overflow_recoveries:
+          type: integer
+        summary_tokens:
+          type: integer
+  securitySchemes:
+    BearerAuth:
+      type: apiKey
+      name: Authorization
+      in: header

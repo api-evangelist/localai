@@ -1,0 +1,117 @@
+openapi: 3.2.0
+info:
+  description: The LocalAI Rest API.
+  title: LocalAI Tokenize API
+  contact:
+    name: LocalAI
+    url: https://localai.io
+  license:
+    name: MIT
+    url: https://raw.githubusercontent.com/mudler/LocalAI/master/LICENSE
+  version: 2.0.0
+servers:
+- url: /
+tags:
+- name: tokenize
+paths:
+  /tokenMetrics:
+    get:
+      tags:
+      - tokenize
+      summary: Get TokenMetrics for Active Slot.
+      responses:
+        '200':
+          description: generated audio/wav file
+          content:
+            audio/x-wav:
+              schema:
+                type: string
+  /v1/detokenize:
+    post:
+      tags:
+      - tokenize
+      summary: Detokenize the input.
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.DetokenizeResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.DetokenizeRequest'
+        description: Request
+        required: true
+  /v1/tokenMetrics:
+    get:
+      tags:
+      - tokenize
+      summary: Get TokenMetrics for Active Slot.
+      responses:
+        '200':
+          description: generated audio/wav file
+          content:
+            audio/x-wav:
+              schema:
+                type: string
+  /v1/tokenize:
+    post:
+      tags:
+      - tokenize
+      summary: Tokenize the input.
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.TokenizeResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.TokenizeRequest'
+        description: Request
+        required: true
+components:
+  schemas:
+    schema.TokenizeRequest:
+      type: object
+      properties:
+        content:
+          description: text to tokenize
+          type: string
+        model:
+          type: string
+    schema.DetokenizeResponse:
+      type: object
+      properties:
+        content:
+          description: detokenized text
+          type: string
+    schema.TokenizeResponse:
+      type: object
+      properties:
+        tokens:
+          description: token IDs
+          type: array
+          items:
+            type: integer
+    schema.DetokenizeRequest:
+      type: object
+      properties:
+        model:
+          type: string
+        tokens:
+          description: token IDs to convert back to text
+          type: array
+          items:
+            type: integer
+  securitySchemes:
+    BearerAuth:
+      type: apiKey
+      name: Authorization
+      in: header

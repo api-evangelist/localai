@@ -1,0 +1,126 @@
+openapi: 3.2.0
+info:
+  description: The LocalAI Rest API.
+  title: LocalAI Branding API
+  contact:
+    name: LocalAI
+    url: https://localai.io
+  license:
+    name: MIT
+    url: https://raw.githubusercontent.com/mudler/LocalAI/master/LICENSE
+  version: 2.0.0
+servers:
+- url: /
+tags:
+- name: branding
+paths:
+  /api/branding:
+    get:
+      description: Returns the configured instance name, tagline, and asset URLs. Public — no authentication required.
+      tags:
+      - branding
+      summary: Get instance branding
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/localai.BrandingResponse'
+  /api/branding/asset/{kind}:
+    post:
+      description: Upload a custom logo, horizontal logo, or favicon. The file replaces any previous override for that kind.
+      tags:
+      - branding
+      summary: Upload a branding asset
+      parameters:
+      - description: 'Asset kind: logo, logo_horizontal, or favicon'
+        name: kind
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/localai.BrandingResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  description: Image file (png, jpeg, svg, webp, ico — up to 5MiB)
+                  format: binary
+              required:
+              - file
+    delete:
+      description: Remove a custom branding asset; the UI falls back to the bundled LocalAI default.
+      tags:
+      - branding
+      summary: Reset a branding asset to default
+      parameters:
+      - description: 'Asset kind: logo, logo_horizontal, or favicon'
+        name: kind
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/localai.BrandingResponse'
+  /branding/asset/{kind}:
+    get:
+      description: Serves the admin-uploaded logo, horizontal logo, or favicon. 404 when no override is set.
+      tags:
+      - branding
+      summary: Serve a custom branding asset
+      parameters:
+      - description: 'Asset kind: logo, logo_horizontal, or favicon'
+        name: kind
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Not Found
+components:
+  schemas:
+    localai.BrandingResponse:
+      type: object
+      properties:
+        favicon_url:
+          type: string
+        instance_name:
+          type: string
+        instance_tagline:
+          type: string
+        logo_horizontal_url:
+          type: string
+        logo_url:
+          type: string
+  securitySchemes:
+    BearerAuth:
+      type: apiKey
+      name: Authorization
+      in: header

@@ -1,0 +1,135 @@
+openapi: 3.2.0
+info:
+  description: The LocalAI Rest API.
+  title: LocalAI Pii API
+  contact:
+    name: LocalAI
+    url: https://localai.io
+  license:
+    name: MIT
+    url: https://raw.githubusercontent.com/mudler/LocalAI/master/LICENSE
+  version: 2.0.0
+servers:
+- url: /
+tags:
+- name: pii
+paths:
+  /api/pii/analyze:
+    post:
+      description: 'Runs the configured PII detectors (NER and/or pattern tiers) over the supplied text and returns the matched entity spans with the policy action that would fire. Detection only — the text is not modified and no block is enforced. Select detectors explicitly via `detectors`, or pass a consuming `model` to use its effective policy: the model''s own `pii.detectors`, else the instance-wide `pii_default_detectors`. A model with PII disabled, or enabled with nothing to scan with, is a 400. The raw matched value is never returned; admins may set `reveal:true` for the audit hash prefix.'
+      tags:
+      - pii
+      summary: Detect PII entities in a string (no mutation).
+      responses:
+        '200':
+          description: Detected entities
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.PIIAnalyzeResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.PIIAnalyzeRequest'
+        description: text + detector selection
+        required: true
+  /api/pii/redact:
+    post:
+      description: 'Runs the configured PII detectors over the text and applies each detector model''s policy: masked spans are replaced with `[REDACTED:<id>]`, allow spans pass through, and a single block action causes a 400 (type `pii_blocked`) carrying the offending entities — the text is never returned in that case. Select detectors via `detectors`, or a consuming `model`''s effective policy (its own `pii.detectors`, else the instance-wide `pii_default_detectors`; PII must be enabled on the model). Records audit events (origin `pii_redact`) visible at /api/pii/events.'
+      tags:
+      - pii
+      summary: Redact PII in a string by applying the configured policy.
+      responses:
+        '200':
+          description: Redacted text + entities
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.PIIRedactResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.PIIAnalyzeRequest'
+        description: text + detector selection
+        required: true
+components:
+  schemas:
+    schema.PIIRedactResponse:
+      type: object
+      properties:
+        blocked:
+          type: boolean
+        correlation_id:
+          type: string
+        entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.PIIEntity'
+        masked:
+          type: boolean
+        redacted_text:
+          type: string
+    schema.PIIEntity:
+      type: object
+      properties:
+        action:
+          type: string
+        end:
+          type: integer
+        entity_type:
+          type: string
+        hash_prefix:
+          type: string
+        score:
+          type: number
+        source:
+          type: string
+        start:
+          type: integer
+    schema.PIIAnalyzeResponse:
+      type: object
+      properties:
+        blocked:
+          type: boolean
+        correlation_id:
+          type: string
+        entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.PIIEntity'
+    schema.PIIAnalyzeRequest:
+      type: object
+      properties:
+        detectors:
+          description: 'Detectors names the detector models to run (NER and/or pattern). Takes
+
+            precedence over Model.'
+          type: array
+          items:
+            type: string
+        model:
+          description: 'Model is a consuming model whose effective PII policy (own
+
+            pii.detectors, else the instance default detectors; PII must be
+
+            enabled) is used when Detectors is empty.'
+          type: string
+        reveal:
+          description: 'Reveal includes the per-entity hash_prefix in the response. Honoured
+
+            only for admin callers; ignored otherwise. The raw matched value is
+
+            never returned regardless.'
+          type: boolean
+        text:
+          description: 'Text is the string to scan. Bounded only by the server''s global HTTP
+
+            body limit.'
+          type: string
+  securitySchemes:
+    BearerAuth:
+      type: apiKey
+      name: Authorization
+      in: header

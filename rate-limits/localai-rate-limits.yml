@@ -1,0 +1,57 @@
+generated: '2026-08-27'
+method: searched
+source: >-
+  https://localai.io/reference/cli-reference, https://localai.io/features/authentication,
+  https://localai.io/features/middleware/ and openapi/localai-api-openapi.yml
+limit_count: 0
+note: >-
+  LocalAI publishes no rate limits, and structurally cannot: it is self-hosted software with no vendor-
+  operated service and no commercial quota to enforce. Throughput is bounded by the operator's own
+  hardware and by concurrency settings, not by a policy. Searched the CLI/environment reference, the
+  authentication reference, the middleware reference and all 123 published operations — no rate-limit
+  policy, no 429 response, and no rate-limit response header is documented or declared anywhere.
+  Recording an honest zero rather than omitting the artifact.
+limits: []
+response_headers: []
+exhaustion_status_code: null
+retry_after: false
+adjacent_controls:
+  note: >-
+    These are not rate limits, but they are the closest published governors of request volume and cost and
+    are recorded so a later pass does not mistake their absence for an unsearched gap.
+  controls:
+  - id: agent-max-iterations
+    field: agent.max_iterations
+    default: 10
+    scope: per request
+    description: >-
+      Caps the MCP tool-execution loop — how many times a model may call tools and receive results before
+      it must produce a final response. The only documented ceiling on agentic fan-out.
+    source: https://localai.io/features/mcp
+  - id: usage-accounting
+    scope: per user, per API key
+    description: >-
+      When authentication is enabled LocalAI records prompt, completion and total tokens plus request
+      count and duration per user, per model, per endpoint and per API key, queryable through
+      GET /api/auth/usage, /api/auth/usage/sources and the admin equivalents over day/week/month/all
+      periods. This is measurement, not enforcement — no threshold triggers a rejection.
+    source: https://localai.io/features/authentication
+  - id: response-caps
+    scope: per response
+    description: >-
+      Two hard caps behave like limits in a response. The usage by_key list is capped at 200 entries and
+      sets "truncated": true when more would qualify; the router decision log is a 5,000-entry in-process
+      ring buffer, not persisted.
+    source: https://localai.io/features/middleware/
+  - id: watchdog
+    scope: per backend process
+    description: >-
+      --enable-watchdog-idle with --watchdog-idle-timeout reclaims idle backend processes, bounding
+      resource consumption rather than request rate.
+    source: https://localai.io/reference/cli-reference
+  - id: pii-admission
+    scope: per request
+    description: >-
+      The middleware layer can BLOCK a request outright when its body matches a PII policy, returning
+      400 pii_blocked. A content gate, not a volume gate.
+    source: https://localai.io/features/middleware/

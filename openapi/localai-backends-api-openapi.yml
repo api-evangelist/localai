@@ -1,0 +1,437 @@
+openapi: 3.2.0
+info:
+  description: The LocalAI Rest API.
+  title: LocalAI Backends API
+  contact:
+    name: LocalAI
+    url: https://localai.io
+  license:
+    name: MIT
+    url: https://raw.githubusercontent.com/mudler/LocalAI/master/LICENSE
+  version: 2.0.0
+servers:
+- url: /
+tags:
+- name: backends
+paths:
+  /backends:
+    get:
+      tags:
+      - backends
+      summary: List all Backends
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/gallery.GalleryBackend'
+  /backends/apply:
+    post:
+      tags:
+      - backends
+      summary: Install backends to LocalAI.
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.BackendResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/localai.GalleryBackend'
+        description: query params
+        required: true
+  /backends/available:
+    get:
+      tags:
+      - backends
+      summary: List all available Backends
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/gallery.GalleryBackend'
+  /backends/delete/{name}:
+    post:
+      tags:
+      - backends
+      summary: delete backends from LocalAI.
+      parameters:
+      - description: Backend name
+        name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.BackendResponse'
+  /backends/galleries:
+    get:
+      tags:
+      - backends
+      summary: List all Galleries
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/config.Gallery'
+  /backends/jobs:
+    get:
+      tags:
+      - backends
+      summary: Returns all the jobs status progress
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/galleryop.OpStatus'
+  /backends/jobs/{uuid}:
+    get:
+      tags:
+      - backends
+      summary: Returns the job status
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/galleryop.OpStatus'
+  /backends/known:
+    get:
+      tags:
+      - backends
+      summary: List all known Backends (importer registry + curated pref-only + installed-on-disk)
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/schema.KnownBackend'
+  /backends/upgrade/{name}:
+    post:
+      tags:
+      - backends
+      summary: Upgrade a backend
+      parameters:
+      - description: Backend name
+        name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.BackendResponse'
+  /backends/upgrades:
+    get:
+      tags:
+      - backends
+      summary: Get available backend upgrades
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/gallery.UpgradeInfo'
+  /backends/upgrades/check:
+    post:
+      tags:
+      - backends
+      summary: Force backend upgrade check
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/gallery.UpgradeInfo'
+components:
+  schemas:
+    galleryop.OpStatus:
+      type: object
+      properties:
+        cancellable:
+          description: Cancellable is true if the operation can be cancelled
+          type: boolean
+        cancelled:
+          description: Cancelled is true if the operation was cancelled
+          type: boolean
+        current_bytes:
+          type: integer
+        deletion:
+          description: Deletion is true if the operation is a deletion
+          type: boolean
+        downloaded_size:
+          type: string
+        file_name:
+          type: string
+        file_size:
+          type: string
+        gallery_element_name:
+          type: string
+        message:
+          type: string
+        nodes:
+          description: 'Nodes is the per-node breakdown for a fanned-out backend install.
+
+            Populated by DistributedBackendManager (per-node terminal status)
+
+            and by the Phase 2 progress bridge (per-byte ticks). The
+
+            /api/operations handler surfaces this so the UI can render an
+
+            expandable per-node view of an in-flight install.'
+          type: array
+          items:
+            $ref: '#/components/schemas/galleryop.NodeProgress'
+        phase:
+          type: string
+        processed:
+          type: boolean
+        progress:
+          type: number
+        total_bytes:
+          type: integer
+    gallery.NodeDriftInfo:
+      type: object
+      properties:
+        digest:
+          type: string
+        node_id:
+          type: string
+        node_name:
+          type: string
+        version:
+          type: string
+    schema.KnownBackend:
+      type: object
+      properties:
+        auto_detect:
+          type: boolean
+        description:
+          type: string
+        installed:
+          description: 'Installed is true when the backend is currently present on disk — i.e. it
+
+            appears in gallery.ListSystemBackends(systemState). Importer-registered or
+
+            curated pref-only backends default to false unless they also show up on
+
+            disk. The import form uses this to warn users that submitting an import
+
+            may trigger an automatic backend download.'
+          type: boolean
+        modality:
+          type: string
+        name:
+          type: string
+    config.GalleryVerification:
+      type: object
+      properties:
+        identity:
+          type: string
+        identity_regex:
+          type: string
+        issuer:
+          type: string
+        issuer_regex:
+          type: string
+        not_before:
+          description: NotBefore is an RFC3339 timestamp. Empty disables the time check.
+          type: string
+    gallery.UpgradeInfo:
+      type: object
+      properties:
+        available_digest:
+          type: string
+        available_version:
+          type: string
+        backend_name:
+          type: string
+        installed_digest:
+          type: string
+        installed_version:
+          type: string
+        node_drift:
+          description: 'NodeDrift lists nodes whose installed version or digest differs from
+
+            the cluster majority. Non-empty means the cluster has diverged and an
+
+            upgrade will realign it. Empty in single-node mode.'
+          type: array
+          items:
+            $ref: '#/components/schemas/gallery.NodeDriftInfo'
+    localai.GalleryBackend:
+      type: object
+      properties:
+        force:
+          description: 'Force reinstalls the backend even when it is already installed and
+
+            runnable. Off by default so apply stays idempotent for supervising
+
+            apps that ensure their backend on every boot.'
+          type: boolean
+        id:
+          type: string
+    schema.BackendResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        status_url:
+          type: string
+    gallery.File:
+      type: object
+      properties:
+        filename:
+          type: string
+        sha256:
+          type: string
+        uri:
+          type: string
+    config.Gallery:
+      type: object
+      properties:
+        mirrors:
+          description: 'Mirrors are tried in order when URL cannot be fetched. They are a
+
+            fallback for availability, not a load-balancing pool: the primary is
+
+            always preferred, and a mirror is only consulted after the one before
+
+            it fails. Any URI the gallery loader understands works here
+
+            (https://, github:, file://).'
+          type: array
+          items:
+            type: string
+        name:
+          type: string
+        url:
+          type: string
+        verification:
+          $ref: '#/components/schemas/config.GalleryVerification'
+    galleryop.NodeProgress:
+      type: object
+      properties:
+        current:
+          type: string
+        error:
+          type: string
+        file_name:
+          type: string
+        node_id:
+          type: string
+        node_name:
+          type: string
+        percentage:
+          type: number
+        phase:
+          type: string
+        status:
+          type: string
+        total:
+          type: string
+    gallery.GalleryBackend:
+      type: object
+      properties:
+        alias:
+          type: string
+        backend:
+          description: 'Backend is the resolved backend engine for this model (e.g. "llama-cpp").
+
+            Populated at load time from overrides, inline config, or the URL-referenced config file.'
+          type: string
+        capabilities:
+          type: object
+          additionalProperties:
+            type: string
+        description:
+          type: string
+        files:
+          description: AdditionalFiles are used to add additional files to the model
+          type: array
+          items:
+            $ref: '#/components/schemas/gallery.File'
+        gallery:
+          description: Gallery is a reference to the gallery which contains the model
+          allOf:
+          - $ref: '#/components/schemas/config.Gallery'
+        icon:
+          type: string
+        installed:
+          description: Installed is used to indicate if the model is installed or not
+          type: boolean
+        license:
+          type: string
+        mirrors:
+          type: array
+          items:
+            type: string
+        name:
+          type: string
+        sha256:
+          description: 'SHA256 is the expected sha256 of the backend tarball at URI / Mirrors.
+
+            Empty disables the integrity check; OCI URIs carry their own digest.'
+          type: string
+        size:
+          description: 'Size is an optional hardcoded model size string (e.g. "500MB", "14.5GB").
+
+            Used when the size cannot be estimated automatically.'
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        uri:
+          type: string
+        url:
+          type: string
+        urls:
+          type: array
+          items:
+            type: string
+        version:
+          type: string
+  securitySchemes:
+    BearerAuth:
+      type: apiKey
+      name: Authorization
+      in: header

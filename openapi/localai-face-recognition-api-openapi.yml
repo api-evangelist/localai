@@ -1,0 +1,340 @@
+openapi: 3.2.0
+info:
+  description: The LocalAI Rest API.
+  title: LocalAI Face Recognition API
+  contact:
+    name: LocalAI
+    url: https://localai.io
+  license:
+    name: MIT
+    url: https://raw.githubusercontent.com/mudler/LocalAI/master/LICENSE
+  version: 2.0.0
+servers:
+- url: /
+tags:
+- name: face-recognition
+paths:
+  /v1/face/analyze:
+    post:
+      tags:
+      - face-recognition
+      summary: Analyze demographic attributes (age, gender, ...) of faces.
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.FaceAnalyzeResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.FaceAnalyzeRequest'
+        description: query params
+        required: true
+  /v1/face/embed:
+    post:
+      tags:
+      - face-recognition
+      summary: Extract a face embedding from an image.
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.FaceEmbedResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.FaceEmbedRequest'
+        description: query params
+        required: true
+  /v1/face/forget:
+    post:
+      tags:
+      - face-recognition
+      summary: Remove a previously-registered face by ID.
+      responses:
+        '204':
+          description: No Content
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.FaceForgetRequest'
+        description: query params
+        required: true
+  /v1/face/identify:
+    post:
+      tags:
+      - face-recognition
+      summary: Identify a face against the registered database (1:N recognition).
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.FaceIdentifyResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.FaceIdentifyRequest'
+        description: query params
+        required: true
+  /v1/face/register:
+    post:
+      tags:
+      - face-recognition
+      summary: Register a face for 1:N identification.
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.FaceRegisterResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.FaceRegisterRequest'
+        description: query params
+        required: true
+  /v1/face/verify:
+    post:
+      tags:
+      - face-recognition
+      summary: Verify that two images depict the same person.
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.FaceVerifyResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.FaceVerifyRequest'
+        description: query params
+        required: true
+components:
+  schemas:
+    schema.FaceIdentifyResponse:
+      type: object
+      properties:
+        matches:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.FaceIdentifyMatch'
+    schema.FaceRegisterRequest:
+      type: object
+      properties:
+        img:
+          type: string
+        labels:
+          type: object
+          additionalProperties:
+            type: string
+        model:
+          type: string
+        name:
+          type: string
+        store:
+          description: vector store model; empty = local-store default
+          type: string
+    schema.FaceAnalysis:
+      type: object
+      properties:
+        age:
+          type: number
+        antispoof_score:
+          type: number
+        dominant_emotion:
+          type: string
+        dominant_gender:
+          type: string
+        dominant_race:
+          type: string
+        emotion:
+          type: object
+          additionalProperties:
+            type: number
+            format: float32
+        face_confidence:
+          type: number
+        gender:
+          type: object
+          additionalProperties:
+            type: number
+            format: float32
+        is_real:
+          description: Liveness fields — see FaceVerifyResponse for why these are pointers.
+          type: boolean
+        race:
+          type: object
+          additionalProperties:
+            type: number
+            format: float32
+        region:
+          $ref: '#/components/schemas/schema.FacialArea'
+    schema.FaceEmbedRequest:
+      type: object
+      properties:
+        img:
+          type: string
+        model:
+          type: string
+    schema.FacialArea:
+      type: object
+      properties:
+        h:
+          type: number
+        w:
+          type: number
+        x:
+          type: number
+        y:
+          type: number
+    schema.FaceForgetRequest:
+      type: object
+      properties:
+        id:
+          type: string
+        model:
+          type: string
+        store:
+          type: string
+    schema.FaceVerifyRequest:
+      type: object
+      properties:
+        anti_spoofing:
+          type: boolean
+        img1:
+          type: string
+        img2:
+          type: string
+        model:
+          type: string
+        threshold:
+          type: number
+    schema.FaceAnalyzeRequest:
+      type: object
+      properties:
+        actions:
+          description: subset of {"age","gender","emotion","race"}
+          type: array
+          items:
+            type: string
+        anti_spoofing:
+          type: boolean
+        img:
+          type: string
+        model:
+          type: string
+    schema.FaceIdentifyMatch:
+      type: object
+      properties:
+        confidence:
+          type: number
+        distance:
+          type: number
+        id:
+          type: string
+        labels:
+          type: object
+          additionalProperties:
+            type: string
+        match:
+          description: true when distance <= threshold
+          type: boolean
+        name:
+          type: string
+    schema.FaceVerifyResponse:
+      type: object
+      properties:
+        confidence:
+          type: number
+        distance:
+          type: number
+        img1_antispoof_score:
+          type: number
+        img1_area:
+          $ref: '#/components/schemas/schema.FacialArea'
+        img1_is_real:
+          description: 'Liveness fields are only populated when the request set
+
+            anti_spoofing=true. Pointers keep them fully absent from the
+
+            JSON response otherwise, so callers can tell "not checked"
+
+            apart from "checked and fake" (which would collapse to zero
+
+            values with plain bool+omitempty).'
+          type: boolean
+        img2_antispoof_score:
+          type: number
+        img2_area:
+          $ref: '#/components/schemas/schema.FacialArea'
+        img2_is_real:
+          type: boolean
+        model:
+          type: string
+        processing_time_ms:
+          type: number
+        threshold:
+          type: number
+        verified:
+          type: boolean
+    schema.FaceEmbedResponse:
+      type: object
+      properties:
+        dim:
+          type: integer
+        embedding:
+          type: array
+          items:
+            type: number
+        model:
+          type: string
+    schema.FaceAnalyzeResponse:
+      type: object
+      properties:
+        faces:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.FaceAnalysis'
+    schema.FaceRegisterResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        registered_at:
+          type: string
+    schema.FaceIdentifyRequest:
+      type: object
+      properties:
+        img:
+          type: string
+        model:
+          type: string
+        store:
+          type: string
+        threshold:
+          description: optional cutoff on distance
+          type: number
+        top_k:
+          type: integer
+  securitySchemes:
+    BearerAuth:
+      type: apiKey
+      name: Authorization
+      in: header

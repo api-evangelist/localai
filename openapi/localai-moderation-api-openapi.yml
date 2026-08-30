@@ -1,0 +1,82 @@
+openapi: 3.2.0
+info:
+  description: The LocalAI Rest API.
+  title: LocalAI Moderation API
+  contact:
+    name: LocalAI
+    url: https://localai.io
+  license:
+    name: MIT
+    url: https://raw.githubusercontent.com/mudler/LocalAI/master/LICENSE
+  version: 2.0.0
+servers:
+- url: /
+tags:
+- name: moderation
+paths:
+  /v1/moderations:
+    post:
+      tags:
+      - moderation
+      summary: Classify text for potentially harmful content.
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.ModerationResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.ModerationRequest'
+        description: query params
+        required: true
+components:
+  schemas:
+    schema.ModerationRequest:
+      type: object
+      properties:
+        input:
+          type: array
+          items:
+            type: string
+        model:
+          type: string
+    schema.ModerationResult:
+      type: object
+      properties:
+        categories:
+          type: object
+          additionalProperties:
+            type: boolean
+        category_applied_input_types:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+        category_scores:
+          type: object
+          additionalProperties:
+            type: number
+            format: float64
+        flagged:
+          type: boolean
+    schema.ModerationResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        model:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.ModerationResult'
+  securitySchemes:
+    BearerAuth:
+      type: apiKey
+      name: Authorization
+      in: header

@@ -1,0 +1,1092 @@
+openapi: 3.2.0
+info:
+  description: The LocalAI Rest API.
+  title: LocalAI Inference API
+  contact:
+    name: LocalAI
+    url: https://localai.io
+  license:
+    name: MIT
+    url: https://raw.githubusercontent.com/mudler/LocalAI/master/LICENSE
+  version: 2.0.0
+servers:
+- url: /
+tags:
+- name: inference
+paths:
+  /v1/chat/completions:
+    post:
+      tags:
+      - inference
+      summary: Generate a chat completions for a given prompt and model.
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.OpenAIResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.OpenAIRequest'
+        description: query params
+        required: true
+  /v1/completions:
+    post:
+      tags:
+      - inference
+      summary: Generate completions for a given prompt and model.
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.OpenAIResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.OpenAIRequest'
+        description: query params
+        required: true
+  /v1/edits:
+    post:
+      tags:
+      - inference
+      summary: OpenAI edit endpoint
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.OpenAIResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.OpenAIRequest'
+        description: query params
+        required: true
+  /v1/messages:
+    post:
+      tags:
+      - inference
+      summary: Generate a message response for the given messages and model.
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.AnthropicResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.AnthropicRequest'
+        description: query params
+        required: true
+  /v1/responses:
+    post:
+      tags:
+      - inference
+      summary: Create a response using the Open Responses API
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.ORResponseResource'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.OpenResponsesRequest'
+        description: Request body
+        required: true
+  /v1/responses/{id}:
+    get:
+      description: Retrieve a response by ID. Can be used for polling background responses or resuming streaming responses.
+      tags:
+      - inference
+      summary: Get a response by ID
+      parameters:
+      - description: Response ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: Set to 'true' to resume streaming
+        name: stream
+        in: query
+        schema:
+          type: string
+      - description: Sequence number to resume from (for streaming)
+        name: starting_after
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.ORResponseResource'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /v1/responses/{id}/cancel:
+    post:
+      description: Cancel a background response if it's still in progress
+      tags:
+      - inference
+      summary: Cancel a response
+      parameters:
+      - description: Response ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.ORResponseResource'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+components:
+  schemas:
+    functions.Item:
+      type: object
+      properties:
+        properties:
+          type: object
+          additionalProperties: {}
+        type:
+          type: string
+    schema.ORTextFormat:
+      type: object
+      properties:
+        type:
+          description: '"text" or "json_schema"'
+          type: string
+    functions.Function:
+      type: object
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        parameters:
+          type: object
+          additionalProperties: {}
+        strict:
+          type: boolean
+    schema.LogprobsValue:
+      type: object
+      properties:
+        enabled:
+          description: true if logprobs should be returned
+          type: boolean
+    schema.ORTextConfig:
+      type: object
+      properties:
+        format:
+          $ref: '#/components/schemas/schema.ORTextFormat'
+    schema.ORError:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        param:
+          type: string
+        type:
+          description: invalid_request|not_found|server_error|model_error|too_many_requests
+          type: string
+    schema.AnthropicResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.AnthropicContentBlock'
+        id:
+          type: string
+        model:
+          type: string
+        role:
+          type: string
+        stop_reason:
+          type: string
+        stop_sequence:
+          type: string
+        type:
+          type: string
+        usage:
+          $ref: '#/components/schemas/schema.AnthropicUsage'
+    schema.AnthropicUsage:
+      type: object
+      properties:
+        input_tokens:
+          type: integer
+        output_tokens:
+          type: integer
+    schema.ORReasoningParam:
+      type: object
+      properties:
+        effort:
+          description: '"none"|"low"|"medium"|"high"|"xhigh"'
+          type: string
+        summary:
+          description: '"auto"|"concise"|"detailed"'
+          type: string
+    schema.AnthropicImageSource:
+      type: object
+      properties:
+        data:
+          type: string
+        media_type:
+          type: string
+        type:
+          type: string
+    schema.ORIncompleteDetails:
+      type: object
+      properties:
+        reason:
+          type: string
+    schema.OpenResponsesRequest:
+      type: object
+      properties:
+        allowed_tools:
+          description: Restrict which tools can be invoked
+          type: array
+          items:
+            type: string
+        background:
+          description: Run request in background
+          type: boolean
+        frequency_penalty:
+          description: Frequency penalty (-2.0 to 2.0)
+          type: number
+        include:
+          description: What to include in response
+          type: array
+          items:
+            type: string
+        input:
+          description: string or []ORItemParam
+        instructions:
+          type: string
+        logit_bias:
+          description: OpenAI-compatible extensions (not in Open Responses spec)
+          type: object
+          additionalProperties:
+            type: number
+            format: float64
+        max_output_tokens:
+          type: integer
+        max_tool_calls:
+          description: Maximum number of tool calls
+          type: integer
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+        model:
+          type: string
+        parallel_tool_calls:
+          description: Allow parallel tool calls
+          type: boolean
+        presence_penalty:
+          description: Presence penalty (-2.0 to 2.0)
+          type: number
+        previous_response_id:
+          type: string
+        reasoning:
+          $ref: '#/components/schemas/schema.ORReasoningParam'
+        service_tier:
+          description: '"auto"|"default"|priority hint'
+          type: string
+        store:
+          description: Whether to store the response
+          type: boolean
+        stream:
+          type: boolean
+        temperature:
+          type: number
+        text_format:
+          description: Additional parameters from spec
+        tool_choice:
+          description: '"auto"|"required"|"none"|{type:"function",name:"..."}'
+        tools:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.ORFunctionTool'
+        top_logprobs:
+          description: Number of top logprobs to return
+          type: integer
+        top_p:
+          type: number
+        truncation:
+          description: '"auto"|"disabled"'
+          type: string
+    schema.CompressionMetadata:
+      type: object
+      properties:
+        compressed_tokens:
+          type: integer
+        compressor:
+          type: string
+        dropped_turns:
+          type: integer
+        original_tokens:
+          type: integer
+        overflow_recoveries:
+          type: integer
+        summary_tokens:
+          type: integer
+    schema.ORUsage:
+      type: object
+      properties:
+        input_tokens:
+          type: integer
+        input_tokens_details:
+          description: Always present
+          allOf:
+          - $ref: '#/components/schemas/schema.ORInputTokensDetails'
+        output_tokens:
+          type: integer
+        output_tokens_details:
+          description: Always present
+          allOf:
+          - $ref: '#/components/schemas/schema.OROutputTokensDetails'
+        total_tokens:
+          type: integer
+    schema.InputTokensDetails:
+      type: object
+      properties:
+        image_tokens:
+          type: integer
+        text_tokens:
+          type: integer
+    schema.ORResponseResource:
+      type: object
+      properties:
+        background:
+          type: boolean
+        completed_at:
+          description: 'Required: present as number or null'
+          type: integer
+        created_at:
+          type: integer
+        error:
+          description: Always present, null if no error
+          allOf:
+          - $ref: '#/components/schemas/schema.ORError'
+        frequency_penalty:
+          type: number
+        id:
+          type: string
+        incomplete_details:
+          description: Always present, null if complete
+          allOf:
+          - $ref: '#/components/schemas/schema.ORIncompleteDetails'
+        instructions:
+          type: string
+        max_output_tokens:
+          type: integer
+        max_tool_calls:
+          description: nullable
+          type: integer
+        metadata:
+          description: Metadata and operational flags
+          type: object
+          additionalProperties:
+            type: string
+        model:
+          type: string
+        object:
+          description: always "response"
+          type: string
+        output:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.ORItemField'
+        parallel_tool_calls:
+          type: boolean
+        presence_penalty:
+          type: number
+        previous_response_id:
+          type: string
+        prompt_cache_key:
+          description: nullable
+          type: string
+        reasoning:
+          description: nullable
+          allOf:
+          - $ref: '#/components/schemas/schema.ORReasoning'
+        safety_identifier:
+          description: Safety and caching
+          type: string
+        service_tier:
+          type: string
+        status:
+          description: in_progress|completed|failed|incomplete
+          type: string
+        store:
+          type: boolean
+        temperature:
+          description: Sampling parameters (always required)
+          type: number
+        text:
+          description: Text format configuration
+          allOf:
+          - $ref: '#/components/schemas/schema.ORTextConfig'
+        tool_choice: {}
+        tools:
+          description: Tool-related fields
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.ORFunctionTool'
+        top_logprobs:
+          description: Default to 0
+          type: integer
+        top_p:
+          type: number
+        truncation:
+          description: Truncation and reasoning
+          type: string
+        usage:
+          description: Usage statistics
+          allOf:
+          - $ref: '#/components/schemas/schema.ORUsage'
+    schema.StreamOptions:
+      type: object
+      properties:
+        include_usage:
+          type: boolean
+    schema.ORReasoning:
+      type: object
+      properties:
+        effort:
+          type: string
+        summary:
+          type: string
+    schema.AnthropicContentBlock:
+      type: object
+      properties:
+        content: {}
+        id:
+          type: string
+        input:
+          type: object
+          additionalProperties: {}
+        is_error:
+          type: boolean
+        name:
+          type: string
+        signature:
+          type: string
+        source:
+          $ref: '#/components/schemas/schema.AnthropicImageSource'
+        text:
+          type: string
+        thinking:
+          type: string
+        tool_use_id:
+          type: string
+        type:
+          type: string
+    schema.Choice:
+      type: object
+      properties:
+        delta:
+          $ref: '#/components/schemas/schema.Message'
+        finish_reason:
+          type: string
+        index:
+          type: integer
+        logprobs:
+          $ref: '#/components/schemas/schema.Logprobs'
+        message:
+          $ref: '#/components/schemas/schema.Message'
+        text:
+          type: string
+    schema.OpenAIRequest:
+      type: object
+      required:
+      - file
+      properties:
+        backend:
+          type: string
+        batch:
+          description: Custom parameters - not present in the OpenAI API
+          type: integer
+        clip_skip:
+          description: Diffusers
+          type: integer
+        echo:
+          type: boolean
+        encoding_format:
+          description: 'Embedding encoding format: "float" (default) or "base64" (OpenAI Node.js SDK default)'
+          type: string
+        file:
+          description: whisper
+          type: string
+        files:
+          description: Multiple input images for img2img or inpainting
+          type: array
+          items:
+            type: string
+        frequency_penalty:
+          type: number
+        function_call:
+          description: might be a string or an object
+        functions:
+          description: A list of available functions to call
+          type: array
+          items:
+            $ref: '#/components/schemas/functions.Function'
+        grammar:
+          description: A grammar to constrain the LLM output
+          type: string
+        grammar_json_functions:
+          $ref: '#/components/schemas/functions.JSONFunctionStructure'
+        ignore_eos:
+          type: boolean
+        input: {}
+        instruction:
+          description: Edit endpoint
+          type: string
+        language:
+          description: Also part of the OpenAI official spec
+          type: string
+        logit_bias:
+          description: Map of token IDs to bias values (-100 to 100)
+          type: object
+          additionalProperties:
+            type: number
+            format: float64
+        logprobs:
+          description: 'OpenAI API logprobs parameters
+
+            logprobs: boolean - if true, returns log probabilities of each output token
+
+            top_logprobs: integer 0-20 - number of most likely tokens to return at each token position'
+          allOf:
+          - $ref: '#/components/schemas/schema.LogprobsValue'
+        max_completion_tokens:
+          description: 'MaxCompletionTokens is the modern alias for max_tokens
+
+            (OpenAI deprecated max_tokens; gpt-5 / o-series reject it).
+
+            Accepted on the wire so up-to-date clients can use the new
+
+            name; the request middleware collapses it into Maxtokens so
+
+            internal code reads exactly one field.'
+          type: integer
+        max_tokens:
+          type: integer
+        messages:
+          description: Messages is read only by chat/completion API calls
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.Message'
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+        min_p:
+          type: number
+        model:
+          type: string
+        model_base_name:
+          type: string
+        n:
+          description: Also part of the OpenAI official spec. use it for returning multiple results
+          type: integer
+        n_keep:
+          type: integer
+        negative_prompt:
+          type: string
+        negative_prompt_scale:
+          type: number
+        pooling:
+          description: 'Pooling is a LocalAI extension for /v1/embeddings: how the backend''s
+
+            per-token vectors are reduced to a single embedding. "" or "backend"
+
+            leaves pooling to the inference backend (the pre-existing behavior);
+
+            "mean", "last" and "decayed_mean" pool Go-side from raw per-token
+
+            vectors (the backend must run with the "pooling:none" option, which
+
+            model configs get automatically when this is set).'
+          type: string
+        pooling_half_life_tokens:
+          description: 'PoolingHalfLifeTokens is a LocalAI extension for /v1/embeddings: the
+
+            half-life (in tokens) of the "decayed_mean" pooling scheme — a token''s
+
+            weight halves every this-many positions counting back from the end of
+
+            the conversation. Defaults to 256 when unset.'
+          type: integer
+        presence_penalty:
+          type: number
+        prompt:
+          description: Prompt is read only by completion/image API calls
+        quality:
+          description: Image (not supported by OpenAI)
+          type: string
+        reasoning_effort:
+          type: string
+        ref_images:
+          description: Reference images for models that support them (e.g., Flux Kontext)
+          type: array
+          items:
+            type: string
+        repeat_last_n:
+          type: integer
+        repeat_penalty:
+          type: number
+        response_format:
+          description: whisper/image
+        rope_freq_base:
+          type: number
+        rope_freq_scale:
+          type: number
+        seed:
+          type: integer
+        size:
+          description: image
+          type: string
+        step:
+          type: integer
+        stop: {}
+        stream:
+          type: boolean
+        stream_options:
+          description: StreamOptions opts into OpenAI streaming extensions, e.g. include_usage.
+          allOf:
+          - $ref: '#/components/schemas/schema.StreamOptions'
+        temperature:
+          type: number
+        tfz:
+          type: number
+        tokenizer:
+          description: RWKV (?)
+          type: string
+        tool_choice: {}
+        tools:
+          type: array
+          items:
+            $ref: '#/components/schemas/functions.Tool'
+        top_k:
+          type: integer
+        top_logprobs:
+          description: Number of top logprobs per token (0-20)
+          type: integer
+        top_p:
+          description: Common options between all the API calls, part of the OpenAI spec
+          type: number
+        translate:
+          description: Only for audio transcription
+          type: boolean
+        typical_p:
+          type: number
+    schema.AnthropicTool:
+      type: object
+      properties:
+        description:
+          type: string
+        input_schema:
+          type: object
+          additionalProperties: {}
+        name:
+          type: string
+    schema.AnthropicRequest:
+      type: object
+      properties:
+        max_tokens:
+          type: integer
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.AnthropicMessage'
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+        model:
+          type: string
+        stop_sequences:
+          type: array
+          items:
+            type: string
+        stream:
+          type: boolean
+        system:
+          type: string
+        temperature:
+          type: number
+        thinking:
+          description: 'Thinking gates extended-thinking output. We only surface thinking
+
+            content blocks when the client explicitly opts in, matching Anthropic''s
+
+            API where thinking is off unless requested.'
+          allOf:
+          - $ref: '#/components/schemas/schema.AnthropicThinkingParam'
+        tool_choice: {}
+        tools:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.AnthropicTool'
+        top_k:
+          type: integer
+        top_p:
+          type: number
+    schema.ORFunctionTool:
+      type: object
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        parameters:
+          type: object
+          additionalProperties: {}
+        strict:
+          description: Always include in response
+          type: boolean
+        type:
+          description: always "function"
+          type: string
+    schema.LogprobContent:
+      type: object
+      properties:
+        bytes:
+          type: array
+          items:
+            type: integer
+        id:
+          type: integer
+        logprob:
+          type: number
+        token:
+          type: string
+        top_logprobs:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.LogprobContent'
+    schema.ORItemField:
+      type: object
+      properties:
+        arguments:
+          type: string
+        call_id:
+          description: Function call fields
+          type: string
+        content:
+          description: string or []ORContentPart for messages
+        encrypted_content:
+          description: Provider-specific encrypted content
+          type: string
+        id:
+          description: Present for all output items
+          type: string
+        name:
+          type: string
+        output:
+          description: Function call output fields
+        role:
+          description: Message fields
+          type: string
+        status:
+          description: in_progress|completed|incomplete
+          type: string
+        summary:
+          description: Reasoning fields (for type == "reasoning")
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.ORContentPart'
+        type:
+          description: message|function_call|function_call_output|reasoning|item_reference
+          type: string
+    schema.ORAnnotation:
+      type: object
+      properties:
+        end_index:
+          type: integer
+        start_index:
+          type: integer
+        title:
+          type: string
+        type:
+          description: url_citation
+          type: string
+        url:
+          type: string
+    schema.ORInputTokensDetails:
+      type: object
+      properties:
+        cached_tokens:
+          description: Always include, even if 0
+          type: integer
+    schema.ORTopLogProb:
+      type: object
+      properties:
+        bytes:
+          type: array
+          items:
+            type: integer
+        logprob:
+          type: number
+        token:
+          type: string
+    schema.ORContentPart:
+      type: object
+      properties:
+        annotations:
+          description: REQUIRED for output_text - must always be present (use [])
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.ORAnnotation'
+        detail:
+          description: low|high|auto for images
+          type: string
+        file_data:
+          type: string
+        file_url:
+          type: string
+        filename:
+          type: string
+        image_url:
+          type: string
+        logprobs:
+          description: REQUIRED for output_text - must always be present (use [])
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.ORLogProb'
+        refusal:
+          type: string
+        text:
+          description: REQUIRED for output_text - must always be present (even if empty)
+          type: string
+        type:
+          description: input_text|input_image|input_file|output_text|refusal
+          type: string
+    functions.Tool:
+      type: object
+      properties:
+        function:
+          $ref: '#/components/schemas/functions.Function'
+        type:
+          type: string
+    schema.AnthropicThinkingParam:
+      type: object
+      properties:
+        budget_tokens:
+          type: integer
+        type:
+          description: '"enabled" | "disabled"'
+          type: string
+    schema.ToolCall:
+      type: object
+      properties:
+        function:
+          $ref: '#/components/schemas/schema.FunctionCall'
+        id:
+          type: string
+        index:
+          type: integer
+        type:
+          type: string
+    schema.Message:
+      type: object
+      properties:
+        content:
+          description: The message content
+        function_call:
+          description: A result of a function call
+        name:
+          description: The message name (used for tools calls)
+          type: string
+        reasoning:
+          description: Reasoning content extracted from <thinking>...</thinking> tags
+          type: string
+        role:
+          description: The message role
+          type: string
+        tool_call_id:
+          type: string
+        tool_calls:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.ToolCall'
+    schema.OROutputTokensDetails:
+      type: object
+      properties:
+        reasoning_tokens:
+          description: Always include, even if 0
+          type: integer
+    functions.JSONFunctionStructure:
+      type: object
+      properties:
+        $defs:
+          type: object
+          additionalProperties: {}
+        anyOf:
+          type: array
+          items:
+            $ref: '#/components/schemas/functions.Item'
+        oneOf:
+          type: array
+          items:
+            $ref: '#/components/schemas/functions.Item'
+    schema.Item:
+      type: object
+      properties:
+        b64_json:
+          type: string
+        index:
+          type: integer
+        object:
+          type: string
+        url:
+          description: Images
+          type: string
+    schema.OpenAIUsage:
+      type: object
+      properties:
+        completion_tokens:
+          type: integer
+        compression_meta:
+          $ref: '#/components/schemas/schema.CompressionMetadata'
+        input_tokens:
+          description: Fields for image generation API compatibility
+          type: integer
+        input_tokens_details:
+          $ref: '#/components/schemas/schema.InputTokensDetails'
+        output_tokens:
+          type: integer
+        prompt_tokens:
+          type: integer
+        timing_prompt_processing:
+          description: Extra timing data, disabled by default as is't not a part of OpenAI specification
+          type: number
+        timing_token_generation:
+          type: number
+        total_tokens:
+          type: integer
+    schema.AnthropicMessage:
+      type: object
+      properties:
+        content: {}
+        role:
+          type: string
+    schema.ORLogProb:
+      type: object
+      properties:
+        bytes:
+          type: array
+          items:
+            type: integer
+        logprob:
+          type: number
+        token:
+          type: string
+        top_logprobs:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.ORTopLogProb'
+    schema.OpenAIResponse:
+      type: object
+      properties:
+        choices:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.Choice'
+        created:
+          type: integer
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.Item'
+        id:
+          type: string
+        model:
+          type: string
+        object:
+          type: string
+        usage:
+          description: 'Usage is intentionally a pointer with omitempty: per the OpenAI
+
+            chat-completion streaming spec, intermediate chunks must not carry
+
+            a `usage` field. Marshalling a value-typed usage would emit
+
+            `"usage":{"prompt_tokens":0,...}` on every chunk and break
+
+            OpenAI-SDK consumers that filter on a truthy `result.usage`
+
+            (continuedev/continue, Kilo Code, Roo Code, etc.).'
+          allOf:
+          - $ref: '#/components/schemas/schema.OpenAIUsage'
+    schema.FunctionCall:
+      type: object
+      properties:
+        arguments:
+          type: string
+        name:
+          type: string
+    schema.Logprobs:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.LogprobContent'
+  securitySchemes:
+    BearerAuth:
+      type: apiKey
+      name: Authorization
+      in: header

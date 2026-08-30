@@ -1,0 +1,91 @@
+openapi: 3.2.0
+info:
+  description: The LocalAI Rest API.
+  title: LocalAI Detection API
+  contact:
+    name: LocalAI
+    url: https://localai.io
+  license:
+    name: MIT
+    url: https://raw.githubusercontent.com/mudler/LocalAI/master/LICENSE
+  version: 2.0.0
+servers:
+- url: /
+tags:
+- name: detection
+paths:
+  /v1/detection:
+    post:
+      tags:
+      - detection
+      summary: Detects objects in the input image.
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.DetectionResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.DetectionRequest'
+        description: query params
+        required: true
+components:
+  schemas:
+    schema.Detection:
+      type: object
+      properties:
+        class_name:
+          type: string
+        confidence:
+          type: number
+        height:
+          type: number
+        mask:
+          description: base64-encoded PNG segmentation mask
+          type: string
+        width:
+          type: number
+        x:
+          type: number
+        y:
+          type: number
+    schema.DetectionRequest:
+      type: object
+      properties:
+        boxes:
+          description: Box coordinates as [x1,y1,x2,y2,...] quads
+          type: array
+          items:
+            type: number
+        image:
+          description: URL or base64-encoded image to analyze
+          type: string
+        model:
+          type: string
+        points:
+          description: 'Point coordinates as [x,y,label,...] triples (label: 1=pos, 0=neg)'
+          type: array
+          items:
+            type: number
+        prompt:
+          description: Text prompt (for SAM 3 PCS mode)
+          type: string
+        threshold:
+          description: Detection confidence threshold
+          type: number
+    schema.DetectionResponse:
+      type: object
+      properties:
+        detections:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.Detection'
+  securitySchemes:
+    BearerAuth:
+      type: apiKey
+      name: Authorization
+      in: header

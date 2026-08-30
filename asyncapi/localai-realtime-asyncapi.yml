@@ -1,0 +1,202 @@
+x-generated: '2026-08-27'
+x-method: derived
+x-source: https://localai.io/features/openai-realtime
+asyncapi: 3.0.0
+info:
+  title: LocalAI Realtime API
+  version: 4.9.0
+  description: |
+    The LocalAI Realtime API — an OpenAI Realtime-compatible, low-latency, multi-modal (voice and text)
+    conversation surface carried over WebSocket, with an alternative WebRTC transport negotiated through
+    an SDP offer/answer handshake on the REST endpoint.
+
+    PROVENANCE: LocalAI publishes no AsyncAPI document. This description is DERIVED from the provider's
+    own Realtime API documentation at https://localai.io/features/openai-realtime and contains only event
+    names quoted verbatim from that page. No event was invented, and no payload schema is asserted, because
+    none is published — the message payloads below are declared as unconstrained objects rather than
+    guessed. LocalAI has no webhook surface; this WebSocket channel and the backend-log stream are its
+    entire event surface.
+  license:
+    name: MIT
+    url: https://raw.githubusercontent.com/mudler/LocalAI/master/LICENSE
+  externalDocs:
+    url: https://localai.io/features/openai-realtime
+servers:
+  instance:
+    host: '{localai-host}:8080'
+    protocol: ws
+    description: >-
+      A self-hosted LocalAI instance. The documented default address is localhost:8080. Realtime requires
+      a pipeline model configuration naming vad, transcription, llm and tts components.
+    variables:
+      localai-host:
+        default: localhost
+        description: The host running LocalAI.
+channels:
+  realtime:
+    address: /v1/realtime
+    title: Realtime session
+    description: >-
+      WebSocket channel. Connect as ws://<host>:8080/v1/realtime?model=<model>. Carries the OpenAI
+      Realtime event vocabulary in both directions.
+    parameters:
+      model:
+        description: Name of a pipeline model configuration (query parameter, not a path parameter).
+    messages:
+      sessionCreated:
+        $ref: '#/components/messages/sessionCreated'
+      sessionUpdate:
+        $ref: '#/components/messages/sessionUpdate'
+      responseCreate:
+        $ref: '#/components/messages/responseCreate'
+      responseCreated:
+        $ref: '#/components/messages/responseCreated'
+      responseDone:
+        $ref: '#/components/messages/responseDone'
+      responseOutputAudioDelta:
+        $ref: '#/components/messages/responseOutputAudioDelta'
+      responseOutputAudioTranscriptDelta:
+        $ref: '#/components/messages/responseOutputAudioTranscriptDelta'
+      conversationItemCreate:
+        $ref: '#/components/messages/conversationItemCreate'
+      conversationItemDelete:
+        $ref: '#/components/messages/conversationItemDelete'
+      conversationItemTruncate:
+        $ref: '#/components/messages/conversationItemTruncate'
+      conversationItemSpeaker:
+        $ref: '#/components/messages/conversationItemSpeaker'
+      conversationItemInputAudioTranscriptionDelta:
+        $ref: '#/components/messages/conversationItemInputAudioTranscriptionDelta'
+      conversationItemInputAudioTranscriptionFailed:
+        $ref: '#/components/messages/conversationItemInputAudioTranscriptionFailed'
+      inputAudioBufferClear:
+        $ref: '#/components/messages/inputAudioBufferClear'
+  backendLogs:
+    address: /ws/backend-logs/{modelId}
+    title: Backend log stream
+    description: >-
+      WebSocket channel streaming backend logs for one model. Declared in the published Swagger document
+      as GET /ws/backend-logs/{modelId}. Admin-only when authentication is enabled. No message schema is
+      published, so none is asserted here.
+    parameters:
+      modelId:
+        description: Identifier of the model whose backend logs to stream.
+    messages:
+      logLine:
+        $ref: '#/components/messages/logLine'
+operations:
+  sendClientEvent:
+    action: send
+    channel:
+      $ref: '#/channels/realtime'
+    title: Client events
+    description: Events the client sends into a realtime session.
+    messages:
+    - $ref: '#/channels/realtime/messages/sessionUpdate'
+    - $ref: '#/channels/realtime/messages/responseCreate'
+    - $ref: '#/channels/realtime/messages/conversationItemCreate'
+    - $ref: '#/channels/realtime/messages/conversationItemDelete'
+    - $ref: '#/channels/realtime/messages/conversationItemTruncate'
+    - $ref: '#/channels/realtime/messages/inputAudioBufferClear'
+  receiveServerEvent:
+    action: receive
+    channel:
+      $ref: '#/channels/realtime'
+    title: Server events
+    description: Events LocalAI emits back over the session.
+    messages:
+    - $ref: '#/channels/realtime/messages/sessionCreated'
+    - $ref: '#/channels/realtime/messages/responseCreated'
+    - $ref: '#/channels/realtime/messages/responseDone'
+    - $ref: '#/channels/realtime/messages/responseOutputAudioDelta'
+    - $ref: '#/channels/realtime/messages/responseOutputAudioTranscriptDelta'
+    - $ref: '#/channels/realtime/messages/conversationItemSpeaker'
+    - $ref: '#/channels/realtime/messages/conversationItemInputAudioTranscriptionDelta'
+    - $ref: '#/channels/realtime/messages/conversationItemInputAudioTranscriptionFailed'
+  receiveBackendLogs:
+    action: receive
+    channel:
+      $ref: '#/channels/backendLogs'
+    title: Backend log lines
+components:
+  messages:
+    sessionCreated:
+      name: session.created
+      title: Session created
+      payload:
+        $ref: '#/components/schemas/undocumentedEvent'
+    sessionUpdate:
+      name: session.update
+      title: Update session configuration
+      payload:
+        $ref: '#/components/schemas/undocumentedEvent'
+    responseCreate:
+      name: response.create
+      title: Request a response
+      description: >-
+        Setting `conversation` to `none` creates a response outside the default conversation; the reply is
+        not added to conversation history, which makes it usable as a side channel during a spoken turn.
+      payload:
+        $ref: '#/components/schemas/undocumentedEvent'
+    responseCreated:
+      name: response.created
+      payload:
+        $ref: '#/components/schemas/undocumentedEvent'
+    responseDone:
+      name: response.done
+      payload:
+        $ref: '#/components/schemas/undocumentedEvent'
+    responseOutputAudioDelta:
+      name: response.output_audio.delta
+      title: Audio chunk
+      description: >-
+        Emitted per audio chunk when pipeline.streaming.tts is enabled and the TTS backend supports
+        streaming synthesis; otherwise one unary delta is emitted for the whole utterance.
+      payload:
+        $ref: '#/components/schemas/undocumentedEvent'
+    responseOutputAudioTranscriptDelta:
+      name: response.output_audio_transcript.delta
+      description: Emitted as LLM tokens stream when pipeline.streaming.llm is enabled.
+      payload:
+        $ref: '#/components/schemas/undocumentedEvent'
+    conversationItemCreate:
+      name: conversation.item.create
+      payload:
+        $ref: '#/components/schemas/undocumentedEvent'
+    conversationItemDelete:
+      name: conversation.item.delete
+      payload:
+        $ref: '#/components/schemas/undocumentedEvent'
+    conversationItemTruncate:
+      name: conversation.item.truncate
+      payload:
+        $ref: '#/components/schemas/undocumentedEvent'
+    conversationItemSpeaker:
+      name: conversation.item.speaker
+      payload:
+        $ref: '#/components/schemas/undocumentedEvent'
+    conversationItemInputAudioTranscriptionDelta:
+      name: conversation.item.input_audio_transcription.delta
+      description: Streams transcript text deltas of the user's speech when pipeline.streaming.transcription is enabled.
+      payload:
+        $ref: '#/components/schemas/undocumentedEvent'
+    conversationItemInputAudioTranscriptionFailed:
+      name: conversation.item.input_audio_transcription.failed
+      payload:
+        $ref: '#/components/schemas/undocumentedEvent'
+    inputAudioBufferClear:
+      name: input_audio_buffer.clear
+      payload:
+        $ref: '#/components/schemas/undocumentedEvent'
+    logLine:
+      name: backendLogLine
+      payload:
+        $ref: '#/components/schemas/undocumentedEvent'
+  schemas:
+    undocumentedEvent:
+      type: object
+      description: >-
+        No payload schema is published for this event. LocalAI documents the event NAMES and the transport
+        but not the message bodies, deferring to the OpenAI Realtime API specification it emulates. The
+        shape is deliberately left unconstrained rather than guessed.
+      additionalProperties: true

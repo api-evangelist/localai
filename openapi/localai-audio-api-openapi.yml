@@ -1,0 +1,724 @@
+openapi: 3.2.0
+info:
+  description: The LocalAI Rest API.
+  title: LocalAI Audio API
+  contact:
+    name: LocalAI
+    url: https://localai.io
+  license:
+    name: MIT
+    url: https://raw.githubusercontent.com/mudler/LocalAI/master/LICENSE
+  version: 2.0.0
+servers:
+- url: /
+tags:
+- name: audio
+paths:
+  /api/voice-profiles:
+    get:
+      description: List saved voice-cloning references without exposing filesystem paths.
+      tags:
+      - audio
+      summary: List voice profiles
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/localai.VoiceProfileListResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.ErrorResponse'
+    post:
+      description: Save a consent-confirmed PCM WAV reference clip and exact transcript for voice cloning. Admin-only.
+      tags:
+      - audio
+      summary: Create a voice profile
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/voiceprofile.Profile'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.ErrorResponse'
+        '413':
+          description: Request Entity Too Large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.ErrorResponse'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Display name
+                description:
+                  type: string
+                  description: Optional description
+                language:
+                  type: string
+                  description: Optional language tag
+                transcript:
+                  type: string
+                  description: Exact transcript of the reference clip
+                consent_confirmed:
+                  type: boolean
+                  description: Confirms authorization to clone the voice
+                audio:
+                  type: string
+                  description: 16-bit PCM WAV, preferably mono 24 kHz, 1-120 seconds, up to 50 MiB
+                  format: binary
+              required:
+              - name
+              - transcript
+              - consent_confirmed
+              - audio
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Display name
+                description:
+                  type: string
+                  description: Optional description
+                language:
+                  type: string
+                  description: Optional language tag
+                transcript:
+                  type: string
+                  description: Exact transcript of the reference clip
+                consent_confirmed:
+                  type: boolean
+                  description: Confirms authorization to clone the voice
+                audio:
+                  type: string
+                  description: 16-bit PCM WAV, preferably mono 24 kHz, 1-120 seconds, up to 50 MiB
+                  format: binary
+              required:
+              - name
+              - transcript
+              - consent_confirmed
+              - audio
+  /api/voice-profiles/{id}:
+    delete:
+      description: Permanently remove a saved voice-cloning profile. Admin-only.
+      tags:
+      - audio
+      summary: Delete a voice profile
+      parameters:
+      - description: Voice profile UUID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.ErrorResponse'
+  /api/voice-profiles/{id}/audio:
+    get:
+      description: Stream the saved reference WAV for an authenticated TTS user.
+      tags:
+      - audio
+      summary: Preview voice profile audio
+      parameters:
+      - description: Voice profile UUID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            audio/x-wav:
+              schema:
+                type: string
+        '404':
+          description: Not Found
+          content:
+            audio/x-wav:
+              schema:
+                $ref: '#/components/schemas/schema.ErrorResponse'
+  /audio/transform:
+    post:
+      description: Runs an audio-in / audio-out transform conditioned on an optional auxiliary reference signal. Concrete transforms include AEC + noise suppression + dereverberation (LocalVQE), voice conversion (reference = target speaker), and pitch shifting. The backend determines the operation; pass model-specific tuning via repeated `params[<key>]=<value>` form fields.
+      tags:
+      - audio
+      summary: Transform audio (echo cancellation, noise suppression, voice conversion, etc.)
+      responses:
+        '200':
+          description: transformed audio file
+          content:
+            audio/x-wav:
+              schema:
+                type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                model:
+                  type: string
+                  description: model
+                audio:
+                  type: string
+                  description: primary input audio file
+                  format: binary
+                reference:
+                  type: string
+                  description: auxiliary reference audio (loopback for AEC, target voice for conversion, etc.)
+                  format: binary
+                response_format:
+                  type: string
+                  description: wav | mp3 | ogg | flac
+                sample_rate:
+                  type: integer
+                  description: desired output sample rate in Hz; omit for the backend's own rate, otherwise 8000-192000
+              required:
+              - model
+              - audio
+  /audio/transformations:
+    post:
+      description: Runs an audio-in / audio-out transform conditioned on an optional auxiliary reference signal. Concrete transforms include AEC + noise suppression + dereverberation (LocalVQE), voice conversion (reference = target speaker), and pitch shifting. The backend determines the operation; pass model-specific tuning via repeated `params[<key>]=<value>` form fields.
+      tags:
+      - audio
+      summary: Transform audio (echo cancellation, noise suppression, voice conversion, etc.)
+      responses:
+        '200':
+          description: transformed audio file
+          content:
+            audio/x-wav:
+              schema:
+                type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                model:
+                  type: string
+                  description: model
+                audio:
+                  type: string
+                  description: primary input audio file
+                  format: binary
+                reference:
+                  type: string
+                  description: auxiliary reference audio (loopback for AEC, target voice for conversion, etc.)
+                  format: binary
+                response_format:
+                  type: string
+                  description: wav | mp3 | ogg | flac
+                sample_rate:
+                  type: integer
+                  description: desired output sample rate in Hz; omit for the backend's own rate, otherwise 8000-192000
+              required:
+              - model
+              - audio
+  /audio/transformations/stream:
+    get:
+      description: 'Streams binary PCM frames in (interleaved stereo: ch0=audio, ch1=reference) and out (mono). The model must support the audio_transform use case. Any-to-any models such as liquid-audio use the OpenAI Realtime API instead. The first message must be a JSON `session.update` envelope describing model + sample format + frame size + backend params. Server emits binary PCM on the same cadence.'
+      tags:
+      - audio
+      summary: Bidirectional realtime audio transform over WebSocket.
+      responses: {}
+  /tts:
+    post:
+      tags:
+      - audio
+      summary: Generates audio from the input text.
+      responses:
+        '200':
+          description: generated audio/wav file
+          content:
+            audio/x-wav:
+              schema:
+                type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.TTSRequest'
+        description: query params
+        required: true
+  /v1/audio/classification:
+    post:
+      tags:
+      - audio
+      summary: Classify sound events in audio (audio tagging).
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.SoundClassificationResult'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                model:
+                  type: string
+                  description: model
+                file:
+                  type: string
+                  description: audio file
+                  format: binary
+                top_k:
+                  type: integer
+                  description: number of top tags to return (0 = backend default)
+                threshold:
+                  type: number
+                  description: drop tags scoring below this value
+              required:
+              - model
+              - file
+  /v1/audio/diarization:
+    post:
+      tags:
+      - audio
+      summary: Identify speakers in audio (who spoke when).
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.DiarizationResult'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                model:
+                  type: string
+                  description: model
+                file:
+                  type: string
+                  description: audio file
+                  format: binary
+                num_speakers:
+                  type: integer
+                  description: exact speaker count (>0 forces; 0 = auto)
+                min_speakers:
+                  type: integer
+                  description: lower bound when auto-detecting
+                max_speakers:
+                  type: integer
+                  description: upper bound when auto-detecting
+                clustering_threshold:
+                  type: number
+                  description: clustering distance threshold when num_speakers is unknown
+                min_duration_on:
+                  type: number
+                  description: discard segments shorter than this (seconds)
+                min_duration_off:
+                  type: number
+                  description: merge gaps shorter than this (seconds)
+                language:
+                  type: string
+                  description: audio language hint (only meaningful for backends that bundle ASR)
+                include_text:
+                  type: boolean
+                  description: include per-segment transcript when the backend supports it
+                response_format:
+                  type: string
+                  description: json (default), verbose_json, or rttm
+              required:
+              - model
+              - file
+  /v1/audio/speech:
+    post:
+      tags:
+      - audio
+      summary: Generates audio from the input text.
+      responses:
+        '200':
+          description: generated audio/wav file
+          content:
+            audio/x-wav:
+              schema:
+                type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.TTSRequest'
+        description: query params
+        required: true
+  /v1/audio/transcriptions:
+    post:
+      tags:
+      - audio
+      summary: Transcribes audio into the input language.
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                model:
+                  type: string
+                  description: model
+                file:
+                  type: string
+                  description: file
+                  format: binary
+                temperature:
+                  type: number
+                  description: sampling temperature
+                timestamp_granularities:
+                  type: array
+                  items:
+                    type: string
+                  description: timestamp granularities (word, segment)
+                stream:
+                  type: boolean
+                  description: stream partial results as SSE
+              required:
+              - model
+              - file
+  /v1/sound-generation:
+    post:
+      tags:
+      - audio
+      summary: Generates audio from the input text.
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.ElevenLabsSoundGenerationRequest'
+        description: query params
+        required: true
+  /v1/text-to-speech/{voice-id}:
+    post:
+      tags:
+      - audio
+      summary: Generates audio from the input text.
+      parameters:
+      - description: Account ID
+        name: voice-id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.TTSRequest'
+        description: query params
+        required: true
+  /vad:
+    post:
+      tags:
+      - audio
+      summary: Detect voice fragments in an audio stream
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/proto.VADResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.VADRequest'
+        description: query params
+        required: true
+components:
+  schemas:
+    schema.DiarizationSpeaker:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        segment_count:
+          type: integer
+        total_speech_duration:
+          type: number
+    schema.ElevenLabsSoundGenerationRequest:
+      type: object
+      properties:
+        bpm:
+          type: integer
+        caption:
+          type: string
+        do_sample:
+          type: boolean
+        duration_seconds:
+          type: number
+        instrumental:
+          description: 'Simple mode: use text as description; optional instrumental / vocal_language'
+          type: boolean
+        keyscale:
+          type: string
+        language:
+          type: string
+        lyrics:
+          type: string
+        model_id:
+          type: string
+        prompt_influence:
+          type: number
+        text:
+          type: string
+        think:
+          description: Advanced mode
+          type: boolean
+        timesignature:
+          type: string
+        vocal_language:
+          type: string
+    schema.TTSRequest:
+      description: TTS request body
+      type: object
+      properties:
+        backend:
+          description: backend engine override
+          type: string
+        input:
+          description: text input
+          type: string
+        instructions:
+          description: 'Instructions is a free-form, per-request style/voice description. It maps to
+
+            the OpenAI `instructions` field and is forwarded to the backend so expressive
+
+            TTS models (e.g. Qwen3-TTS CustomVoice/VoiceDesign) can vary tone or designed
+
+            voice per request instead of only via the static YAML option.'
+          type: string
+        language:
+          description: (optional) language to use with TTS model
+          type: string
+        model:
+          type: string
+        params:
+          description: 'Params carries optional, backend-specific per-request generation parameters
+
+            (LocalAI extension, e.g. Chatterbox exaggeration/cfg_weight/temperature).'
+          type: object
+          additionalProperties:
+            type: string
+        response_format:
+          description: (optional) output format
+          type: string
+        sample_rate:
+          description: (optional) desired output sample rate
+          type: integer
+        speed:
+          description: 'Speed is the OpenAI `speed` field (0.25-4.0). It is a pointer so an
+
+            explicit `"speed": 0` (invalid, rejected with 400) is distinguishable
+
+            from an omitted field (left at the backend default). It is normalised
+
+            into Params["speed"] so it reaches the backend over the same channel as
+
+            the other per-request generation parameters.'
+          type: number
+        stream:
+          description: (optional) enable streaming TTS
+          type: boolean
+        voice:
+          description: voice audio file or speaker id
+          type: string
+    schema.DiarizationSegment:
+      type: object
+      properties:
+        end:
+          type: number
+        id:
+          type: integer
+        label:
+          type: string
+        speaker:
+          type: string
+        start:
+          type: number
+        text:
+          type: string
+    voiceprofile.AudioMetadata:
+      type: object
+      properties:
+        bit_depth:
+          type: integer
+        channels:
+          type: integer
+        duration_ms:
+          type: integer
+        mime_type:
+          type: string
+        sample_rate:
+          type: integer
+        size_bytes:
+          type: integer
+    schema.ErrorResponse:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/schema.APIError'
+    schema.DiarizationResult:
+      type: object
+      properties:
+        duration:
+          type: number
+        language:
+          type: string
+        num_speakers:
+          type: integer
+        segments:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.DiarizationSegment'
+        speakers:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.DiarizationSpeaker'
+        task:
+          type: string
+    proto.VADSegment:
+      type: object
+      properties:
+        end:
+          type: number
+        start:
+          type: number
+    schema.APIError:
+      type: object
+      properties:
+        code: {}
+        message:
+          type: string
+        param:
+          type: string
+        type:
+          type: string
+    schema.VADRequest:
+      description: VAD request body
+      type: object
+      properties:
+        audio:
+          description: raw audio samples as float32 PCM
+          type: array
+          items:
+            type: number
+        model:
+          type: string
+    voiceprofile.Profile:
+      type: object
+      properties:
+        audio:
+          $ref: '#/components/schemas/voiceprofile.AudioMetadata'
+        consent_confirmed_at:
+          type: string
+        created_at:
+          type: string
+        description:
+          type: string
+        id:
+          type: string
+        language:
+          type: string
+        name:
+          type: string
+        transcript:
+          type: string
+        updated_at:
+          type: string
+        voice:
+          type: string
+    schema.SoundClassification:
+      type: object
+      properties:
+        index:
+          type: integer
+        label:
+          type: string
+        score:
+          type: number
+    schema.SoundClassificationResult:
+      type: object
+      properties:
+        detections:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.SoundClassification'
+        model:
+          type: string
+    localai.VoiceProfileListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/voiceprofile.Profile'
+    proto.VADResponse:
+      type: object
+      properties:
+        segments:
+          type: array
+          items:
+            $ref: '#/components/schemas/proto.VADSegment'
+  securitySchemes:
+    BearerAuth:
+      type: apiKey
+      name: Authorization
+      in: header

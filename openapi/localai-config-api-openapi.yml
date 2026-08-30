@@ -1,0 +1,241 @@
+openapi: 3.2.0
+info:
+  description: The LocalAI Rest API.
+  title: LocalAI Config API
+  contact:
+    name: LocalAI
+    url: https://localai.io
+  license:
+    name: MIT
+    url: https://raw.githubusercontent.com/mudler/LocalAI/master/LICENSE
+  version: 2.0.0
+servers:
+- url: /
+tags:
+- name: config
+paths:
+  /api/models/config-json/{name}:
+    patch:
+      description: Deep-merges the JSON patch body into the existing model config
+      tags:
+      - config
+      summary: Partially update a model configuration
+      parameters:
+      - description: Model name
+        name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: success message
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /api/models/config-metadata:
+    get:
+      description: Returns config field metadata. Use ?section=<id> to filter by section, or omit for a section index.
+      tags:
+      - config
+      summary: List model configuration field metadata
+      parameters:
+      - description: Section ID to filter (e.g. 'general', 'llm', 'parameters') or 'all' for everything
+        name: section
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Section index or filtered field metadata
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /api/models/config-metadata/autocomplete/{provider}:
+    get:
+      description: Returns runtime-resolved values for dynamic providers (backends, models)
+      tags:
+      - config
+      summary: Get dynamic autocomplete values for a config field
+      parameters:
+      - description: Provider name (backends, models, models:chat, models:tts, models:transcript, models:vad)
+        name: provider
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: values array
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /api/models/toggle-pinned/{name}/{action}:
+    put:
+      description: Pin or unpin a model. Pinned models stay loaded and are excluded from automatic eviction.
+      tags:
+      - config
+      summary: Toggle model pinned status
+      parameters:
+      - description: Model name
+        name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: 'Action: ''pin'' or ''unpin'''
+        name: action
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/localai.ModelResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/localai.ModelResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/localai.ModelResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/localai.ModelResponse'
+  /api/models/vram-estimate:
+    post:
+      description: Estimates VRAM based on model weight files at multiple context sizes
+      tags:
+      - config
+      summary: Estimate VRAM usage for a model
+      responses:
+        '200':
+          description: VRAM estimate
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/modeladmin.VRAMResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/modeladmin.VRAMRequest'
+        description: VRAM estimation parameters
+        required: true
+  /api/models/{name}/{action}:
+    put:
+      description: Enable or disable a model from being loaded on demand. Disabled models remain installed but cannot be loaded.
+      tags:
+      - config
+      summary: Toggle model enabled/disabled status
+      parameters:
+      - description: Model name
+        name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: 'Action: ''enable'' or ''disable'''
+        name: action
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/localai.ModelResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/localai.ModelResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/localai.ModelResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/localai.ModelResponse'
+components:
+  schemas:
+    modeladmin.VRAMRequest:
+      type: object
+      properties:
+        context_size:
+          type: integer
+        gpu_layers:
+          type: integer
+        kv_quant_bits:
+          type: integer
+        model:
+          type: string
+    localai.ModelResponse:
+      type: object
+      properties:
+        config: {}
+        config_revision:
+          type: string
+        details:
+          type: array
+          items:
+            type: string
+        error:
+          type: string
+        filename:
+          type: string
+        message:
+          type: string
+        pending_cleanup:
+          type: integer
+        success:
+          type: boolean
+    modeladmin.VRAMResponse:
+      type: object
+      properties:
+        context_length:
+          type: integer
+        context_note:
+          type: string
+        model_max_context:
+          type: integer
+        size_bytes:
+          type: integer
+        size_display:
+          type: string
+        vram_bytes:
+          type: integer
+        vram_display:
+          type: string
+  securitySchemes:
+    BearerAuth:
+      type: apiKey
+      name: Authorization
+      in: header

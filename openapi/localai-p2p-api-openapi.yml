@@ -1,0 +1,77 @@
+openapi: 3.2.0
+info:
+  description: The LocalAI Rest API.
+  title: LocalAI P2p API
+  contact:
+    name: LocalAI
+    url: https://localai.io
+  license:
+    name: MIT
+    url: https://raw.githubusercontent.com/mudler/LocalAI/master/LICENSE
+  version: 2.0.0
+servers:
+- url: /
+tags:
+- name: p2p
+paths:
+  /api/p2p:
+    get:
+      tags:
+      - p2p
+      summary: Returns available P2P nodes
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/schema.P2PNodesResponse'
+  /api/p2p/token:
+    get:
+      tags:
+      - p2p
+      summary: Show the P2P token
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: string
+components:
+  schemas:
+    schema.NodeData:
+      type: object
+      properties:
+        id:
+          type: string
+        lastSeen:
+          type: string
+        name:
+          type: string
+        serviceID:
+          type: string
+        tunnelAddress:
+          type: string
+    schema.P2PNodesResponse:
+      type: object
+      properties:
+        federated_nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.NodeData'
+        llama_cpp_nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.NodeData'
+        mlx_nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.NodeData'
+  securitySchemes:
+    BearerAuth:
+      type: apiKey
+      name: Authorization
+      in: header

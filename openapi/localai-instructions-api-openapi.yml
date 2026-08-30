@@ -1,0 +1,92 @@
+openapi: 3.2.0
+info:
+  description: The LocalAI Rest API.
+  title: LocalAI Instructions API
+  contact:
+    name: LocalAI
+    url: https://localai.io
+  license:
+    name: MIT
+    url: https://raw.githubusercontent.com/mudler/LocalAI/master/LICENSE
+  version: 2.0.0
+servers:
+- url: /
+tags:
+- name: instructions
+paths:
+  /api/instructions:
+    get:
+      description: Returns a compact list of instruction areas with descriptions and URLs for detailed guides
+      tags:
+      - instructions
+      summary: List available API instruction areas
+      responses:
+        '200':
+          description: instructions list with hint
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /api/instructions/{name}:
+    get:
+      description: Returns a markdown guide (default) or filtered OpenAPI fragment (format=json) for a named instruction
+      tags:
+      - instructions
+      summary: Get an instruction's API guide or OpenAPI fragment
+      parameters:
+      - description: Instruction name (e.g. chat-inference, config-management)
+        name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: 'Response format: json for OpenAPI fragment, omit for markdown'
+        name: format
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: instruction documentation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/localai.APIInstructionResponse'
+            text/markdown:
+              schema:
+                $ref: '#/components/schemas/localai.APIInstructionResponse'
+        '404':
+          description: instruction not found
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+            text/markdown:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+components:
+  schemas:
+    localai.APIInstructionResponse:
+      type: object
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        swagger_fragment:
+          type: object
+          additionalProperties: {}
+        tags:
+          type: array
+          items:
+            type: string
+  securitySchemes:
+    BearerAuth:
+      type: apiKey
+      name: Authorization
+      in: header

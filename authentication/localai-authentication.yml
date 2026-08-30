@@ -1,0 +1,179 @@
+generated: '2026-08-27'
+method: searched
+source: https://localai.io/features/authentication
+docs: https://localai.io/features/authentication
+spec: openapi/localai-api-openapi.yml
+summary:
+  types:
+  - apiKey
+  - http
+  - oauth2
+  - openIdConnect
+  api_key_in:
+  - header
+  - cookie
+  note: >-
+    The published Swagger 2.0 document declares only a single apiKey scheme (BearerAuth, Authorization
+    header). The documentation describes a materially larger model than the contract does: two coexisting
+    modes (legacy shared API keys and a database-backed user system) plus GitHub OAuth and generic OIDC
+    single sign-on. This artifact records the documented model; the gap between the docs and the
+    securityDefinitions block is a real contract-quality finding for the provider.
+schemes:
+- name: BearerAuth
+  type: apiKey
+  in: header
+  parameter: Authorization
+  declared_in_spec: true
+  sources:
+  - openapi/localai-api-openapi.yml
+  - https://localai.io/features/authentication
+modes:
+- id: legacy-api-key
+  name: Legacy API key authentication
+  description: >-
+    One or more shared keys configured via LOCALAI_API_KEY (comma-separated) or the equivalent CLI flag.
+    Legacy keys grant full admin access — there is no role separation. Keys can also be managed at runtime
+    through the Runtime Settings interface.
+  credential_transports:
+  - 'Authorization: Bearer <key>'
+  - 'x-api-key: <key>'
+  - 'xi-api-key: <key>'
+  - 'token cookie'
+  configuration:
+  - env: LOCALAI_API_KEY
+    description: Single key, or comma-separated list of keys.
+  - env: LOCALAI_DISABLE_API_KEY_REQUIREMENT_FOR_HTTP_GET
+    default: 'false'
+    description: Enables a GET-only compatibility override when legacy keys are configured.
+  - env: LOCALAI_HTTP_GET_EXEMPTED_ENDPOINTS
+    description: Regular expressions naming the exempt GET routes; inert unless the flag above is enabled.
+- id: user-auth
+  name: User authentication system
+  description: >-
+    A database-backed user system (SQLite by default, PostgreSQL supported) with accounts, admin/user
+    roles, session cookies, per-user API keys, invite links and per-user token-usage accounting. The first
+    user to sign in is automatically promoted to admin.
+  enabled_by:
+  - LOCALAI_AUTH=true
+  - Setting a GitHub OAuth Client ID (auto-enables)
+  - Setting an OIDC Client ID (auto-enables)
+  roles:
+  - id: admin
+    description: >-
+      Full access, including model management, backend configuration, system settings, traces, agents and
+      user management.
+  - id: user
+    description: >-
+      Inference endpoints only — chat completions, embeddings, image/video/audio generation, TTS, MCP
+      chat, and the caller's own usage statistics.
+  registration_modes:
+  - id: open
+    description: Anyone can register and is immediately active.
+  - id: approval
+    default: true
+    description: New users land in pending status until an admin approves them; a valid invite activates immediately.
+  - id: invite
+    description: Registration requires an admin-generated invite link.
+  build_requirement: >-
+    Requires CGO and the `auth` build tag. Docker images ship with GO_TAGS="auth"; a source build without
+    the tag ignores LOCALAI_AUTH entirely.
+- id: oauth-github
+  name: GitHub OAuth
+  type: oauth2
+  flow: authorizationCode
+  authorization_start: GET /api/auth/github/login
+  callback: GET /api/auth/github/callback
+  callback_url_pattern: '{LOCALAI_BASE_URL}/api/auth/github/callback'
+  configuration:
+  - env: GITHUB_CLIENT_ID
+  - env: GITHUB_CLIENT_SECRET
+  - env: LOCALAI_BASE_URL
+- id: oidc
+  name: OIDC single sign-on
+  type: openIdConnect
+  discovery: /.well-known/openid-configuration on the configured issuer
+  scopes_requested:
+  - openid
+  - profile
+  - email
+  authorization_start: GET /api/auth/oidc/login
+  callback: GET /api/auth/oidc/callback
+  callback_url_pattern: '{LOCALAI_BASE_URL}/api/auth/oidc/callback'
+  configuration:
+  - env: LOCALAI_OIDC_ISSUER
+  - env: LOCALAI_OIDC_CLIENT_ID
+  - env: LOCALAI_OIDC_CLIENT_SECRET
+  - env: LOCALAI_BASE_URL
+  documented_providers:
+  - Keycloak
+  - Google
+  - Okta
+  - Authentik
+  - Azure AD
+- id: user-api-keys
+  name: Per-user API keys
+  description: >-
+    Authenticated users create personal keys through POST /api/auth/api-keys. A user API key inherits the
+    creating user's role, so an admin's key grants admin access.
+  management_endpoints:
+  - POST /api/auth/api-keys
+  - GET /api/auth/api-keys
+  - DELETE /api/auth/api-keys/{id}
+anonymous_surface:
+  description: >-
+    When either authentication mode is configured, the HTTP surface is private by default. Only the routes
+    below answer anonymously. If neither mode is configured the middleware does not restrict requests at all.
+  discovery:
+  - GET /.well-known/localai.json
+  - GET /api/instructions
+  - GET /api/instructions/{name}
+  - GET /swagger and GET under /swagger/
+  bootstrap:
+  - GET /healthz
+  - GET /readyz
+  - GET /api/auth/status
+  - POST /api/auth/token-login
+  - POST /api/auth/register
+  - POST /api/auth/login
+  - GET /api/auth/github/login
+  - GET /api/auth/github/callback
+  - GET /api/auth/oidc/login
+  - GET /api/auth/oidc/callback
+  - OPTIONS under /api/auth/
+  - GET /api/branding and GET under /branding/asset/
+  overrides:
+    field: ApplicationConfig.PathWithoutAuth
+    default: empty
+    description: >-
+      Embedded deployments may add path prefixes that bypass global authentication for every HTTP method
+      below that prefix. Route-specific authorization still applies.
+authorization:
+  model: role-based
+  admin_only_examples:
+  - GET /api/traces
+  - GET /api/traces/summary
+  - POST /api/traces/clear
+  - GET /system
+  - GET /backend/monitor
+  - POST /backend/shutdown
+  - POST /backend/load
+  - GET /api/p2p (and all /api/p2p/* routes)
+  - All /api/agent/tasks/* and /api/agent/jobs/* routes
+  - GET /models/available
+  - GET /models/galleries
+  - GET /backends and GET /backends/available
+  user_accessible_examples:
+  - POST /v1/chat/completions
+  - POST /v1/embeddings
+  - POST /v1/completions
+  - POST /v1/images/generations
+  - POST /v1/mcp/chat/completions
+  - POST /v1/messages
+  - POST /v1/responses
+  - GET /v1/models
+  - GET /api/auth/usage
+  failure_codes:
+  - code: 401
+    condition: "Missing or invalid credentials. Response carries the header WWW-Authenticate: Bearer."
+  - code: 403
+    condition: Authenticated non-admin calling an admin-only endpoint.

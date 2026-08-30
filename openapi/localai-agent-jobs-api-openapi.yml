@@ -1,0 +1,596 @@
+openapi: 3.2.0
+info:
+  description: The LocalAI Rest API.
+  title: LocalAI Agent Jobs API
+  contact:
+    name: LocalAI
+    url: https://localai.io
+  license:
+    name: MIT
+    url: https://raw.githubusercontent.com/mudler/LocalAI/master/LICENSE
+  version: 2.0.0
+servers:
+- url: /
+tags:
+- name: agent-jobs
+paths:
+  /api/agent/jobs:
+    get:
+      tags:
+      - agent-jobs
+      summary: List agent jobs
+      parameters:
+      - description: Filter by task ID
+        name: task_id
+        in: query
+        schema:
+          type: string
+      - description: Filter by status (pending, running, completed, failed, cancelled)
+        name: status
+        in: query
+        schema:
+          type: string
+      - description: Max number of jobs to return
+        name: limit
+        in: query
+        schema:
+          type: integer
+      - description: Set to 'true' for admin cross-user listing
+        name: all_users
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/schema.Job'
+  /api/agent/jobs/execute:
+    post:
+      tags:
+      - agent-jobs
+      summary: Execute an agent job
+      responses:
+        '201':
+          description: job created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.JobExecutionResponse'
+        '400':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.JobExecutionRequest'
+        description: Job execution request
+        required: true
+  /api/agent/jobs/{id}:
+    get:
+      tags:
+      - agent-jobs
+      summary: Get an agent job
+      parameters:
+      - description: Job ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: job
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.Job'
+        '404':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+    delete:
+      tags:
+      - agent-jobs
+      summary: Delete an agent job
+      parameters:
+      - description: Job ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: message
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        '404':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+  /api/agent/jobs/{id}/cancel:
+    post:
+      tags:
+      - agent-jobs
+      summary: Cancel an agent job
+      parameters:
+      - description: Job ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: message
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        '400':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        '404':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+  /api/agent/tasks:
+    get:
+      tags:
+      - agent-jobs
+      summary: List agent tasks
+      parameters:
+      - description: Set to 'true' for admin cross-user listing
+        name: all_users
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/schema.Task'
+    post:
+      tags:
+      - agent-jobs
+      summary: Create a new agent task
+      responses:
+        '201':
+          description: id
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        '400':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.Task'
+        description: Task definition
+        required: true
+  /api/agent/tasks/{id}:
+    get:
+      tags:
+      - agent-jobs
+      summary: Get an agent task
+      parameters:
+      - description: Task ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.Task'
+        '404':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+    put:
+      tags:
+      - agent-jobs
+      summary: Update an agent task
+      parameters:
+      - description: Task ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: message
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        '400':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        '404':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schema.Task'
+        description: Updated task definition
+        required: true
+    delete:
+      tags:
+      - agent-jobs
+      summary: Delete an agent task
+      parameters:
+      - description: Task ID
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: message
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        '404':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+  /api/agent/tasks/{name}/execute:
+    post:
+      tags:
+      - agent-jobs
+      summary: Execute an agent task by name
+      parameters:
+      - description: Task name
+        name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: job created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schema.JobExecutionResponse'
+        '400':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        '404':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        description: Optional template parameters
+components:
+  schemas:
+    schema.JobTrace:
+      type: object
+      properties:
+        arguments:
+          description: Tool arguments or result data
+          type: object
+          additionalProperties: {}
+        content:
+          description: The actual trace content
+          type: string
+        timestamp:
+          description: When this trace occurred
+          type: string
+        tool_name:
+          description: Tool name (for tool_call/tool_result)
+          type: string
+        type:
+          description: '"reasoning", "tool_call", "tool_result", "status"'
+          type: string
+    schema.JobExecutionResponse:
+      type: object
+      properties:
+        job_id:
+          description: unique job identifier
+          type: string
+        status:
+          description: initial status (pending)
+          type: string
+        url:
+          description: URL to poll for job status
+          type: string
+    schema.JobExecutionRequest:
+      type: object
+      properties:
+        audios:
+          description: List of audio URLs or base64 strings
+          type: array
+          items:
+            type: string
+        files:
+          description: List of file URLs or base64 strings
+          type: array
+          items:
+            type: string
+        images:
+          description: 'Multimedia content (optional, for manual execution)
+
+            Can contain URLs or base64-encoded data URIs'
+          type: array
+          items:
+            type: string
+        parameters:
+          description: Optional, for templating
+          type: object
+          additionalProperties:
+            type: string
+        task_id:
+          description: Required
+          type: string
+        videos:
+          description: List of video URLs or base64 strings
+          type: array
+          items:
+            type: string
+    schema.JobStatus:
+      type: string
+      enum:
+      - pending
+      - running
+      - completed
+      - failed
+      - cancelled
+      x-enum-varnames:
+      - JobStatusPending
+      - JobStatusRunning
+      - JobStatusCompleted
+      - JobStatusFailed
+      - JobStatusCancelled
+    schema.MultimediaSourceConfig:
+      type: object
+      properties:
+        headers:
+          description: Custom headers for HTTP request (e.g., Authorization)
+          type: object
+          additionalProperties:
+            type: string
+        type:
+          description: '"image", "video", "audio", "file"'
+          type: string
+        url:
+          description: URL to fetch from
+          type: string
+    schema.Task:
+      type: object
+      properties:
+        created_at:
+          type: string
+        cron:
+          description: Optional cron expression
+          type: string
+        cron_parameters:
+          description: Parameters to use when executing cron jobs
+          type: object
+          additionalProperties:
+            type: string
+        description:
+          description: Optional description
+          type: string
+        enabled:
+          description: Can be disabled without deletion
+          type: boolean
+        id:
+          description: UUID
+          type: string
+        model:
+          description: Model name (must have MCP config)
+          type: string
+        multimedia_sources:
+          description: 'Multimedia sources (for cron jobs)
+
+            URLs to fetch multimedia content from when cron job executes
+
+            Each source can have custom headers for authentication/authorization'
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.MultimediaSourceConfig'
+        name:
+          description: User-friendly name
+          type: string
+        prompt:
+          description: Template prompt (supports Go template .param syntax)
+          type: string
+        updated_at:
+          type: string
+        webhooks:
+          description: 'Webhook configuration (for notifications).
+
+            Supports multiple webhook endpoints.
+
+            Webhooks can handle both success and failure cases using template variables:
+
+            .Job (Job object), .Task (Task object), .Result (if successful),
+
+            .Error (if failed), .Status (job status string).'
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.WebhookConfig'
+    schema.WebhookConfig:
+      type: object
+      properties:
+        headers:
+          description: Custom headers (e.g., Authorization)
+          type: object
+          additionalProperties:
+            type: string
+        method:
+          description: 'HTTP method (POST, PUT, PATCH) - default: POST'
+          type: string
+        payload_template:
+          description: Optional template for payload
+          type: string
+        url:
+          description: Webhook endpoint URL
+          type: string
+    schema.Job:
+      type: object
+      properties:
+        audios:
+          description: List of audio URLs or base64 strings
+          type: array
+          items:
+            type: string
+        completed_at:
+          type: string
+        created_at:
+          type: string
+        error:
+          description: Error message if failed
+          type: string
+        files:
+          description: List of file URLs or base64 strings
+          type: array
+          items:
+            type: string
+        id:
+          description: UUID
+          type: string
+        images:
+          description: 'Multimedia content (for manual execution)
+
+            Can contain URLs or base64-encoded data URIs'
+          type: array
+          items:
+            type: string
+        parameters:
+          description: Template parameters
+          type: object
+          additionalProperties:
+            type: string
+        result:
+          description: Agent response
+          type: string
+        started_at:
+          type: string
+        status:
+          description: pending, running, completed, failed, cancelled
+          allOf:
+          - $ref: '#/components/schemas/schema.JobStatus'
+        task_id:
+          description: Reference to Task
+          type: string
+        traces:
+          description: Execution traces (reasoning, tool calls, tool results)
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.JobTrace'
+        triggered_by:
+          description: '"manual", "cron", "api"'
+          type: string
+        videos:
+          description: List of video URLs or base64 strings
+          type: array
+          items:
+            type: string
+        webhook_error:
+          description: Error if webhook failed
+          type: string
+        webhook_sent:
+          description: Webhook delivery tracking
+          type: boolean
+        webhook_sent_at:
+          type: string
+  securitySchemes:
+    BearerAuth:
+      type: apiKey
+      name: Authorization
+      in: header
