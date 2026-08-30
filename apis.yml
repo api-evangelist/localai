@@ -35,6 +35,19 @@ modified: '2026-08-27'
 image: https://raw.githubusercontent.com/mudler/LocalAI/master/core/http/static/logo_horizontal.png
 tags:
 - Artificial Intelligence
+- Machine-Learning
+- Large Language Models
+- Inference
+- Self-Hosted
+- Open-Source
+- Agents
+- MCP
+- Speech
+- Computer-Vision
+- Embeddings
+- Edge Computing
+tags_raw:
+- Artificial Intelligence
 - Machine Learning
 - Large Language Models
 - Inference
@@ -58,6 +71,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - 3D
+  tags_raw:
   - 3d
   properties:
   - type: OpenAPI
@@ -110,6 +125,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - Audio
+  tags_raw:
   - audio
   properties:
   - type: OpenAPI
@@ -136,6 +153,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - Backend
+  tags_raw:
   - backends
   properties:
   - type: OpenAPI
@@ -162,6 +181,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - Branding
+  tags_raw:
   - branding
   properties:
   - type: OpenAPI
@@ -188,6 +209,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - Config
+  tags_raw:
   - config
   properties:
   - type: OpenAPI
@@ -214,6 +237,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - Depth
+  tags_raw:
   - depth
   properties:
   - type: OpenAPI
@@ -240,6 +265,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - Detection
+  tags_raw:
   - detection
   properties:
   - type: OpenAPI
@@ -266,6 +293,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - Embeddings
+  tags_raw:
   - embeddings
   properties:
   - type: OpenAPI
@@ -292,6 +321,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - Face Recognition
+  tags_raw:
   - face-recognition
   properties:
   - type: OpenAPI
@@ -318,6 +349,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - Image
+  tags_raw:
   - images
   properties:
   - type: OpenAPI
@@ -344,6 +377,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - Inference
+  tags_raw:
   - inference
   properties:
   - type: OpenAPI
@@ -370,6 +405,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - Instructions
+  tags_raw:
   - instructions
   properties:
   - type: OpenAPI
@@ -396,6 +433,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - MCP
+  tags_raw:
   - mcp
   properties:
   - type: OpenAPI
@@ -422,6 +461,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - Models
+  tags_raw:
   - models
   properties:
   - type: OpenAPI
@@ -448,6 +489,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - Moderation
+  tags_raw:
   - moderation
   properties:
   - type: OpenAPI
@@ -474,6 +517,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - Monitoring
+  tags_raw:
   - monitoring
   properties:
   - type: OpenAPI
@@ -526,6 +571,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - P2P
+  tags_raw:
   - p2p
   properties:
   - type: OpenAPI
@@ -552,6 +599,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - PII
+  tags_raw:
   - pii
   properties:
   - type: OpenAPI
@@ -578,6 +627,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - Rerank
+  tags_raw:
   - rerank
   properties:
   - type: OpenAPI
@@ -604,6 +655,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - Router
+  tags_raw:
   - router
   properties:
   - type: OpenAPI
@@ -630,6 +683,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - Tokenize
+  tags_raw:
   - tokenize
   properties:
   - type: OpenAPI
@@ -656,6 +711,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - Video
+  tags_raw:
   - video
   properties:
   - type: OpenAPI
@@ -682,6 +739,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - Voice Profiles
+  tags_raw:
   - voice-profiles
   properties:
   - type: OpenAPI
@@ -708,6 +767,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - Voice Recognition
+  tags_raw:
   - voice-recognition
   properties:
   - type: OpenAPI

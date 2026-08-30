@@ -1,0 +1,14 @@
+{
+  "repo": "localai",
+  "feeds": [
+    {
+      "source": "https://github.com/mudler/LocalAI/discussions",
+      "feed_url": "https://github.com/mudler/LocalAI/discussions",
+      "title": "",
+      "saved": 0,
+      "method": "none"
+    }
+  ],
+  "post_count": 0,
+  "fetched": "2026-08-30T22:33:40Z"
+}
