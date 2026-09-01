@@ -1,0 +1,83 @@
+generated: '2026-08-27'
+method: probed
+source: live HTTP probes of every apis.yml host on 2026-08-27
+note: >-
+  No /.well-known/ document is served on any host this company controls, so no WellKnown or SecurityTxt
+  pointer is emitted in apis.yml — this file records a measured absence, not a presence. The absence is
+  structural rather than negligent: LocalAI is self-hosted software, and its discovery documents are
+  served by the customer's own instance, not by the project's marketing/docs site. A running LocalAI
+  instance does serve GET /.well-known/localai.json (instance version, endpoint URLs flat and categorized,
+  and runtime capability flags for config_metadata, config_patch, vram_estimate, mcp, agents and p2p) plus
+  GET /api/instructions and GET /api/instructions/{name}, all three anonymous even when authentication is
+  configured. Those are documented at https://localai.io/docs/features/api-discovery/ and appear in the
+  published Swagger document; they cannot be probed here because there is no vendor-operated instance.
+hosts:
+- host: localai.io
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+    file: null
+  - path: /.well-known/openid-configuration
+    status: 404
+    file: null
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+    file: null
+  - path: /.well-known/api-catalog
+    status: 404
+    file: null
+  - path: /.well-known/ai-plugin.json
+    status: 404
+    file: null
+  - path: /.well-known/agent-card.json
+    status: 404
+    file: null
+  - path: /.well-known/agent.json
+    status: 404
+    file: null
+  - path: /.well-known/localai.json
+    status: 404
+    file: null
+  - path: /llms.txt
+    status: 404
+    file: null
+- host: agenthub.localai.io
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+    file: null
+  - path: /.well-known/openid-configuration
+    status: 404
+    file: null
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+    file: null
+  - path: /.well-known/api-catalog
+    status: 404
+    file: null
+  - path: /.well-known/ai-plugin.json
+    status: 404
+    file: null
+  - path: /.well-known/agent-card.json
+    status: 404
+    file: null
+  - path: /.well-known/agent.json
+    status: 404
+    file: null
+  - path: /llms.txt
+    status: 404
+    file: null
+self_hosted_instance_paths:
+- path: /.well-known/localai.json
+  served_by: a running LocalAI instance
+  anonymous: true
+  documented: https://localai.io/docs/features/api-discovery/
+- path: /api/instructions
+  served_by: a running LocalAI instance
+  anonymous: true
+  documented: https://localai.io/docs/features/api-discovery/
+- path: /api/instructions/{name}
+  served_by: a running LocalAI instance
+  anonymous: true
+  documented: https://localai.io/docs/features/api-discovery/
+  note: Returns a markdown guide by default, or a raw OpenAPI fragment with ?format=json.

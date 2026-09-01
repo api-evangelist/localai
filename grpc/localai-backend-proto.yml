@@ -1,0 +1,62 @@
+generated: '2026-08-27'
+method: searched
+source: https://raw.githubusercontent.com/mudler/LocalAI/master/backend/backend.proto
+http_status: 200
+file: grpc/localai-backend.proto
+syntax: proto3
+package: backend
+go_package: github.com/go-skynet/LocalAI/pkg/grpc/proto
+java_package: io.skynet.localai.backend
+java_outer_classname: LocalAIBackend
+services:
+- name: Backend
+  fq_name: backend.Backend
+  rpc_count: 52
+  streaming_rpc_count: 19
+message_count: 114
+note: >-
+  LocalAI ships a real, first-party proto3 contract alongside its REST surface, and it is the more
+  interesting of the two. `backend.Backend` is the interface every LocalAI inference backend implements —
+  llama.cpp, vllm.cpp, audio.cpp, whisper, stable-diffusion and the rest all speak it — which makes this
+  the contract a third party writes against to add a new engine to LocalAI, rather than the one a client
+  writes against to call it. It is saved verbatim; nothing here was authored by this pipeline.
+  It also covers capability the REST surface does not expose: fine-tuning (StartFineTune,
+  FineTuneProgress, StopFineTune, ListCheckpoints, ExportModel), quantization (StartQuantization,
+  QuantizationProgress, StopQuantization), distributed forwarding (Forward), and bidirectional live audio
+  (AudioTranscriptionLive, AudioTransformStream, AudioToAudioStream).
+rpc_groups:
+- group: lifecycle
+  rpcs: [Health, Free, LoadModel, Status, ModelMetadata, GetMetrics]
+- group: text
+  rpcs: [Predict, PredictStream, Embedding, TokenizeString, Detokenize, Rerank, TokenClassify, Score]
+- group: image-video-3d
+  rpcs: [GenerateImage, UpscaleImage, GenerateVideo, Generate3D, Detect, Depth]
+- group: audio
+  rpcs:
+  - AudioTranscription
+  - AudioTranscriptionStream
+  - AudioTranscriptionLive
+  - TTS
+  - TTSStream
+  - SoundGeneration
+  - SoundDetection
+  - VAD
+  - Diarize
+  - AudioEncode
+  - AudioDecode
+  - AudioTransform
+  - AudioTransformStream
+  - AudioToAudioStream
+- group: recognition
+  rpcs: [FaceVerify, FaceAnalyze, VoiceVerify, VoiceAnalyze, VoiceEmbed]
+- group: stores
+  rpcs: [StoresSet, StoresDelete, StoresGet, StoresFind]
+- group: training
+  rpcs: [StartFineTune, FineTuneProgress, StopFineTune, ListCheckpoints, ExportModel]
+- group: quantization
+  rpcs: [StartQuantization, QuantizationProgress, StopQuantization]
+- group: distributed
+  rpcs: [Forward]
+buf_registry:
+  published: false
+  note: Not published to buf.build; the .proto is distributed in the source repository only.

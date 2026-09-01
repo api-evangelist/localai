@@ -1,0 +1,64 @@
+generated: '2026-08-27'
+method: generated
+source: >-
+  openapi/localai-api-openapi.yml plus the LocalAI documentation (authentication, api-errors, mcp,
+  middleware, tracing, localai-assistant, api-discovery)
+api: LocalAI API
+note: >-
+  Four packaged Agent Skills covering the flows a LocalAI instance is actually driven through. Every
+  operation named in every skill was verified present in the published Swagger document before it was
+  written; the handful that are documented but absent from the contract (/api/pii/events,
+  /api/middleware/status, /api/router/decisions, /api/operations/{id}/cancel) are called out as
+  unverified in the skill text rather than presented as contract operations. Because the contract declares
+  no operationId on any of its 123 operations, operations are referenced as "METHOD path" throughout —
+  that is the only stable identifier this contract offers.
+  Searched first for provider-published agent instructions and FOUND them: LocalAI publishes an
+  AGENTS.md at the repository root indexing 16 topic guides under .agents/, saved verbatim below.
+  Separately, LocalAI's Skills system (LOCALAI_AGENT_POOL_ENABLE_SKILLS, /api/agents/skills, git-based
+  skill repositories) is a runtime feature for skills the OPERATOR authors, not a catalogue of published
+  skills for driving the API, so there was nothing to save from it.
+skills:
+- name: localai-orient-against-an-instance
+  file: localai-orient-against-an-instance.md
+  summary: >-
+    Establish what an unknown LocalAI instance is, which subsystems are live, which models it serves and
+    what the caller is allowed to call — using the three anonymous discovery endpoints first.
+  operations: 6
+- name: localai-run-an-inference-request
+  file: localai-run-an-inference-request.md
+  summary: >-
+    Choose the right compatibility surface (OpenAI, Anthropic, Open Responses, ElevenLabs), send the
+    request, and parse errors with the envelope that endpoint family actually uses.
+  operations: 8
+- name: localai-install-a-model
+  file: localai-install-a-model.md
+  summary: >-
+    Search the gallery, rehearse the VRAM fit, confirm with the human, install, poll the job, verify —
+    and know which of the surrounding writes have no documented inverse.
+  operations: 8
+- name: localai-operate-and-observe
+  file: localai-operate-and-observe.md
+  summary: >-
+    Diagnose a failed or rewritten request through traces, backend logs, middleware decision and event
+    logs, and account for token usage per user and per API key.
+  operations: 9
+provider_published:
+- name: LocalAI Agent Instructions
+  file: localai-AGENTS.md
+  method: searched
+  source: https://raw.githubusercontent.com/mudler/LocalAI/master/AGENTS.md
+  http_status: 200
+  audience: coding-agents-contributing-to-localai
+  note: >-
+    Saved verbatim. This is an entry point for AI coding assistants working ON LocalAI (Claude Code,
+    Cursor, Copilot, Codex, Aider), not for agents CALLING the API — a distinction worth keeping straight.
+    It is unusually substantive for the genre: LocalAI adopts the Linux kernel project's guidelines for AI
+    coding assistants, forbids Signed-off-by and Co-Authored-By trailers from an AI, and mandates an
+    `Assisted-by: AGENT_NAME:MODEL_VERSION [TOOL1] [TOOL2]` trailer instead, with the human submitter
+    owning the change. Two of its rules are directly relevant to this catalog: a docs-with-code rule
+    requiring docs/content/ to be updated in the same change as any user-facing API/CLI/config change,
+    and a rule that every admin endpoint an admin would manage conversationally MUST also be exposed as an
+    MCP tool in pkg/mcp/localaitools/, enforced by a TestToolHTTPRouteMappingComplete test. The second is
+    the governance behind mcp/localai-tool-crosswalk.yml — REST/MCP drift is treated as a test failure.
+  topic_guides: 16
+  topic_guide_index: https://github.com/mudler/LocalAI/tree/master/.agents

@@ -1,0 +1,217 @@
+generated: '2026-08-27'
+method: searched
+source: >-
+  https://localai.io/features/authentication, https://localai.io/reference/api-errors,
+  https://localai.io/features/middleware/, https://localai.io/docs/features/api-discovery/,
+  and openapi/localai-api-openapi.yml
+auth_style:
+  primary: bearer-token
+  headers:
+  - 'Authorization: Bearer <key>'
+  - 'x-api-key: <key>'
+  - 'xi-api-key: <key>'
+  cookies:
+  - session
+  - token
+  detail: authentication/localai-authentication.yml
+  note: >-
+    Three interchangeable header names plus two cookie names carry the same credential. The xi-api-key
+    alias exists for ElevenLabs client compatibility, mirroring the /v1/text-to-speech/{voice-id} and
+    /v1/sound-generation endpoints.
+idempotency:
+  supported: false
+  header: null
+  note: >-
+    No idempotency key, request-deduplication window, or replay-safety guarantee is documented anywhere in
+    the LocalAI documentation or declared in the published Swagger document. An agent retrying a mutating
+    call — install_model, POST /models/apply, POST /backends/apply, POST /api/router/{name}/corpus —
+    cannot rely on the second call being a no-op. No Idempotency pointer is emitted in apis.yml.
+pagination:
+  style: limit-offset
+  scope: partial
+  note: >-
+    Pagination exists on 3 of the 123 published operations and nowhere else. The three are log/trace
+    listings, not resource collections. Every genuine resource collection — GET /v1/models,
+    GET /v1/models/capabilities, GET /models/available, GET /backends, GET /backends/available,
+    GET /api/aliases, GET /api/voice-profiles — returns an unbounded list with no limit, offset, cursor
+    or page parameter, so an agent cannot bound a response it has not already fetched. Two server-side
+    caps stand in for pagination elsewhere: the router decision log is a 5,000-entry in-process ring
+    buffer, and the usage `by_key` list is capped at 200 entries with a `truncated: true` flag in the
+    response when more would qualify. No response carries a total count or a next-page link.
+  paginated_operations:
+  - operation: GET /api/traces
+    params: [limit, offset]
+    in: query
+  - operation: GET /api/backend-traces
+    params: [limit, offset]
+    in: query
+  - operation: GET /api/agent/jobs
+    params: [limit]
+    in: query
+  limit_params:
+  - name: limit
+    applies_to: GET /api/router/decisions
+    note: Documented in the middleware endpoint table; that path is absent from the published Swagger document.
+filtering:
+  supported: true
+  note: >-
+    Log and event endpoints accept filters rather than page cursors — /api/pii/events by correlation_id,
+    user_id, pattern_id, kind and origin; /api/router/decisions by correlation_id, user_id, router_model
+    and limit; /api/auth/admin/usage by user_id; /api/auth/admin/usage/sources by user_id and api_key_id.
+  time_bucketing:
+    param: period
+    values:
+    - day
+    - week
+    - month
+    - all
+    applies_to:
+    - GET /api/auth/usage
+    - GET /api/auth/usage/sources
+    - GET /api/auth/admin/usage
+    - GET /api/auth/admin/usage/sources
+metadata:
+  field: metadata
+  note: >-
+    The standard OpenAI `metadata` object doubles as LocalAI's request-control channel. metadata.mcp_servers
+    takes a comma-separated list of MCP server names and activates only those for the request;
+    metadata.localai_assistant=true wires the request to the in-process admin MCP server. These keys are
+    consumed by LocalAI and stripped before the request reaches the backend, so a client that supports the
+    standard metadata field needs no schema extension.
+tracing:
+  request_id_header: null
+  correlation_id:
+    field: correlation_id
+    note: >-
+      A correlation_id threads through the middleware event and decision logs and is the documented filter
+      for both, but no documentation states that it is returned on the response as a header. An agent
+      cannot currently capture a request identifier from a response and use it to look the request up.
+  surfaces:
+  - GET /api/traces
+  - GET /api/traces/summary
+  - GET /api/traces/{id}
+  - POST /api/traces/clear
+  - GET /api/backend-traces
+  - GET /api/backend-traces/{id}
+  - GET /api/pii/events
+  docs: https://localai.io/features/tracing
+versioning:
+  style: path-prefix
+  detail: lifecycle/localai-lifecycle.yml
+error_envelope:
+  style: three vendor envelopes selected by endpoint family
+  detail: errors/localai-problem-types.yml
+rate_limit_signaling:
+  headers: []
+  detail: rate-limits/localai-rate-limits.yml
+  note: No rate-limit response headers and no 429 are documented or declared in the published contract.
+streaming:
+  sse:
+    param: stream
+    applies_to:
+    - POST /v1/chat/completions
+    - POST /v1/completions
+    - POST /v1/messages
+    - POST /v1/responses
+  websocket:
+  - ws://<host>/v1/realtime?model=<model>
+  - /ws/backend-logs/{modelId}
+  webrtc:
+  - POST /v1/realtime?model=<model> (SDP offer/answer handshake, Opus codec via the opus backend)
+  detail: asyncapi/localai-realtime-asyncapi.yml
+content_types:
+  json: application/json
+  multipart: >-
+    multipart/form-data for file-bearing operations — audio transcription (file field), image editing
+    (image and mask fields), voice and face enrolment.
+compatibility:
+  note: >-
+    The single most important convention for an integrator: LocalAI is a compatibility surface, not an
+    original API. Point an existing OpenAI, Anthropic or ElevenLabs client at the instance base URL and it
+    works unchanged. Where LocalAI adds capability it does so through the host API's own extension points
+    (metadata, model config YAML) rather than through new required parameters.
+  emulated_apis:
+  - OpenAI Chat Completions, Completions, Embeddings, Images, Audio, Moderations, Models
+  - OpenAI Responses (/v1/responses)
+  - OpenAI Realtime (WebSocket + WebRTC)
+  - Anthropic Messages (/v1/messages)
+  - ElevenLabs TTS (/v1/text-to-speech/{voice-id}) and sound generation (/v1/sound-generation)
+  - Ollama (/api/chat, /api/generate, /api/embed — named in the middleware docs)
+reversibility:
+  grade: documented
+  write_surface: true
+  note: >-
+    LocalAI has a real write surface — model and backend installation, config mutation, corpus seeding,
+    job execution — and several of those writes have a named inverse operation. What is missing everywhere
+    is a stated WINDOW: no documentation names a period inside which a reversal is guaranteed to work, so
+    this grades `documented` rather than `verified`. No window is asserted below that the provider does not
+    state, and none is stated.
+  operations:
+  - action: install a model
+    write: POST /models/apply
+    reversal: POST /models/delete/{name}
+    reversal_tool: delete_model
+    window: null
+    window_note: No window is stated. Deletion is available for as long as the model remains installed.
+  - action: install a backend
+    write: POST /backends/apply
+    reversal: POST /backends/delete/{name}
+    reversal_tool: null
+    window: null
+  - action: start a model or backend install job
+    write: POST /models/apply, POST /backends/apply
+    reversal: POST /api/operations/{id}/cancel (documented in the auth admin-endpoint list)
+    window: while the job is still running
+    window_note: >-
+      Stated only as a lifecycle condition, not as a duration; the endpoint is documented in the
+      authentication reference and absent from the published Swagger document.
+  - action: enqueue an agent job
+    write: POST /api/agent/jobs
+    reversal: POST /api/agent/jobs/{id}/cancel
+    window: null
+  - action: upgrade a backend
+    write: POST /backends/upgrade/{name}
+    reversal: null
+    window: null
+    window_note: >-
+      NOT REVERSIBLE by any documented operation. There is no downgrade or rollback endpoint; recovery
+      means deleting the backend and reinstalling a chosen version.
+  - action: seed a KNN router corpus
+    write: POST /api/router/{name}/corpus
+    reversal: DELETE /api/router/{name}/corpus
+    window: null
+    window_note: >-
+      The reversal is all-or-nothing — it wipes the whole corpus (file and live index), not just the
+      entries the caller added. An agent seeding a shared corpus cannot undo only its own writes.
+  - action: edit a model configuration
+    write: PATCH /api/models/config-json/{name}
+    reversal: null
+    window: null
+    window_note: >-
+      NOT REVERSIBLE by any documented operation. There is no version history or restore endpoint for a
+      model config; a caller must read the prior configuration first and PATCH it back.
+  - action: revoke a user API key
+    write: DELETE /api/auth/api-keys/{id}
+    reversal: null
+    window: null
+    window_note: Permanent. Revoked keys retain their label in usage records but cannot be reinstated.
+  - action: clear traces or backend logs
+    write: POST /api/traces/clear, POST /api/backend-traces/clear, POST /api/backend-logs/{modelId}/clear
+    reversal: null
+    window: null
+    window_note: Permanent and irreversible; the router decision log is in-process and not persisted at all.
+dry_run_mode:
+  supported: partial
+  note: >-
+    No general dry-run/preview parameter exists on mutating operations, and the assistant documentation is
+    explicit that mutating MCP tools have "no separate code-side preview/apply step" — safety rests on a
+    system-prompt rule that the model must confirm with the user first. Two genuine rehearsal surfaces do
+    exist: POST /api/models/vram-estimate estimates whether a model will fit before installing it, and
+    POST /api/pii/analyze returns entity spans with no mutation as the read-only sibling of
+    POST /api/pii/redact.
+cross_links:
+  errors: errors/localai-problem-types.yml
+  lifecycle: lifecycle/localai-lifecycle.yml
+  authentication: authentication/localai-authentication.yml
+  rate_limits: rate-limits/localai-rate-limits.yml
+  conformance: conformance/localai-conformance.yml

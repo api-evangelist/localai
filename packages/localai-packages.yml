@@ -1,0 +1,88 @@
+generated: '2026-08-27'
+method: searched
+source: >-
+  Registry metadata endpoints (hub.docker.com, proxy.golang.org, go-skynet.github.io/helm-charts,
+  api.github.com releases) plus https://localai.io/installation/
+note: >-
+  LocalAI is distributed as a server, not as a client SDK. There is no first-party client library in any
+  language registry: because the API is OpenAI- and Anthropic-compatible, the documented integration path
+  is the vendors' own SDKs pointed at a LocalAI base_url. The PyPI package `localai` (0.0.26, 2023-06-10)
+  and the npm package `localai` (0.0.1, 2024-05-29) are unrelated third-party publications — the PyPI one
+  is "Private AutoGPT Robot" by Viet-Anh Nguyen — and are recorded here explicitly so a later pass does
+  not mistake them for first-party SDKs.
+packages:
+- name: localai/localai
+  registry: docker
+  official: true
+  url: https://hub.docker.com/r/localai/localai
+  version: master
+  published: '2026-08-27'
+  note: >-
+    Primary distribution channel and the recommended install method. Rolling tags (master, master-gpu-intel,
+    master-gpu-vulkan, sha-*) are rebuilt continuously; pull_count 6,955,076 at probe time. Version is
+    recorded as the rolling tag because the registry's most recent publications are branch tags, not the
+    v4.9.0 release tag.
+- name: go-skynet/local-ai
+  registry: quay
+  official: true
+  url: https://quay.io/repository/go-skynet/local-ai
+  version: null
+  published: null
+  note: >-
+    Mirror of the container image on Quay. Repository responds 200 to the Quay v1 API; no version was read
+    because the tag list was not enumerated in this pass.
+- name: local-ai
+  registry: github-releases
+  official: true
+  url: https://github.com/mudler/LocalAI/releases
+  version: v4.9.0
+  published: '2026-08-20'
+  note: >-
+    Static binaries and installers published per release — local-ai-v4.9.0-darwin-arm64,
+    local-ai-v4.9.0-linux-amd64, local-ai-v4.9.0-linux-arm64, LocalAI.dmg, local-ai-launcher-linux.tar.xz,
+    plus LocalAI-v4.9.0-checksums.txt.
+- name: github.com/mudler/LocalAI
+  registry: go
+  official: true
+  url: https://pkg.go.dev/github.com/mudler/LocalAI
+  version: v1.40.0
+  published: '2023-10-30'
+  note: >-
+    DECAY SIGNAL. proxy.golang.org resolves @latest for the module path github.com/mudler/LocalAI to
+    v1.40.0, published 2023-10-30, while the project itself is at v4.9.0 (2026-08-20). Requesting the /v4
+    path returns "go.mod has non-.../v4 module path" — the repository never adopted the semantic-import
+    versioning suffix, so every tag from v2.0.0 onward is invisible to the Go module proxy. Go consumers
+    importing LocalAI as a library therefore get a build nearly three years old unless they pin a pseudo-
+    version by commit. This affects library import only, not the binary or container distribution.
+- name: local-ai
+  registry: helm
+  official: true
+  url: https://go-skynet.github.io/helm-charts
+  chart_repository: https://go-skynet.github.io/helm-charts
+  version: 3.4.2
+  published: '2024-11-21'
+  app_version: '2.23'
+  note: >-
+    DECAY SIGNAL. The Kubernetes Helm chart's newest published version is 3.4.2 with appVersion "2.23",
+    dated 2024-11-21 — 21 months behind the v4.9.0 server it deploys. Kubernetes is one of the five
+    installation methods LocalAI's own install page lists, so the chart's staleness is a live gap between
+    the documented install path and the shipping product.
+third_party_namesakes:
+- name: localai
+  registry: pypi
+  official: false
+  url: https://pypi.org/project/localai/
+  version: 0.0.26
+  published: '2023-06-10'
+  note: >-
+    NOT LocalAI. Summary "Private AutoGPT Robot - Your private task assistant with GPT!", author
+    Viet-Anh Nguyen, homepage github.com/vietanhdev/pautobot. Recorded to prevent misattribution.
+- name: localai
+  registry: npm
+  official: false
+  url: https://www.npmjs.com/package/localai
+  version: 0.0.1
+  published: '2024-05-29'
+  note: >-
+    NOT LocalAI. Empty description, no repository, no homepage, single 0.0.1 publication. Recorded to
+    prevent misattribution.

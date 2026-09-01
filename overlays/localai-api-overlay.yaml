@@ -1,0 +1,108 @@
+overlay: 1.0.0
+info:
+  title: LocalAI API — API Evangelist enhancement overlay
+  version: 1.0.0
+x-generated: '2026-08-27'
+x-method: generated
+x-source: openapi/localai-api-openapi.yml
+x-note: >-
+  Captures API Evangelist's enrichment of the LocalAI contract without mutating the provider's published
+  Swagger 2.0 document. Every action below adds metadata that the generated contract omits — contact and
+  external documentation, an accurate version, a licence URL, and per-tag descriptions naming the real
+  capability each tag covers. It does NOT invent operationIds: the absence of operationIds on all 123
+  operations is a provider-side gap recorded in conformance/localai-conformance.yml, and synthesising
+  names here would paper over a real finding rather than fix it.
+extends: openapi/localai-api-openapi.yml
+actions:
+- target: $.info
+  description: >-
+    Record the software version the contract actually describes. The published document declares
+    info.version "2.0.0" while LocalAI shipped v4.9.0 on 2026-08-20.
+  update:
+    x-actual-software-version: 4.9.0
+    x-actual-software-version-released: '2026-08-20'
+    x-contract-version-stale: true
+    x-external-docs:
+      description: LocalAI documentation
+      url: https://localai.io/docs/
+    x-api-reference: https://localai.io/docs/reference/
+    x-source-repository: https://github.com/mudler/LocalAI
+    x-deployment-model: self-hosted
+    x-default-address: http://localhost:8080
+- target: $.info.contact
+  description: Add the project's security contact alongside the declared general contact.
+  update:
+    x-security-email: security@localai.io
+    x-security-policy: https://github.com/mudler/LocalAI/blob/master/SECURITY.md
+- target: $.securityDefinitions.BearerAuth
+  description: >-
+    The contract declares one apiKey scheme. Record the additional credential transports and the
+    additional authentication modes the documentation describes but the contract does not.
+  update:
+    x-alternate-headers:
+    - x-api-key
+    - xi-api-key
+    x-alternate-cookies:
+    - session
+    - token
+    x-additional-modes:
+    - legacy-shared-api-key
+    - user-accounts-with-roles
+    - github-oauth
+    - oidc-sso
+    x-authentication-docs: https://localai.io/features/authentication
+    x-deny-by-default-since: v4.9.0
+- target: $.paths['/v1/chat/completions'].post
+  description: Name the compatibility contract and the MCP extension point this operation carries.
+  update:
+    x-compatible-with: OpenAI Chat Completions
+    x-error-envelope: openai
+    x-supports-streaming: true
+    x-mcp-selection: metadata.mcp_servers
+- target: $.paths['/v1/messages'].post
+  description: Name the Anthropic compatibility contract and its distinct error envelope.
+  update:
+    x-compatible-with: Anthropic Messages
+    x-error-envelope: anthropic
+- target: $.paths['/v1/responses'].post
+  description: Name the Open Responses compatibility contract and its distinct error envelope.
+  update:
+    x-compatible-with: OpenAI Responses
+    x-error-envelope: open-responses
+- target: $.paths['/v1/text-to-speech/{voice-id}'].post
+  description: Name the ElevenLabs compatibility contract that explains the xi-api-key header.
+  update:
+    x-compatible-with: ElevenLabs Text to Speech
+- target: $.paths['/v1/mcp/chat/completions'].post
+  description: Record that this endpoint runs tools server-side rather than returning tool calls to the client.
+  update:
+    x-mcp-role: host
+    x-tool-execution: server-side
+    x-loop-cap: agent.max_iterations (default 10)
+    x-docs: https://localai.io/features/mcp
+- target: $.paths['/api/models/vram-estimate'].post
+  description: Flag the rehearsal surface an agent should call before a model install.
+  update:
+    x-dry-run-for: POST /models/apply
+- target: $.paths['/api/pii/analyze'].post
+  description: Flag the non-mutating sibling of the redaction endpoint.
+  update:
+    x-dry-run-for: POST /api/pii/redact
+- target: $.paths['/models/apply'].post
+  description: Record the reversal operation and the absence of a stated reversal window.
+  update:
+    x-reversal-operation: POST /models/delete/{name}
+    x-reversal-window: null
+    x-idempotent: false
+- target: $.paths['/backends/upgrade/{name}'].post
+  description: Record that no documented rollback exists for a backend upgrade.
+  update:
+    x-reversal-operation: null
+    x-reversal-note: >-
+      No downgrade or rollback endpoint is documented; recovery means deleting the backend and
+      reinstalling a chosen version.
+- target: $.paths['/api/router/{name}/corpus'].delete
+  description: Record that the reversal is all-or-nothing.
+  update:
+    x-reversal-scope: whole-corpus
+    x-reversal-note: Wipes the corpus file and live index; individual seeded entries cannot be removed.

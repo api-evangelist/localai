@@ -1,0 +1,209 @@
+generated: '2026-08-27'
+method: derived
+source: >-
+  mcp/localai-mcp.yml (published tool catalog) bound against openapi/localai-api-openapi.yml
+  (Swagger 2.0, 123 operations) and the endpoint tables at https://localai.io/features/middleware/
+  and https://localai.io/docs/features/api-discovery/
+identifier_note: >-
+  The published Swagger document declares NO operationId on any of its 123 operations (verified: 123/123
+  carry a summary, 0/123 carry an operationId). REST operations are therefore addressed here by
+  "METHOD path", which is the only stable identifier the contract offers. This is a real contract-quality
+  gap for the provider, not a shortcut in this artifact — an agent binding tools to this API cannot
+  reference operations by name.
+surfaces:
+- kind: openapi
+  url: openapi/localai-api-openapi.yml
+  gated: false
+  note: Swagger 2.0, generated from Go source, published in the project repository.
+- kind: mcp
+  url: null
+  transport: stdio
+  gated: true
+  note: >-
+    No hosted endpoint to introspect. `local-ai mcp-server --target <url> --api-key <admin-key>` requires
+    a running LocalAI instance and an admin key, so live tools/list could not be called; the tool list is
+    taken from the provider's published catalog, and inputSchemas were not read.
+- kind: graphql
+  url: null
+  gated: null
+  note: LocalAI publishes no GraphQL surface.
+crosswalk:
+- tool: list_installed_models
+  category: models
+  rest:
+  - GET /v1/models
+  binding: direct
+  confidence: high
+- tool: gallery_search
+  category: models
+  rest:
+  - GET /models/available
+  binding: direct
+  confidence: medium
+  note: The gallery listing endpoint; the tool adds search/filter semantics the REST operation does not name.
+- tool: list_galleries
+  category: models
+  rest:
+  - GET /models/galleries
+  binding: direct
+  confidence: high
+- tool: list_backends
+  category: backends
+  rest:
+  - GET /backends
+  binding: direct
+  confidence: high
+- tool: list_known_backends
+  category: backends
+  rest:
+  - GET /backends/known
+  binding: direct
+  confidence: high
+- tool: get_job_status
+  category: jobs
+  rest:
+  - GET /models/jobs/{uuid}
+  - GET /backends/jobs/{uuid}
+  binding: composite
+  confidence: medium
+  note: One tool spans two REST job surfaces (model installs and backend installs).
+- tool: get_model_config
+  category: config
+  rest:
+  - GET /api/models/config-json/{name}
+  binding: direct
+  confidence: low
+  note: >-
+    The API-discovery documentation names GET /api/models/config-json/:name, but the published Swagger
+    document declares only PATCH on that path. The read is documented and unspecified.
+- tool: edit_model_config
+  category: config
+  rest:
+  - PATCH /api/models/config-json/{name}
+  binding: direct
+  confidence: high
+- tool: vram_estimate
+  category: models
+  rest:
+  - POST /api/models/vram-estimate
+  binding: direct
+  confidence: high
+- tool: system_info
+  category: monitoring
+  rest:
+  - GET /system
+  binding: direct
+  confidence: high
+- tool: list_nodes
+  category: p2p
+  rest:
+  - GET /api/p2p
+  - GET /api/nodes/models
+  binding: composite
+  confidence: medium
+  note: Both p2p node surfaces exist in the spec; the tool's exact backing operation was not confirmed.
+- tool: install_model
+  category: models
+  rest:
+  - POST /models/apply
+  binding: direct
+  confidence: high
+- tool: import_model_uri
+  category: models
+  rest:
+  - POST /models/apply
+  binding: direct
+  confidence: medium
+  note: Same operation as install_model, invoked with a URI rather than a gallery identifier.
+- tool: delete_model
+  category: models
+  rest:
+  - POST /models/delete/{name}
+  binding: direct
+  confidence: high
+- tool: install_backend
+  category: backends
+  rest:
+  - POST /backends/apply
+  binding: direct
+  confidence: high
+- tool: upgrade_backend
+  category: backends
+  rest:
+  - POST /backends/upgrade/{name}
+  binding: direct
+  confidence: high
+- tool: toggle_model_state
+  category: models
+  rest:
+  - PUT /api/models/{name}/{action}
+  binding: direct
+  confidence: high
+- tool: toggle_model_pinned
+  category: models
+  rest:
+  - PUT /api/models/toggle-pinned/{name}/{action}
+  binding: direct
+  confidence: high
+- tool: get_router_corpus_stats
+  category: router
+  rest:
+  - GET /api/router/{name}/corpus/stats
+  binding: direct
+  confidence: high
+- tool: seed_router_corpus
+  category: router
+  rest:
+  - POST /api/router/{name}/corpus
+  binding: direct
+  confidence: high
+- tool: clear_router_corpus
+  category: router
+  rest:
+  - DELETE /api/router/{name}/corpus
+  binding: direct
+  confidence: high
+mcp_only:
+- tool: get_pii_events
+  reason: >-
+    Backed by GET /api/pii/events, documented in the middleware endpoint table but absent from the
+    published Swagger document.
+- tool: get_middleware_status
+  reason: >-
+    Backed by GET /api/middleware/status, documented in the middleware endpoint table but absent from the
+    published Swagger document.
+- tool: get_router_decisions
+  reason: >-
+    Backed by GET /api/router/decisions, documented in the middleware endpoint table but absent from the
+    published Swagger document.
+- tool: reload_models
+  reason: >-
+    Backed by POST /models/reload, referenced in the middleware operational notes but absent from the
+    published Swagger document.
+rest_only_summary: >-
+  102 of the 123 published operations have no corresponding MCP tool. The MCP server is deliberately an
+  ADMIN tool surface, not an inference one: every inference operation is REST-only by design. The largest
+  REST-only groups are audio (15 operations), agent-jobs (11), monitoring (16, of which only /system is
+  bridged), inference (7), face-recognition (6), voice-recognition (6), images (3), branding (4),
+  voice-profiles (4), tokenize (4), plus 3d, depth, detection, embeddings, moderation, rerank and video.
+rest_only_notable:
+- POST /v1/chat/completions
+- POST /v1/completions
+- POST /v1/embeddings
+- POST /v1/messages
+- POST /v1/responses
+- POST /v1/images/generations
+- POST /v1/audio/transcriptions
+- POST /v1/audio/speech
+- POST /v1/rerank
+- POST /v1/moderations
+- POST /v1/mcp/chat/completions
+- GET /metrics
+coverage:
+  mcp_tools_total: 25
+  mcp_tools_bound_to_rest: 21
+  mcp_only: 4
+  rest_operations_total: 123
+  rest_operations_bound: 21
+  rest_only: 102
+  graphql_fields: 0

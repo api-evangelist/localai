@@ -1,0 +1,85 @@
+generated: '2026-08-27'
+method: searched
+source: >-
+  https://github.com/mudler/LocalAI/blob/master/SECURITY.md and
+  https://api.github.com/repos/mudler/LocalAI/releases (probed 2026-08-27)
+versioning:
+  scheme: semver
+  current_version: v4.9.0
+  current_version_released: '2026-08-20'
+  api_versioning: >-
+    Path-prefix versioning inherited from the APIs LocalAI imitates — /v1/* for the OpenAI- and
+    Anthropic-compatible surface. LocalAI's own management endpoints are unversioned (/api/*, /models/*,
+    /backends/*, /system). The product version and the API version are not the same thing: the Swagger
+    document declares info.version 2.0.0 while the software is at 4.9.0, so the contract's own version
+    field has not tracked a release in two major versions.
+  release_cadence: >-
+    Frequent. Ten releases probed span v4.5.6 (2026-06-30) to v4.9.0 (2026-08-20) — roughly weekly to
+    fortnightly, with patch releases landing within a day of a minor (v4.8.0 2026-08-05, v4.8.1
+    2026-08-06, v4.8.2 2026-08-07).
+support_policy:
+  source: https://github.com/mudler/LocalAI/blob/master/SECURITY.md
+  published: true
+  stale: true
+  stale_note: >-
+    DECAY SIGNAL. The published support matrix names 3.x as "actively supported", 2.x as security-fixes-
+    only until 2025-12-31, and 1.x as end-of-life since 2024-01-01. It has not been updated for the 4.x
+    series, which shipped v4.9.0 on 2026-08-20 — so the running release is not named anywhere in the
+    project's own supported-versions table, and the newest series the policy blesses is a major version
+    behind. Both dated windows in the table are also already in the past.
+  tiers:
+  - series: 4.x
+    status: undeclared
+    note: The current series. Absent from the published table.
+  - series: 3.x
+    status: actively-supported-per-policy
+    detail: Full security updates and bug fixes for the latest minor releases.
+  - series: 2.x
+    status: security-fixes-only
+    until: '2025-12-31'
+    detail: Critical security patches only (RCE, authentication bypass, data exposure).
+  - series: 1.x
+    status: end-of-life
+    since: '2024-01-01'
+    detail: No updates of any kind.
+deprecation:
+  policy_published: true
+  policy_url: https://github.com/mudler/LocalAI/blob/master/SECURITY.md
+  policy_note: >-
+    Deprecation is expressed as a versioned support matrix with named end-of-life dates and a documented
+    migration path (1.x to 3.x, 2.x to 3.x, with release notes named as the source of breaking changes),
+    rather than as HTTP-level signalling.
+  sunset_headers: false
+  rfc8594: false
+  rfc8594_note: >-
+    No Deprecation or Sunset response headers are documented or present in the published Swagger document.
+    An agent cannot learn from a response that an operation is going away.
+  deprecated_in_spec: []
+  deprecated_in_spec_note: >-
+    Zero operations in the published Swagger document carry `deprecated: true`. Deprecation is signalled
+    only at flag level in the CLI reference — for example `--debug` is marked DEPRECATED in favour of
+    `--log-level=debug`.
+  deprecated_flags:
+  - flag: --debug
+    replacement: --log-level=debug
+    env: LOCALAI_DEBUG, DEBUG
+sla:
+  published: false
+  note: >-
+    No SLA is published, and none would apply. LocalAI is MIT-licensed software the operator runs on their
+    own hardware; there is no vendor-operated service to warrant availability for.
+status_page:
+  published: false
+  note: >-
+    No status page exists and none is applicable — there is no hosted service whose health could be
+    reported. Availability is a property of the operator's own instance. No StatusPage pointer is emitted.
+release_channels:
+- name: GitHub Releases
+  url: https://github.com/mudler/LocalAI/releases
+  cadence: per release
+- name: Container images
+  url: https://hub.docker.com/r/localai/localai
+  cadence: continuous — master and sha-* tags rebuilt on merge
+- name: Release blog posts
+  url: https://localai.io/blog/
+  cadence: per minor release ("What landed in LocalAI 4.8", 4.3, 4.2, 4.1, 4.0, 3.10)

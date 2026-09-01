@@ -1,0 +1,154 @@
+generated: '2026-08-27'
+method: derived
+source: >-
+  openapi/localai-api-openapi.yml plus https://localai.io/features/authentication,
+  https://localai.io/reference/api-errors and https://localai.io/features/mcp
+note: >-
+  LocalAI's conformance story is unusual and worth stating plainly: its market's de facto standard is not
+  a specification body's document but a vendor's HTTP surface, and LocalAI's whole product thesis is
+  conforming to it. The OpenAI REST API, the Anthropic Messages API, the OpenAI Realtime API and the
+  Model Context Protocol are the standards that matter here, and LocalAI implements four of them.
+standards:
+- id: openai-api
+  name: OpenAI REST API compatibility
+  conforms: true
+  evidence: >-
+    /v1/chat/completions, /v1/completions, /v1/embeddings, /v1/images/generations, /v1/images/edits,
+    /v1/audio/transcriptions, /v1/audio/speech, /v1/moderations, /v1/models, /v1/responses and
+    /v1/edits are all declared in the published Swagger document, and the OpenAI-shaped error envelope is
+    documented at https://localai.io/reference/api-errors.
+  note: >-
+    This is the domain standard for the local-inference market. A drop-in OpenAI surface is why an
+    integrator can move an existing client to LocalAI by changing base_url alone, with no bespoke connector.
+- id: anthropic-messages
+  name: Anthropic Messages API compatibility
+  conforms: true
+  evidence: >-
+    POST /v1/messages is declared in the published Swagger document, and the Anthropic error envelope
+    ({"type":"error","error":{"type","message"}}) is documented as that endpoint's error shape.
+- id: openai-realtime
+  name: OpenAI Realtime API
+  conforms: true
+  evidence: >-
+    ws://<host>/v1/realtime?model=<model> plus a WebRTC SDP handshake at POST /v1/realtime, carrying the
+    OpenAI Realtime event vocabulary (session.created, session.update, response.create, response.created,
+    response.done, response.output_audio.delta, response.output_audio_transcript.delta,
+    conversation.item.create, conversation.item.delete, conversation.item.truncate,
+    conversation.item.input_audio_transcription.delta / .failed, input_audio_buffer.clear).
+    Documented at https://localai.io/features/openai-realtime; captured in
+    asyncapi/localai-realtime-asyncapi.yml.
+- id: mcp
+  name: Model Context Protocol
+  conforms: true
+  role: both host and server
+  evidence: >-
+    As a HOST, LocalAI connects to remote HTTP and local stdio MCP servers and executes their tools inside
+    the completion loop across /v1/chat/completions, /v1/messages and /v1/responses, with MCP Prompts and
+    MCP Resources support (https://localai.io/features/mcp). As a SERVER, `local-ai mcp-server` exposes a
+    25-tool admin catalog over stdio (https://localai.io/features/localai-assistant). Captured in
+    mcp/localai-mcp.yml.
+- id: elevenlabs-tts
+  name: ElevenLabs TTS API compatibility
+  conforms: true
+  evidence: >-
+    POST /v1/text-to-speech/{voice-id} and POST /v1/sound-generation are declared in the published Swagger
+    document, and the xi-api-key credential header is accepted alongside Authorization and x-api-key.
+- id: ollama-api
+  name: Ollama API compatibility
+  conforms: partial
+  evidence: >-
+    /api/chat, /api/generate and /api/embed are named as filtered endpoints in the middleware
+    documentation (https://localai.io/features/middleware/), but none of the three appears in the
+    published Swagger document — so the surface is implemented and undeclared.
+- id: oidc
+  name: OpenID Connect
+  conforms: true
+  evidence: >-
+    Generic OIDC single sign-on with issuer auto-discovery via /.well-known/openid-configuration,
+    requesting the standard openid, profile and email scopes. Keycloak, Google, Okta, Authentik and
+    Azure AD are named as tested providers.
+    https://localai.io/features/authentication
+- id: oauth2
+  name: OAuth 2.0
+  conforms: partial
+  evidence: >-
+    Authorization-code flow implemented as an inbound login mechanism (GitHub OAuth at
+    /api/auth/github/login and /api/auth/github/callback), and bearer tokens accepted for outbound remote
+    MCP server connections. LocalAI is not itself an OAuth authorization server: it declares no oauth2
+    securityScheme, publishes no scope vocabulary of its own, and serves no
+    /.well-known/oauth-authorization-server or /.well-known/oauth-protected-resource.
+- id: grpc
+  name: gRPC / Protocol Buffers
+  conforms: true
+  evidence: >-
+    A first-party proto3 contract is published at backend/backend.proto in the project repository —
+    service backend.Backend, 52 RPCs (19 of them streaming) and 114 messages. This is the interface every
+    LocalAI inference backend implements, and it carries capability the REST surface does not expose:
+    fine-tuning, quantization, distributed Forward, and bidirectional live audio. Saved verbatim to
+    grpc/localai-backend.proto. Not published to buf.build.
+- id: prometheus-exposition
+  name: Prometheus metrics exposition
+  conforms: true
+  evidence: GET /metrics is declared in the published Swagger document and documented as user-accessible.
+- id: rfc9457
+  name: RFC 9457 Problem Details for HTTP APIs
+  conforms: false
+  evidence: >-
+    No operation declares application/problem+json. Three vendor error envelopes are used instead, each
+    inherited from the API being emulated. See errors/localai-problem-types.yml.
+- id: rfc8594
+  name: RFC 8594 Sunset HTTP header
+  conforms: false
+  evidence: >-
+    No Deprecation or Sunset headers are documented or declared; zero operations carry deprecated:true.
+- id: idempotency
+  name: Idempotency keys
+  conforms: false
+  evidence: No idempotency key or deduplication window is documented. See conventions/localai-conventions.yml.
+- id: pagination
+  name: Collection pagination
+  conforms: partial
+  evidence: >-
+    limit/offset query parameters appear on exactly 3 of the 123 operations (GET /api/traces,
+    GET /api/backend-traces, GET /api/agent/jobs) — all log or job listings. Every resource collection
+    (GET /v1/models, GET /models/available, GET /backends, GET /api/aliases, GET /api/voice-profiles)
+    returns an unbounded list with no limit, cursor, total count or next-page link.
+- id: json-api
+  name: JSON:API
+  conforms: false
+  evidence: Not implemented; plain JSON payloads shaped by the emulated vendor APIs.
+- id: scim
+  name: SCIM
+  conforms: false
+  evidence: >-
+    User provisioning exists (/api/auth/admin/users, role assignment, invites) but is a bespoke surface —
+    no urn:ietf:params:scim:schemas:* URN appears anywhere in the contract or the documentation.
+- id: openapi-3
+  name: OpenAPI 3.x
+  conforms: false
+  evidence: >-
+    The published contract is Swagger 2.0 (swagger: "2.0"), generated from Go source annotations. It is a
+    real, complete, machine-readable contract, but it predates OpenAPI 3.0 and therefore cannot express
+    the multiple content types, callbacks, or webhook blocks the product's surface actually uses.
+certifications:
+  published: []
+  note: >-
+    No SOC 2, ISO 27001, PCI, HIPAA or FedRAMP attestation is published, and none is applicable: LocalAI
+    is MIT-licensed software an operator runs on their own infrastructure, so compliance posture belongs
+    to the deployment, not to the project. No Compliance pointer is emitted in apis.yml.
+contract_quality_findings:
+- Zero of 123 operations declare an operationId.
+- All 123 operations declare a summary; none of the operations is marked deprecated.
+- >-
+    info.version is "2.0.0" while the software is at v4.9.0 — the contract's version field has not tracked
+    a release in two major versions.
+- >-
+    The document declares no host and only basePath "/", which is correct for self-hosted software but
+    leaves servers[] effectively empty.
+- >-
+    securityDefinitions declares one apiKey scheme while the documentation describes API keys, sessions,
+    per-user keys, GitHub OAuth and OIDC.
+- >-
+    At least seven documented endpoints are absent from the contract: /api/pii/events,
+    /api/middleware/status, /api/router/decisions, /models/reload, /api/chat, /api/generate, /api/embed —
+    plus GET /api/models/config-json/{name}, where only PATCH is declared.

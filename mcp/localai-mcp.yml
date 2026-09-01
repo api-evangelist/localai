@@ -1,0 +1,138 @@
+generated: '2026-08-27'
+method: searched
+source: https://localai.io/features/localai-assistant
+docs: https://localai.io/features/localai-assistant
+name: LocalAI Assistant MCP server
+status: published
+deployment:
+  mode: local-stdio
+  endpoint: null
+  install: 'local-ai mcp-server --target http://remote.localai:8080 --api-key <admin-key>'
+  package: https://github.com/mudler/LocalAI
+  auth: api-key
+  verified: searched
+deployment_note: >-
+  There is no vendor-hosted remote MCP endpoint. The provider ships the server two ways, both requiring a
+  LocalAI instance the operator runs. (1) In-process: when an admin flips the Manage toggle on a chat
+  session, the conversation is wired to an in-process MCP server — no loopback socket, no synthetic API
+  key, no extra TCP port — so it is reachable only from inside that LocalAI process, never by an external
+  agent. (2) Standalone stdio: `local-ai mcp-server --target <url> --api-key <admin-key>` runs the same
+  tool catalog as a stdio server pointed at any LocalAI HTTP API, for hooking into Claude Desktop, Cursor
+  or another MCP host. `--read-only` skips registration of every mutating tool. The tool catalog is
+  identical in both variants. The mode is therefore local-stdio, not remote: a human must install and run
+  it before any agent can reach it.
+tool_source: >-
+  Verbatim from the published tool catalog in the LocalAI Assistant documentation, plus the middleware
+  documentation's two MCP tool tables. Input schemas were not read — that requires authenticated
+  introspection against a running instance, which this pass had no access to.
+transport: stdio
+protocol: Model Context Protocol
+tools:
+- name: gallery_search
+  category: models
+  access: read
+- name: list_installed_models
+  category: models
+  access: read
+- name: list_galleries
+  category: models
+  access: read
+- name: list_backends
+  category: backends
+  access: read
+- name: list_known_backends
+  category: backends
+  access: read
+- name: get_job_status
+  category: jobs
+  access: read
+- name: get_model_config
+  category: config
+  access: read
+- name: vram_estimate
+  category: models
+  access: read
+- name: system_info
+  category: monitoring
+  access: read
+- name: list_nodes
+  category: p2p
+  access: read
+- name: get_pii_events
+  category: middleware
+  access: read
+  description: Recent redaction / block events with optional filters.
+- name: get_middleware_status
+  category: middleware
+  access: read
+  description: Aggregator returning the same payload as GET /api/middleware/status.
+- name: get_router_decisions
+  category: router
+  access: read
+  description: Recent router decision log with optional filters.
+- name: get_router_corpus_stats
+  category: router
+  access: read
+  description: KNN corpus size and per-label counts; entry texts are never returned.
+- name: install_model
+  category: models
+  access: write
+- name: import_model_uri
+  category: models
+  access: write
+- name: delete_model
+  category: models
+  access: write
+- name: install_backend
+  category: backends
+  access: write
+- name: upgrade_backend
+  category: backends
+  access: write
+- name: edit_model_config
+  category: config
+  access: write
+- name: reload_models
+  category: models
+  access: write
+- name: toggle_model_state
+  category: models
+  access: write
+- name: toggle_model_pinned
+  category: models
+  access: write
+- name: seed_router_corpus
+  category: router
+  access: write
+  description: Add labelled exemplars to a KNN router's corpus.
+- name: clear_router_corpus
+  category: router
+  access: write
+  description: Wipe a KNN router's corpus.
+tool_count: 25
+safety:
+  admin_only: true
+  confirmation: >-
+    Mutating tools are guarded by a system-prompt rule requiring the model to confirm the action with the
+    user before calling them. There is no separate code-side preview/apply step.
+  read_only_flag: --read-only
+  disable: LOCALAI_DISABLE_ASSISTANT=true (chat requests with metadata.localai_assistant=true then return 503)
+mcp_client_capability:
+  note: >-
+    Distinct from the server above, LocalAI is also an MCP HOST — it connects models and agents outward to
+    remote HTTP and local stdio MCP servers and executes their tools server-side inside the completion
+    loop. This is configuration, not an agent surface LocalAI exposes, so it does not affect deployment.mode.
+  endpoints:
+  - POST /v1/mcp/chat/completions
+  - POST /mcp/v1/chat/completions
+  - POST /mcp/chat/completions
+  selection: metadata.mcp_servers (comma-separated server names, stripped before reaching the backend)
+  scopes:
+  - model-scoped via the `mcp:` block in a model YAML (remote + stdio)
+  - agent-scoped via an agent's mcp_servers / mcp_stdio_servers fields
+  features:
+  - MCP Prompts — discover and expand reusable prompt templates from MCP servers
+  - MCP Resources — browse and inject resource content from MCP servers into conversations
+  - Bearer token authentication to remote MCP servers
+  - agent.max_iterations caps the tool execution loop (default 10)
+  docs: https://localai.io/features/mcp

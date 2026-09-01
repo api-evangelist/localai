@@ -1,0 +1,53 @@
+generated: '2026-08-27'
+method: searched
+source: >-
+  https://localai.io/docs/features/api-discovery/, https://localai.io/features/authentication and
+  https://localai.io/installation/
+note: >-
+  LocalAI has no vendor-hosted sandbox, no test-mode credentials and no test fixtures — there is nothing
+  to sandbox against, because every install IS a private instance. What it does ship, on every instance,
+  is an interactive API console and a web UI, which is the console_or_sandbox surface for a self-hosted
+  product. No test keys, cards or magic identifiers are published, so none are recorded here.
+test_mode:
+  supported: false
+  key_prefixes: []
+  note: >-
+    There is no live/test key split. Legacy keys are arbitrary operator-chosen strings (LOCALAI_API_KEY);
+    the docs use `sk-my-secret-key` as an illustrative placeholder only. Per-user API keys carry a `lai-`
+    prefix in the usage documentation's example. No published test value exists to record.
+consoles:
+- name: Swagger UI
+  path: /swagger/index.html
+  anonymous: true
+  anonymous_note: >-
+    Swagger GET requests at /swagger and under /swagger/ remain anonymous even when authentication is
+    configured, so the interactive reference is reachable before a caller has credentials. The endpoints
+    it documents still require credentials.
+  source: https://localai.io/docs/features/api-discovery/
+- name: Web UI
+  path: /app
+  description: >-
+    A React SPA with Chat, Images, Video, TTS, Sound, Talk and Usage for every authenticated user, and
+    Models plus the Build console (Agents, Skills, Memory, Jobs, Training, Recognition) and Operate console
+    (Backends, Activity, Nodes, Usage, Traces, Users, Middleware, Settings) for admins.
+  source: https://localai.io/features/authentication
+- name: LocalAI Assistant (Manage mode)
+  description: >-
+    An admin-only chat modality that wires the conversation to an in-process MCP server exposing the admin
+    surface as tools — install models, manage backends, edit configs and check system status by chatting.
+    Starter chips: "What is installed?", "Install a chat model", "Show system status", "Update a backend".
+  source: https://localai.io/features/localai-assistant
+discovery_endpoints:
+  note: >-
+    Three anonymous endpoints let an agent orient itself against an instance before authenticating. This
+    is the nearest thing LocalAI has to a public sandbox surface.
+  endpoints:
+  - GET /.well-known/localai.json
+  - GET /api/instructions
+  - GET /api/instructions/{name}
+  detail: well-known/localai-well-known.yml
+dry_run:
+  detail: conventions/localai-conventions.yml
+  endpoints:
+  - POST /api/models/vram-estimate
+  - POST /api/pii/analyze

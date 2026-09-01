@@ -1,0 +1,101 @@
+generated: '2026-08-27'
+method: searched
+source: https://github.com/mudler/LocalAI/releases
+docs: https://github.com/mudler/LocalAI/releases
+blog: https://localai.io/blog/
+scheme: semver
+current_version: v4.9.0
+current_version_released: '2026-08-20'
+window: v4.5.6 (2026-06-30) through v4.9.0 (2026-08-20), the ten most recent releases at probe time
+format_note: >-
+  Two channels carry the same events at different resolutions. GitHub Releases is the machine-readable
+  one — every tag dated, minor releases carrying a hand-written narrative and patch releases carrying
+  auto-generated "What's Changed" PR lists produced from .github/release.yml. localai.io/blog/ carries a
+  long-form "What landed in LocalAI <minor>" post per minor release. Neither is a structured, per-endpoint
+  API changelog: an agent cannot learn from either which operations changed shape in a given release.
+entries:
+- version: v4.9.0
+  date: '2026-08-20'
+  type: minor
+  breaking: true
+  highlights:
+  - >-
+    Authentication is now DENY-BY-DEFAULT — every HTTP route requires credentials unless it appears on the
+    published anonymous discovery/bootstrap list. This is a behavioural break for any deployment that
+    relied on unauthenticated reads.
+  - Chat gained end-to-end context compression.
+  - Models and backends each got one canonical page in the UI instead of three.
+  - vllm-cpp grew a video modality serving MiniMax-H3 with a real audio track.
+  scope: 13 days, 146 pull requests
+- version: v4.8.2
+  date: '2026-08-07'
+  type: patch
+  breaking: false
+  highlights:
+  - Gallery falls back to mirrors and a cached index when the primary source fails.
+  - Dependency bumps (actions/stale, actions/checkout) and model-gallery checksum updates.
+- version: v4.8.1
+  date: '2026-08-06'
+  type: patch
+  breaking: false
+  highlights:
+  - Contain malformed GGUF metadata in VRAM estimation.
+  - Documentation and vendored-engine checksum updates.
+- version: v4.8.0
+  date: '2026-08-05'
+  type: minor
+  breaking: false
+  highlights:
+  - >-
+    vllm.cpp introduced — a C++20 engine maintained by the LocalAI team, begun as a vLLM port and now
+    carrying its own featureset, shipping as the vllm-cpp backend in alpha development builds.
+  - 3D generation added as a new modality.
+  - A multi-family audio.cpp engine.
+  - Gallery entries now install the build the host hardware can actually run.
+  - A reliability pass on distributed mode.
+  scope: 22 days, 386 pull requests, three new modalities
+- version: v4.7.1
+  date: '2026-07-14'
+  type: patch
+  breaking: false
+  highlights:
+  - Only inject llama.cpp serving options on the llama.cpp path.
+- version: v4.7.0
+  date: '2026-07-14'
+  type: minor
+  breaking: false
+  highlights:
+  - UI-managed voice cloning library with consented recording or upload.
+  - Local video and audio-driven avatar generation.
+  - Interleaved reasoning that travels with tool calls.
+  - New audio engines — one-pass diarized transcription, F5-TTS, and true streaming TTS.
+  - Reliability fixes across auth, transcription and the model gallery.
+- version: v4.6.2
+  date: '2026-07-06'
+  type: patch
+  breaking: false
+- version: v4.6.1
+  date: '2026-07-06'
+  type: patch
+  breaking: false
+- version: v4.6.0
+  date: '2026-07-04'
+  type: minor
+  breaking: false
+- version: v4.5.6
+  date: '2026-06-30'
+  type: patch
+  breaking: false
+narrative_posts:
+- title: What landed in LocalAI 4.8
+  url: https://localai.io/blog/what-landed-in-localai-4-8/
+- title: What landed in LocalAI 4.3
+  url: https://localai.io/blog/what-landed-in-localai-4-3/
+- title: What landed in LocalAI 4.2
+  url: https://localai.io/blog/what-landed-in-localai-4-2/
+- title: What landed in LocalAI 4.1
+  url: https://localai.io/blog/what-landed-in-localai-4-1/
+- title: What landed in LocalAI 4.0
+  url: https://localai.io/blog/what-landed-in-localai-4-0/
+- title: What landed in LocalAI 3.10
+  url: https://localai.io/blog/what-landed-in-localai-3-10/
