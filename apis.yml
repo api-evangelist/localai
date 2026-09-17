@@ -80,34 +80,6 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 apis:
-- aid: localai:localai-3d-api
-  name: LocalAI 3d API
-  description: The 3d API from LocalAI — 2 operation(s) for 3d.
-  humanURL: https://localai.io/docs/reference/
-  baseURL: http://{localai-host}:8080
-  tags:
-  - 3D
-  tags_raw:
-  - 3d
-  properties:
-  - type: OpenAPI
-    url: openapi/localai-3d-api-openapi.yml
-  - type: Swagger
-    url: openapi/_original/localai-openapi.json
-  - type: Documentation
-    url: https://localai.io/docs/
-  - type: APIReference
-    url: https://localai.io/docs/reference/
-  - type: Authentication
-    url: authentication/localai-authentication.yml
-  - type: ErrorCatalog
-    url: errors/localai-problem-types.yml
-  - type: DataModel
-    url: data-model/localai-data-model.yml
-  - type: AsyncAPI
-    url: asyncapi/localai-realtime-asyncapi.yml
-  - type: Protobuf
-    url: grpc/localai-backend.proto
 - aid: localai:localai-agent-jobs-api
   name: LocalAI Agent Jobs API
   description: The agent-jobs API from LocalAI — 7 operation(s) for agent-jobs.
@@ -580,34 +552,6 @@ apis:
     url: asyncapi/localai-realtime-asyncapi.yml
   - type: Protobuf
     url: grpc/localai-backend.proto
-- aid: localai:localai-p2p-api
-  name: LocalAI P2p API
-  description: The p2p API from LocalAI — 2 operation(s) for p2p.
-  humanURL: https://localai.io/docs/reference/
-  baseURL: http://{localai-host}:8080
-  tags:
-  - P2P
-  tags_raw:
-  - p2p
-  properties:
-  - type: OpenAPI
-    url: openapi/localai-p2p-api-openapi.yml
-  - type: Swagger
-    url: openapi/_original/localai-openapi.json
-  - type: Documentation
-    url: https://localai.io/docs/
-  - type: APIReference
-    url: https://localai.io/docs/reference/
-  - type: Authentication
-    url: authentication/localai-authentication.yml
-  - type: ErrorCatalog
-    url: errors/localai-problem-types.yml
-  - type: DataModel
-    url: data-model/localai-data-model.yml
-  - type: AsyncAPI
-    url: asyncapi/localai-realtime-asyncapi.yml
-  - type: Protobuf
-    url: grpc/localai-backend.proto
 - aid: localai:localai-pii-api
   name: LocalAI Pii API
   description: The pii API from LocalAI — 2 operation(s) for pii.
@@ -788,6 +732,58 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/localai-voice-recognition-api-openapi.yml
+  - type: Swagger
+    url: openapi/_original/localai-openapi.json
+  - type: Documentation
+    url: https://localai.io/docs/
+  - type: APIReference
+    url: https://localai.io/docs/reference/
+  - type: Authentication
+    url: authentication/localai-authentication.yml
+  - type: ErrorCatalog
+    url: errors/localai-problem-types.yml
+  - type: DataModel
+    url: data-model/localai-data-model.yml
+  - type: AsyncAPI
+    url: asyncapi/localai-realtime-asyncapi.yml
+  - type: Protobuf
+    url: grpc/localai-backend.proto
+- aid: localai:localai-3-d-api
+  name: LocalAI 3 D API
+  description: The 3 D API from LocalAI — 2 operation(s) for 3 d.
+  humanURL: https://localai.io/docs/reference/
+  baseURL: http://{localai-host}:8080
+  tags:
+  - 3 D
+  properties:
+  - type: OpenAPI
+    url: openapi/localai-3-d-api-openapi.yml
+  - type: Swagger
+    url: openapi/_original/localai-openapi.json
+  - type: Documentation
+    url: https://localai.io/docs/
+  - type: APIReference
+    url: https://localai.io/docs/reference/
+  - type: Authentication
+    url: authentication/localai-authentication.yml
+  - type: ErrorCatalog
+    url: errors/localai-problem-types.yml
+  - type: DataModel
+    url: data-model/localai-data-model.yml
+  - type: AsyncAPI
+    url: asyncapi/localai-realtime-asyncapi.yml
+  - type: Protobuf
+    url: grpc/localai-backend.proto
+- aid: localai:localai-p2-p-api
+  name: LocalAI P2 P API
+  description: The P2 P API from LocalAI — 2 operation(s) for p2 p.
+  humanURL: https://localai.io/docs/reference/
+  baseURL: http://{localai-host}:8080
+  tags:
+  - P2 P
+  properties:
+  - type: OpenAPI
+    url: openapi/localai-p2-p-api-openapi.yml
   - type: Swagger
     url: openapi/_original/localai-openapi.json
   - type: Documentation
