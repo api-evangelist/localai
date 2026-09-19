@@ -51,7 +51,7 @@ image: https://raw.githubusercontent.com/mudler/LocalAI/master/core/http/static/
 tags:
 - Artificial Intelligence
 - Machine-Learning
-- Large Language Models
+- LLM
 - Inference
 - Self-Hosted
 - Open-Source
@@ -532,6 +532,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - Node
+  tags_raw:
   - Nodes
   properties:
   - type: OpenAPI
@@ -754,6 +756,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - 3D
+  tags_raw:
   - 3 D
   properties:
   - type: OpenAPI
@@ -780,6 +784,8 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
+  - P2P
+  tags_raw:
   - P2 P
   properties:
   - type: OpenAPI
