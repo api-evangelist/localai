@@ -1,7 +1,7 @@
 {
   "provider": "localai",
   "sources": [
-    "localai-api-openapi.yml"
+    "_original/localai-api-openapi.yml"
   ],
   "outputs": [
     "localai-3d-api-openapi.yml",
@@ -32,11 +32,13 @@
     "localai-voice-recognition-api-openapi.yml"
   ],
   "archived": [
-    "archived openapi/localai-api-openapi.yml"
+    "deleted 2 superseded output(s) from the previous generation"
   ],
   "errors": [],
   "warnings": [],
   "notes": [
+    "1 archived document(s) dropped as subsets of other archived documents",
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
     "localai-api-openapi.yml: upgraded swagger 2.0 -> OpenAPI 3.2.0",
     "localai-api-openapi.yml: declared missing tag: 3d",
     "localai-api-openapi.yml: declared missing tag: Nodes",
@@ -64,7 +66,36 @@
     "localai-api-openapi.yml: declared missing tag: video",
     "localai-api-openapi.yml: declared missing tag: voice-profiles",
     "localai-api-openapi.yml: declared missing tag: voice-recognition",
-    "apis.yml register: written (+26 apis, 26 total)"
+    "superseded outputs removed: localai-3-d-api-openapi.yml, localai-p2-p-api-openapi.yml",
+    "apis.yml register: written (+2 apis, 26 total)"
   ],
-  "skipped": []
+  "skipped": [
+    "_original/localai-openapi.json: archived document superseded by a larger archived document",
+    "localai-3-d-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "localai-agent-jobs-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "localai-audio-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "localai-backends-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "localai-branding-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "localai-config-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "localai-depth-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "localai-detection-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "localai-embeddings-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "localai-face-recognition-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "localai-images-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "localai-inference-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "localai-instructions-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "localai-mcp-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "localai-models-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "localai-moderation-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "localai-monitoring-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "localai-nodes-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "localai-p2-p-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "localai-pii-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "localai-rerank-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "localai-router-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "localai-tokenize-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "localai-video-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "localai-voice-profiles-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "localai-voice-recognition-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }

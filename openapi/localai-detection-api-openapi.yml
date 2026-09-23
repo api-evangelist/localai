@@ -12,13 +12,13 @@ info:
 servers:
 - url: /
 tags:
-- name: detection
+- name: Detection
 paths:
   /v1/detection:
     post:
       tags:
-      - detection
-      summary: Detects objects in the input image.
+      - Detection
+      summary: Detects objects in the input image
       responses:
         '200':
           description: Response
@@ -33,8 +33,17 @@ paths:
               $ref: '#/components/schemas/schema.DetectionRequest'
         description: query params
         required: true
+      operationId: postV1Detection
+      x-operation-id-source: derived
 components:
   schemas:
+    schema.DetectionResponse:
+      type: object
+      properties:
+        detections:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.Detection'
     schema.Detection:
       type: object
       properties:
@@ -77,13 +86,6 @@ components:
         threshold:
           description: Detection confidence threshold
           type: number
-    schema.DetectionResponse:
-      type: object
-      properties:
-        detections:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.Detection'
   securitySchemes:
     BearerAuth:
       type: apiKey

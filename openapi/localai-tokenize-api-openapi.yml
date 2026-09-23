@@ -12,13 +12,13 @@ info:
 servers:
 - url: /
 tags:
-- name: tokenize
+- name: Tokenize
 paths:
   /tokenMetrics:
     get:
       tags:
-      - tokenize
-      summary: Get TokenMetrics for Active Slot.
+      - Tokenize
+      summary: Get TokenMetrics for Active Slot
       responses:
         '200':
           description: generated audio/wav file
@@ -26,11 +26,13 @@ paths:
             audio/x-wav:
               schema:
                 type: string
+      operationId: getTokenMetrics
+      x-operation-id-source: derived
   /v1/detokenize:
     post:
       tags:
-      - tokenize
-      summary: Detokenize the input.
+      - Tokenize
+      summary: Detokenize the input
       responses:
         '200':
           description: Response
@@ -45,11 +47,13 @@ paths:
               $ref: '#/components/schemas/schema.DetokenizeRequest'
         description: Request
         required: true
+      operationId: postV1Detokenize
+      x-operation-id-source: derived
   /v1/tokenMetrics:
     get:
       tags:
-      - tokenize
-      summary: Get TokenMetrics for Active Slot.
+      - Tokenize
+      summary: Get TokenMetrics for Active Slot
       responses:
         '200':
           description: generated audio/wav file
@@ -57,11 +61,13 @@ paths:
             audio/x-wav:
               schema:
                 type: string
+      operationId: getV1TokenMetrics
+      x-operation-id-source: derived
   /v1/tokenize:
     post:
       tags:
-      - tokenize
-      summary: Tokenize the input.
+      - Tokenize
+      summary: Tokenize the input
       responses:
         '200':
           description: Response
@@ -76,8 +82,28 @@ paths:
               $ref: '#/components/schemas/schema.TokenizeRequest'
         description: Request
         required: true
+      operationId: postV1Tokenize
+      x-operation-id-source: derived
 components:
   schemas:
+    schema.DetokenizeRequest:
+      type: object
+      properties:
+        model:
+          type: string
+        tokens:
+          description: token IDs to convert back to text
+          type: array
+          items:
+            type: integer
+    schema.TokenizeResponse:
+      type: object
+      properties:
+        tokens:
+          description: token IDs
+          type: array
+          items:
+            type: integer
     schema.TokenizeRequest:
       type: object
       properties:
@@ -92,24 +118,6 @@ components:
         content:
           description: detokenized text
           type: string
-    schema.TokenizeResponse:
-      type: object
-      properties:
-        tokens:
-          description: token IDs
-          type: array
-          items:
-            type: integer
-    schema.DetokenizeRequest:
-      type: object
-      properties:
-        model:
-          type: string
-        tokens:
-          description: token IDs to convert back to text
-          type: array
-          items:
-            type: integer
   securitySchemes:
     BearerAuth:
       type: apiKey

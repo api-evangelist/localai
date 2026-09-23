@@ -12,13 +12,13 @@ info:
 servers:
 - url: /
 tags:
-- name: monitoring
+- name: Monitoring
 paths:
   /api/backend-logs:
     get:
       description: Returns a sorted list of model IDs that have captured backend process output
       tags:
-      - monitoring
+      - Monitoring
       summary: List models with backend logs
       responses:
         '200':
@@ -29,11 +29,13 @@ paths:
                 type: array
                 items:
                   type: string
+      operationId: getApiBackendLogs
+      x-operation-id-source: derived
   /api/backend-logs/{modelId}:
     get:
       description: Returns all captured log lines (stdout/stderr) for the specified model's backend process
       tags:
-      - monitoring
+      - Monitoring
       summary: Get backend logs for a model
       parameters:
       - description: Model ID
@@ -51,11 +53,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/model.BackendLogLine'
+      operationId: getApiBackendLogsByModelId
+      x-operation-id-source: derived
   /api/backend-logs/{modelId}/clear:
     post:
       description: Removes all captured log lines for the specified model's backend process
       tags:
-      - monitoring
+      - Monitoring
       summary: Clear backend logs for a model
       parameters:
       - description: Model ID
@@ -67,11 +71,13 @@ paths:
       responses:
         '204':
           description: Logs cleared
+      operationId: postApiBackendLogsByModelIdClear
+      x-operation-id-source: derived
   /api/backend-traces:
     get:
       description: Returns a bounded, newest-first page of captured backend traces (LLM calls, embeddings, TTS, etc). The heavy body and data fields are omitted unless full=true; fetch them per-trace from /api/backend-traces/{id}. Paging metadata is returned in the X-Total-Count, X-Trace-Offset and X-Trace-Limit headers.
       tags:
-      - monitoring
+      - Monitoring
       summary: List backend operation traces
       parameters:
       - description: Maximum entries to return (default 50, max 1000, 0 for all)
@@ -97,20 +103,24 @@ paths:
               schema:
                 type: object
                 additionalProperties: true
+      operationId: getApiBackendTraces
+      x-operation-id-source: derived
   /api/backend-traces/clear:
     post:
       description: Removes all captured backend operation traces from the buffer
       tags:
-      - monitoring
+      - Monitoring
       summary: Clear backend traces
       responses:
         '204':
           description: Traces cleared
+      operationId: postApiBackendTracesClear
+      x-operation-id-source: derived
   /api/backend-traces/{id}:
     get:
       description: Returns a single captured backend trace, including the body and data payloads omitted from the list response
       tags:
-      - monitoring
+      - Monitoring
       summary: Get one backend operation trace
       parameters:
       - description: Trace ID
@@ -133,11 +143,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/schema.ErrorResponse'
+      operationId: getApiBackendTracesById
+      x-operation-id-source: derived
   /api/traces:
     get:
       description: Returns a bounded, newest-first page of captured API exchange traces. Request and response bodies plus headers are omitted unless full=true; fetch them per-trace from /api/traces/{id}. Paging metadata is returned in the X-Total-Count, X-Trace-Offset and X-Trace-Limit headers.
       tags:
-      - monitoring
+      - Monitoring
       summary: List API request/response traces
       parameters:
       - description: Maximum entries to return (default 50, max 1000, 0 for all)
@@ -163,20 +175,24 @@ paths:
               schema:
                 type: object
                 additionalProperties: true
+      operationId: getApiTraces
+      x-operation-id-source: derived
   /api/traces/clear:
     post:
       description: Removes all captured API request/response traces from the buffer
       tags:
-      - monitoring
+      - Monitoring
       summary: Clear API traces
       responses:
         '204':
           description: Traces cleared
+      operationId: postApiTracesClear
+      x-operation-id-source: derived
   /api/traces/summary:
     get:
       description: Returns request, failure and latency totals over a recent window, plus a bucketed series for sparklines. Exists so callers wanting three numbers do not have to fetch the whole trace list and count it themselves.
       tags:
-      - monitoring
+      - Monitoring
       summary: Summarize recent API traces
       parameters:
       - description: Window in hours (default 24, max 168)
@@ -191,11 +207,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/middleware.TraceSummary'
+      operationId: getApiTracesSummary
+      x-operation-id-source: derived
   /api/traces/{id}:
     get:
       description: Returns a single captured API exchange, including the request and response bodies omitted from the list response
       tags:
-      - monitoring
+      - Monitoring
       summary: Get one API trace
       parameters:
       - description: Trace ID
@@ -218,11 +236,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/schema.ErrorResponse'
+      operationId: getApiTracesById
+      x-operation-id-source: derived
   /backend/load:
     post:
       description: Loads the named model (or, for a realtime pipeline, all of its sub-models) into memory so subsequent requests pay no cold-start cost. The inverse of /backend/shutdown.
       tags:
-      - monitoring
+      - Monitoring
       summary: Pre-load a model into memory
       responses:
         '200':
@@ -250,10 +270,12 @@ paths:
               $ref: '#/components/schemas/schema.ModelLoadRequest'
         description: Model to load
         required: true
+      operationId: postBackendLoad
+      x-operation-id-source: derived
   /backend/monitor:
     get:
       tags:
-      - monitoring
+      - Monitoring
       summary: Backend monitor endpoint
       parameters:
       - description: Name of the model to monitor
@@ -269,10 +291,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/proto.StatusResponse'
+      operationId: getBackendMonitor
+      x-operation-id-source: derived
   /backend/shutdown:
     post:
       tags:
-      - monitoring
+      - Monitoring
       summary: Backend shutdown endpoint
       responses: {}
       requestBody:
@@ -282,10 +306,12 @@ paths:
               $ref: '#/components/schemas/schema.BackendMonitorRequest'
         description: Backend statistics request
         required: true
+      operationId: postBackendShutdown
+      x-operation-id-source: derived
   /metrics:
     get:
       tags:
-      - monitoring
+      - Monitoring
       summary: Prometheus metrics endpoint
       responses:
         '200':
@@ -294,10 +320,12 @@ paths:
             text/plain:
               schema:
                 type: string
+      operationId: getMetrics
+      x-operation-id-source: derived
   /system:
     get:
       tags:
-      - monitoring
+      - Monitoring
       summary: Show the LocalAI instance information
       responses:
         '200':
@@ -306,11 +334,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/schema.SystemInformationResponse'
+      operationId: getSystem
+      x-operation-id-source: derived
   /ws/backend-logs/{modelId}:
     get:
       description: Opens a WebSocket connection for real-time backend log streaming. Sends an initial batch of existing lines (type "initial"), then streams new lines as they appear (type "line"). Supports ping/pong keepalive.
       tags:
-      - monitoring
+      - Monitoring
       summary: Stream backend logs via WebSocket
       parameters:
       - description: Model ID
@@ -320,21 +350,27 @@ paths:
         schema:
           type: string
       responses: {}
+      operationId: getWsBackendLogsByModelId
+      x-operation-id-source: derived
 components:
   schemas:
-    proto.StatusResponse_State:
-      type: integer
-      format: int32
-      enum:
-      - 0
-      - 1
-      - 2
-      - -1
-      x-enum-varnames:
-      - StatusResponse_UNINITIALIZED
-      - StatusResponse_BUSY
-      - StatusResponse_READY
-      - StatusResponse_ERROR
+    proto.MemoryUsageData:
+      type: object
+      properties:
+        breakdown:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int64
+        total:
+          type: integer
+    proto.StatusResponse:
+      type: object
+      properties:
+        memory:
+          $ref: '#/components/schemas/proto.MemoryUsageData'
+        state:
+          $ref: '#/components/schemas/proto.StatusResponse_State'
     middleware.TraceBucket:
       type: object
       properties:
@@ -357,6 +393,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/schema.SysInfoModel'
+    schema.ErrorResponse:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/schema.APIError'
     schema.ModelLoadResponse:
       type: object
       properties:
@@ -370,6 +411,11 @@ components:
         message:
           description: Message is a short human-readable status ("model loaded", or an error).
           type: string
+    schema.ModelLoadRequest:
+      type: object
+      properties:
+        model:
+          type: string
     model.BackendLogLine:
       type: object
       properties:
@@ -380,53 +426,19 @@ components:
           type: string
         timestamp:
           type: string
-    proto.MemoryUsageData:
-      type: object
-      properties:
-        breakdown:
-          type: object
-          additionalProperties:
-            type: integer
-            format: int64
-        total:
-          type: integer
-    schema.ErrorResponse:
-      type: object
-      properties:
-        error:
-          $ref: '#/components/schemas/schema.APIError'
-    schema.APIError:
-      type: object
-      properties:
-        code: {}
-        message:
-          type: string
-        param:
-          type: string
-        type:
-          type: string
-    schema.BackendMonitorRequest:
-      type: object
-      properties:
-        model:
-          type: string
-    schema.ModelLoadRequest:
-      type: object
-      properties:
-        model:
-          type: string
-    schema.SysInfoModel:
-      type: object
-      properties:
-        backend:
-          description: 'Backend is the engine serving this model. The loader knows only the ID,
-
-            so it is resolved from the model''s config; empty when the model was
-
-            loaded without one (a loose file, or a config since removed).'
-          type: string
-        id:
-          type: string
+    proto.StatusResponse_State:
+      type: integer
+      format: int32
+      enum:
+      - 0
+      - 1
+      - 2
+      - -1
+      x-enum-varnames:
+      - StatusResponse_UNINITIALIZED
+      - StatusResponse_BUSY
+      - StatusResponse_READY
+      - StatusResponse_ERROR
     middleware.TraceSummary:
       type: object
       properties:
@@ -442,13 +454,33 @@ components:
           type: integer
         window_hours:
           type: integer
-    proto.StatusResponse:
+    schema.BackendMonitorRequest:
       type: object
       properties:
-        memory:
-          $ref: '#/components/schemas/proto.MemoryUsageData'
-        state:
-          $ref: '#/components/schemas/proto.StatusResponse_State'
+        model:
+          type: string
+    schema.APIError:
+      type: object
+      properties:
+        code: {}
+        message:
+          type: string
+        param:
+          type: string
+        type:
+          type: string
+    schema.SysInfoModel:
+      type: object
+      properties:
+        backend:
+          description: 'Backend is the engine serving this model. The loader knows only the ID,
+
+            so it is resolved from the model''s config; empty when the model was
+
+            loaded without one (a loose file, or a config since removed).'
+          type: string
+        id:
+          type: string
   securitySchemes:
     BearerAuth:
       type: apiKey

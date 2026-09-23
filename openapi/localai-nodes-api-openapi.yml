@@ -28,6 +28,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/nodes.NodeModel'
+      operationId: getApiNodesModels
+      x-operation-id-source: derived
   /api/nodes/{id}/max-replicas-per-model:
     put:
       tags:
@@ -70,6 +72,8 @@ paths:
               $ref: '#/components/schemas/localai.UpdateMaxReplicasPerModelRequest'
         description: New value
         required: true
+      operationId: putApiNodesByIdMaxReplicasPerModel
+      x-operation-id-source: derived
     delete:
       tags:
       - Nodes
@@ -97,6 +101,8 @@ paths:
               schema:
                 type: object
                 additionalProperties: true
+      operationId: deleteApiNodesByIdMaxReplicasPerModel
+      x-operation-id-source: derived
   /api/nodes/{id}/vram-budget:
     put:
       tags:
@@ -139,6 +145,8 @@ paths:
               $ref: '#/components/schemas/localai.UpdateVRAMBudgetRequest'
         description: New value (\
         required: true
+      operationId: putApiNodesByIdVramBudget
+      x-operation-id-source: derived
     delete:
       tags:
       - Nodes
@@ -166,6 +174,8 @@ paths:
               schema:
                 type: object
                 additionalProperties: true
+      operationId: deleteApiNodesByIdVramBudget
+      x-operation-id-source: derived
 components:
   schemas:
     localai.UpdateVRAMBudgetRequest:
@@ -174,12 +184,6 @@ components:
         value:
           description: Value is the VRAM cap ("80%" or "12GB"). Empty string clears the cap.
           type: string
-    localai.UpdateMaxReplicasPerModelRequest:
-      type: object
-      properties:
-        value:
-          description: Value is the new per-model replica cap on this node. Must be >= 1.
-          type: integer
     nodes.NodeModel:
       type: object
       properties:
@@ -222,6 +226,12 @@ components:
           type: string
         updated_at:
           type: string
+    localai.UpdateMaxReplicasPerModelRequest:
+      type: object
+      properties:
+        value:
+          description: Value is the new per-model replica cap on this node. Must be >= 1.
+          type: integer
   securitySchemes:
     BearerAuth:
       type: apiKey

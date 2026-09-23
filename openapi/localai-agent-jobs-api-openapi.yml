@@ -49,6 +49,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/schema.Job'
+      operationId: getApiAgentJobs
+      x-operation-id-source: derived
   /api/agent/jobs/execute:
     post:
       tags:
@@ -76,6 +78,8 @@ paths:
               $ref: '#/components/schemas/schema.JobExecutionRequest'
         description: Job execution request
         required: true
+      operationId: postApiAgentJobsExecute
+      x-operation-id-source: derived
   /api/agent/jobs/{id}:
     get:
       tags:
@@ -103,6 +107,8 @@ paths:
                 type: object
                 additionalProperties:
                   type: string
+      operationId: getApiAgentJobsById
+      x-operation-id-source: derived
     delete:
       tags:
       - agent-jobs
@@ -131,6 +137,8 @@ paths:
                 type: object
                 additionalProperties:
                   type: string
+      operationId: deleteApiAgentJobsById
+      x-operation-id-source: derived
   /api/agent/jobs/{id}/cancel:
     post:
       tags:
@@ -168,6 +176,8 @@ paths:
                 type: object
                 additionalProperties:
                   type: string
+      operationId: postApiAgentJobsByIdCancel
+      x-operation-id-source: derived
   /api/agent/tasks:
     get:
       tags:
@@ -188,6 +198,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/schema.Task'
+      operationId: getApiAgentTasks
+      x-operation-id-source: derived
     post:
       tags:
       - agent-jobs
@@ -216,6 +228,8 @@ paths:
               $ref: '#/components/schemas/schema.Task'
         description: Task definition
         required: true
+      operationId: postApiAgentTasks
+      x-operation-id-source: derived
   /api/agent/tasks/{id}:
     get:
       tags:
@@ -243,6 +257,8 @@ paths:
                 type: object
                 additionalProperties:
                   type: string
+      operationId: getApiAgentTasksById
+      x-operation-id-source: derived
     put:
       tags:
       - agent-jobs
@@ -286,6 +302,8 @@ paths:
               $ref: '#/components/schemas/schema.Task'
         description: Updated task definition
         required: true
+      operationId: putApiAgentTasksById
+      x-operation-id-source: derived
     delete:
       tags:
       - agent-jobs
@@ -314,6 +332,8 @@ paths:
                 type: object
                 additionalProperties:
                   type: string
+      operationId: deleteApiAgentTasksById
+      x-operation-id-source: derived
   /api/agent/tasks/{name}/execute:
     post:
       tags:
@@ -355,172 +375,10 @@ paths:
             schema:
               type: object
         description: Optional template parameters
+      operationId: postApiAgentTasksByNameExecute
+      x-operation-id-source: derived
 components:
   schemas:
-    schema.JobTrace:
-      type: object
-      properties:
-        arguments:
-          description: Tool arguments or result data
-          type: object
-          additionalProperties: {}
-        content:
-          description: The actual trace content
-          type: string
-        timestamp:
-          description: When this trace occurred
-          type: string
-        tool_name:
-          description: Tool name (for tool_call/tool_result)
-          type: string
-        type:
-          description: '"reasoning", "tool_call", "tool_result", "status"'
-          type: string
-    schema.JobExecutionResponse:
-      type: object
-      properties:
-        job_id:
-          description: unique job identifier
-          type: string
-        status:
-          description: initial status (pending)
-          type: string
-        url:
-          description: URL to poll for job status
-          type: string
-    schema.JobExecutionRequest:
-      type: object
-      properties:
-        audios:
-          description: List of audio URLs or base64 strings
-          type: array
-          items:
-            type: string
-        files:
-          description: List of file URLs or base64 strings
-          type: array
-          items:
-            type: string
-        images:
-          description: 'Multimedia content (optional, for manual execution)
-
-            Can contain URLs or base64-encoded data URIs'
-          type: array
-          items:
-            type: string
-        parameters:
-          description: Optional, for templating
-          type: object
-          additionalProperties:
-            type: string
-        task_id:
-          description: Required
-          type: string
-        videos:
-          description: List of video URLs or base64 strings
-          type: array
-          items:
-            type: string
-    schema.JobStatus:
-      type: string
-      enum:
-      - pending
-      - running
-      - completed
-      - failed
-      - cancelled
-      x-enum-varnames:
-      - JobStatusPending
-      - JobStatusRunning
-      - JobStatusCompleted
-      - JobStatusFailed
-      - JobStatusCancelled
-    schema.MultimediaSourceConfig:
-      type: object
-      properties:
-        headers:
-          description: Custom headers for HTTP request (e.g., Authorization)
-          type: object
-          additionalProperties:
-            type: string
-        type:
-          description: '"image", "video", "audio", "file"'
-          type: string
-        url:
-          description: URL to fetch from
-          type: string
-    schema.Task:
-      type: object
-      properties:
-        created_at:
-          type: string
-        cron:
-          description: Optional cron expression
-          type: string
-        cron_parameters:
-          description: Parameters to use when executing cron jobs
-          type: object
-          additionalProperties:
-            type: string
-        description:
-          description: Optional description
-          type: string
-        enabled:
-          description: Can be disabled without deletion
-          type: boolean
-        id:
-          description: UUID
-          type: string
-        model:
-          description: Model name (must have MCP config)
-          type: string
-        multimedia_sources:
-          description: 'Multimedia sources (for cron jobs)
-
-            URLs to fetch multimedia content from when cron job executes
-
-            Each source can have custom headers for authentication/authorization'
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.MultimediaSourceConfig'
-        name:
-          description: User-friendly name
-          type: string
-        prompt:
-          description: Template prompt (supports Go template .param syntax)
-          type: string
-        updated_at:
-          type: string
-        webhooks:
-          description: 'Webhook configuration (for notifications).
-
-            Supports multiple webhook endpoints.
-
-            Webhooks can handle both success and failure cases using template variables:
-
-            .Job (Job object), .Task (Task object), .Result (if successful),
-
-            .Error (if failed), .Status (job status string).'
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.WebhookConfig'
-    schema.WebhookConfig:
-      type: object
-      properties:
-        headers:
-          description: Custom headers (e.g., Authorization)
-          type: object
-          additionalProperties:
-            type: string
-        method:
-          description: 'HTTP method (POST, PUT, PATCH) - default: POST'
-          type: string
-        payload_template:
-          description: Optional template for payload
-          type: string
-        url:
-          description: Webhook endpoint URL
-          type: string
     schema.Job:
       type: object
       properties:
@@ -589,6 +447,170 @@ components:
           type: boolean
         webhook_sent_at:
           type: string
+    schema.Task:
+      type: object
+      properties:
+        created_at:
+          type: string
+        cron:
+          description: Optional cron expression
+          type: string
+        cron_parameters:
+          description: Parameters to use when executing cron jobs
+          type: object
+          additionalProperties:
+            type: string
+        description:
+          description: Optional description
+          type: string
+        enabled:
+          description: Can be disabled without deletion
+          type: boolean
+        id:
+          description: UUID
+          type: string
+        model:
+          description: Model name (must have MCP config)
+          type: string
+        multimedia_sources:
+          description: 'Multimedia sources (for cron jobs)
+
+            URLs to fetch multimedia content from when cron job executes
+
+            Each source can have custom headers for authentication/authorization'
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.MultimediaSourceConfig'
+        name:
+          description: User-friendly name
+          type: string
+        prompt:
+          description: Template prompt (supports Go template .param syntax)
+          type: string
+        updated_at:
+          type: string
+        webhooks:
+          description: 'Webhook configuration (for notifications).
+
+            Supports multiple webhook endpoints.
+
+            Webhooks can handle both success and failure cases using template variables:
+
+            .Job (Job object), .Task (Task object), .Result (if successful),
+
+            .Error (if failed), .Status (job status string).'
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.WebhookConfig'
+    schema.JobExecutionResponse:
+      type: object
+      properties:
+        job_id:
+          description: unique job identifier
+          type: string
+        status:
+          description: initial status (pending)
+          type: string
+        url:
+          description: URL to poll for job status
+          type: string
+    schema.JobTrace:
+      type: object
+      properties:
+        arguments:
+          description: Tool arguments or result data
+          type: object
+          additionalProperties: {}
+        content:
+          description: The actual trace content
+          type: string
+        timestamp:
+          description: When this trace occurred
+          type: string
+        tool_name:
+          description: Tool name (for tool_call/tool_result)
+          type: string
+        type:
+          description: '"reasoning", "tool_call", "tool_result", "status"'
+          type: string
+    schema.JobStatus:
+      type: string
+      enum:
+      - pending
+      - running
+      - completed
+      - failed
+      - cancelled
+      x-enum-varnames:
+      - JobStatusPending
+      - JobStatusRunning
+      - JobStatusCompleted
+      - JobStatusFailed
+      - JobStatusCancelled
+    schema.WebhookConfig:
+      type: object
+      properties:
+        headers:
+          description: Custom headers (e.g., Authorization)
+          type: object
+          additionalProperties:
+            type: string
+        method:
+          description: 'HTTP method (POST, PUT, PATCH) - default: POST'
+          type: string
+        payload_template:
+          description: Optional template for payload
+          type: string
+        url:
+          description: Webhook endpoint URL
+          type: string
+    schema.MultimediaSourceConfig:
+      type: object
+      properties:
+        headers:
+          description: Custom headers for HTTP request (e.g., Authorization)
+          type: object
+          additionalProperties:
+            type: string
+        type:
+          description: '"image", "video", "audio", "file"'
+          type: string
+        url:
+          description: URL to fetch from
+          type: string
+    schema.JobExecutionRequest:
+      type: object
+      properties:
+        audios:
+          description: List of audio URLs or base64 strings
+          type: array
+          items:
+            type: string
+        files:
+          description: List of file URLs or base64 strings
+          type: array
+          items:
+            type: string
+        images:
+          description: 'Multimedia content (optional, for manual execution)
+
+            Can contain URLs or base64-encoded data URIs'
+          type: array
+          items:
+            type: string
+        parameters:
+          description: Optional, for templating
+          type: object
+          additionalProperties:
+            type: string
+        task_id:
+          description: Required
+          type: string
+        videos:
+          description: List of video URLs or base64 strings
+          type: array
+          items:
+            type: string
   securitySchemes:
     BearerAuth:
       type: apiKey

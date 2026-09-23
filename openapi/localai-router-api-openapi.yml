@@ -12,12 +12,12 @@ info:
 servers:
 - url: /
 tags:
-- name: router
+- name: Router
 paths:
   /api/router/decide:
     post:
       tags:
-      - router
+      - Router
       summary: Classify a prompt against a router model's policies (decision oracle)
       responses:
         '200':
@@ -65,10 +65,12 @@ paths:
               $ref: '#/components/schemas/schema.RouterDecideRequest'
         description: decide params
         required: true
+      operationId: postApiRouterDecide
+      x-operation-id-source: derived
   /api/router/{name}/corpus:
     post:
       tags:
-      - router
+      - Router
       summary: Seed the KNN routing corpus with labelled example prompts
       parameters:
       - description: router model name
@@ -115,9 +117,11 @@ paths:
               $ref: '#/components/schemas/schema.RouterCorpusAddRequest'
         description: labelled exemplars
         required: true
+      operationId: postApiRouterByNameCorpus
+      x-operation-id-source: derived
     delete:
       tags:
-      - router
+      - Router
       summary: Clear a router's KNN corpus
       parameters:
       - description: router model name
@@ -157,10 +161,12 @@ paths:
                 type: object
                 additionalProperties:
                   type: string
+      operationId: deleteApiRouterByNameCorpus
+      x-operation-id-source: derived
   /api/router/{name}/corpus/stats:
     get:
       tags:
-      - router
+      - Router
       summary: Inspect a router's KNN corpus (label counts only, never texts)
       parameters:
       - description: router model name
@@ -200,26 +206,10 @@ paths:
                 type: object
                 additionalProperties:
                   type: string
+      operationId: getApiRouterByNameCorpusStats
+      x-operation-id-source: derived
 components:
   schemas:
-    schema.RouterDecideNeighbor:
-      type: object
-      properties:
-        id:
-          type: string
-        labels:
-          type: array
-          items:
-            type: string
-        similarity:
-          type: number
-    schema.RouterCorpusAddRequest:
-      type: object
-      properties:
-        entries:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.RouterCorpusEntry'
     schema.RouterDecideResponse:
       type: object
       properties:
@@ -284,6 +274,13 @@ components:
 
             classifier-side confidence signal).'
           type: number
+    schema.RouterCorpusClearResponse:
+      type: object
+      properties:
+        cleared:
+          type: integer
+        router:
+          type: string
     schema.RouterCorpusEntry:
       type: object
       properties:
@@ -293,23 +290,17 @@ components:
             type: string
         text:
           type: string
-    schema.RouterDecideRequest:
+    schema.RouterDecideNeighbor:
       type: object
       properties:
-        input:
-          description: 'Input is the user-visible prompt text to classify. Required.
-
-            Schema-shape extraction (chat-message concatenation, etc.) is
-
-            the caller''s responsibility — matches the Probe contract used
-
-            by the in-band middleware.'
+        id:
           type: string
-        router:
-          description: 'Router is the name of the router model (a ModelConfig with a
-
-            `router:` block). Required.'
-          type: string
+        labels:
+          type: array
+          items:
+            type: string
+        similarity:
+          type: number
     schema.RouterCorpusStatsResponse:
       type: object
       properties:
@@ -334,13 +325,6 @@ components:
           type: string
         total:
           type: integer
-    schema.RouterCorpusClearResponse:
-      type: object
-      properties:
-        cleared:
-          type: integer
-        router:
-          type: string
     schema.RouterCorpusAddResponse:
       type: object
       properties:
@@ -362,6 +346,30 @@ components:
         total:
           description: Total is the corpus size after the call.
           type: integer
+    schema.RouterCorpusAddRequest:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.RouterCorpusEntry'
+    schema.RouterDecideRequest:
+      type: object
+      properties:
+        input:
+          description: 'Input is the user-visible prompt text to classify. Required.
+
+            Schema-shape extraction (chat-message concatenation, etc.) is
+
+            the caller''s responsibility — matches the Probe contract used
+
+            by the in-band middleware.'
+          type: string
+        router:
+          description: 'Router is the name of the router model (a ModelConfig with a
+
+            `router:` block). Required.'
+          type: string
   securitySchemes:
     BearerAuth:
       type: apiKey

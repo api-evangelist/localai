@@ -19,7 +19,7 @@ paths:
       description: 'Runs the configured PII detectors (NER and/or pattern tiers) over the supplied text and returns the matched entity spans with the policy action that would fire. Detection only — the text is not modified and no block is enforced. Select detectors explicitly via `detectors`, or pass a consuming `model` to use its effective policy: the model''s own `pii.detectors`, else the instance-wide `pii_default_detectors`. A model with PII disabled, or enabled with nothing to scan with, is a 400. The raw matched value is never returned; admins may set `reveal:true` for the audit hash prefix.'
       tags:
       - pii
-      summary: Detect PII entities in a string (no mutation).
+      summary: Detect PII entities in a string (no mutation)
       responses:
         '200':
           description: Detected entities
@@ -34,12 +34,14 @@ paths:
               $ref: '#/components/schemas/schema.PIIAnalyzeRequest'
         description: text + detector selection
         required: true
+      operationId: postApiPiiAnalyze
+      x-operation-id-source: derived
   /api/pii/redact:
     post:
-      description: 'Runs the configured PII detectors over the text and applies each detector model''s policy: masked spans are replaced with `[REDACTED:<id>]`, allow spans pass through, and a single block action causes a 400 (type `pii_blocked`) carrying the offending entities — the text is never returned in that case. Select detectors via `detectors`, or a consuming `model`''s effective policy (its own `pii.detectors`, else the instance-wide `pii_default_detectors`; PII must be enabled on the model). Records audit events (origin `pii_redact`) visible at /api/pii/events.'
+      description: 'Runs the configured PII detectors over the text and applies each detector model''s policy: masked spans are replaced with `[REDACTED:]`, allow spans pass through, and a single block action causes a 400 (type `pii_blocked`) carrying the offending entities — the text is never returned in that case. Select detectors via `detectors`, or a consuming `model`''s effective policy (its own `pii.detectors`, else the instance-wide `pii_default_detectors`; PII must be enabled on the model). Records audit events (origin `pii_redact`) visible at /api/pii/events.'
       tags:
       - pii
-      summary: Redact PII in a string by applying the configured policy.
+      summary: Redact PII in a string by applying the configured policy
       responses:
         '200':
           description: Redacted text + entities
@@ -54,6 +56,8 @@ paths:
               $ref: '#/components/schemas/schema.PIIAnalyzeRequest'
         description: text + detector selection
         required: true
+      operationId: postApiPiiRedact
+      x-operation-id-source: derived
 components:
   schemas:
     schema.PIIRedactResponse:
@@ -88,17 +92,6 @@ components:
           type: string
         start:
           type: integer
-    schema.PIIAnalyzeResponse:
-      type: object
-      properties:
-        blocked:
-          type: boolean
-        correlation_id:
-          type: string
-        entities:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.PIIEntity'
     schema.PIIAnalyzeRequest:
       type: object
       properties:
@@ -128,6 +121,17 @@ components:
 
             body limit.'
           type: string
+    schema.PIIAnalyzeResponse:
+      type: object
+      properties:
+        blocked:
+          type: boolean
+        correlation_id:
+          type: string
+        entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.PIIEntity'
   securitySchemes:
     BearerAuth:
       type: apiKey

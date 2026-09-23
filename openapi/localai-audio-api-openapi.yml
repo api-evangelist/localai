@@ -12,13 +12,13 @@ info:
 servers:
 - url: /
 tags:
-- name: audio
+- name: Audio
 paths:
   /api/voice-profiles:
     get:
       description: List saved voice-cloning references without exposing filesystem paths.
       tags:
-      - audio
+      - Audio
       summary: List voice profiles
       responses:
         '200':
@@ -33,10 +33,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/schema.ErrorResponse'
+      operationId: getApiVoiceProfiles
+      x-operation-id-source: derived
     post:
       description: Save a consent-confirmed PCM WAV reference clip and exact transcript for voice cloning. Admin-only.
       tags:
-      - audio
+      - Audio
       summary: Create a voice profile
       responses:
         '201':
@@ -115,11 +117,13 @@ paths:
               - transcript
               - consent_confirmed
               - audio
+      operationId: postApiVoiceProfiles
+      x-operation-id-source: derived
   /api/voice-profiles/{id}:
     delete:
       description: Permanently remove a saved voice-cloning profile. Admin-only.
       tags:
-      - audio
+      - Audio
       summary: Delete a voice profile
       parameters:
       - description: Voice profile UUID
@@ -137,11 +141,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/schema.ErrorResponse'
+      operationId: deleteApiVoiceProfilesById
+      x-operation-id-source: derived
   /api/voice-profiles/{id}/audio:
     get:
       description: Stream the saved reference WAV for an authenticated TTS user.
       tags:
-      - audio
+      - Audio
       summary: Preview voice profile audio
       parameters:
       - description: Voice profile UUID
@@ -163,11 +169,13 @@ paths:
             audio/x-wav:
               schema:
                 $ref: '#/components/schemas/schema.ErrorResponse'
+      operationId: getApiVoiceProfilesByIdAudio
+      x-operation-id-source: derived
   /audio/transform:
     post:
-      description: Runs an audio-in / audio-out transform conditioned on an optional auxiliary reference signal. Concrete transforms include AEC + noise suppression + dereverberation (LocalVQE), voice conversion (reference = target speaker), and pitch shifting. The backend determines the operation; pass model-specific tuning via repeated `params[<key>]=<value>` form fields.
+      description: Runs an audio-in / audio-out transform conditioned on an optional auxiliary reference signal. Concrete transforms include AEC + noise suppression + dereverberation (LocalVQE), voice conversion (reference = target speaker), and pitch shifting. The backend determines the operation; pass model-specific tuning via repeated `params[]=` form fields.
       tags:
-      - audio
+      - Audio
       summary: Transform audio (echo cancellation, noise suppression, voice conversion, etc.)
       responses:
         '200':
@@ -202,11 +210,13 @@ paths:
               required:
               - model
               - audio
+      operationId: postAudioTransform
+      x-operation-id-source: derived
   /audio/transformations:
     post:
-      description: Runs an audio-in / audio-out transform conditioned on an optional auxiliary reference signal. Concrete transforms include AEC + noise suppression + dereverberation (LocalVQE), voice conversion (reference = target speaker), and pitch shifting. The backend determines the operation; pass model-specific tuning via repeated `params[<key>]=<value>` form fields.
+      description: Runs an audio-in / audio-out transform conditioned on an optional auxiliary reference signal. Concrete transforms include AEC + noise suppression + dereverberation (LocalVQE), voice conversion (reference = target speaker), and pitch shifting. The backend determines the operation; pass model-specific tuning via repeated `params[]=` form fields.
       tags:
-      - audio
+      - Audio
       summary: Transform audio (echo cancellation, noise suppression, voice conversion, etc.)
       responses:
         '200':
@@ -241,18 +251,22 @@ paths:
               required:
               - model
               - audio
+      operationId: postAudioTransformations
+      x-operation-id-source: derived
   /audio/transformations/stream:
     get:
       description: 'Streams binary PCM frames in (interleaved stereo: ch0=audio, ch1=reference) and out (mono). The model must support the audio_transform use case. Any-to-any models such as liquid-audio use the OpenAI Realtime API instead. The first message must be a JSON `session.update` envelope describing model + sample format + frame size + backend params. Server emits binary PCM on the same cadence.'
       tags:
-      - audio
-      summary: Bidirectional realtime audio transform over WebSocket.
+      - Audio
+      summary: Bidirectional realtime audio transform over WebSocket
       responses: {}
+      operationId: getAudioTransformationsStream
+      x-operation-id-source: derived
   /tts:
     post:
       tags:
-      - audio
-      summary: Generates audio from the input text.
+      - Audio
+      summary: Generates audio from the input text
       responses:
         '200':
           description: generated audio/wav file
@@ -267,11 +281,13 @@ paths:
               $ref: '#/components/schemas/schema.TTSRequest'
         description: query params
         required: true
+      operationId: postTts
+      x-operation-id-source: derived
   /v1/audio/classification:
     post:
       tags:
-      - audio
-      summary: Classify sound events in audio (audio tagging).
+      - Audio
+      summary: Classify sound events in audio (audio tagging)
       responses:
         '200':
           description: OK
@@ -301,11 +317,13 @@ paths:
               required:
               - model
               - file
+      operationId: postV1AudioClassification
+      x-operation-id-source: derived
   /v1/audio/diarization:
     post:
       tags:
-      - audio
-      summary: Identify speakers in audio (who spoke when).
+      - Audio
+      summary: Identify speakers in audio (who spoke when)
       responses:
         '200':
           description: OK
@@ -356,11 +374,13 @@ paths:
               required:
               - model
               - file
+      operationId: postV1AudioDiarization
+      x-operation-id-source: derived
   /v1/audio/speech:
     post:
       tags:
-      - audio
-      summary: Generates audio from the input text.
+      - Audio
+      summary: Generates audio from the input text
       responses:
         '200':
           description: generated audio/wav file
@@ -375,11 +395,13 @@ paths:
               $ref: '#/components/schemas/schema.TTSRequest'
         description: query params
         required: true
+      operationId: postV1AudioSpeech
+      x-operation-id-source: derived
   /v1/audio/transcriptions:
     post:
       tags:
-      - audio
-      summary: Transcribes audio into the input language.
+      - Audio
+      summary: Transcribes audio into the input language
       responses:
         '200':
           description: Response
@@ -416,11 +438,13 @@ paths:
               required:
               - model
               - file
+      operationId: postV1AudioTranscriptions
+      x-operation-id-source: derived
   /v1/sound-generation:
     post:
       tags:
-      - audio
-      summary: Generates audio from the input text.
+      - Audio
+      summary: Generates audio from the input text
       responses:
         '200':
           description: Response
@@ -435,11 +459,13 @@ paths:
               $ref: '#/components/schemas/schema.ElevenLabsSoundGenerationRequest'
         description: query params
         required: true
+      operationId: postV1SoundGeneration
+      x-operation-id-source: derived
   /v1/text-to-speech/{voice-id}:
     post:
       tags:
-      - audio
-      summary: Generates audio from the input text.
+      - Audio
+      summary: Generates audio from the input text
       parameters:
       - description: Account ID
         name: voice-id
@@ -461,10 +487,12 @@ paths:
               $ref: '#/components/schemas/schema.TTSRequest'
         description: query params
         required: true
+      operationId: postV1TextToSpeechByVoiceId
+      x-operation-id-source: derived
   /vad:
     post:
       tags:
-      - audio
+      - Audio
       summary: Detect voice fragments in an audio stream
       responses:
         '200':
@@ -480,52 +508,19 @@ paths:
               $ref: '#/components/schemas/schema.VADRequest'
         description: query params
         required: true
+      operationId: postVad
+      x-operation-id-source: derived
 components:
   schemas:
-    schema.DiarizationSpeaker:
+    schema.SoundClassification:
       type: object
       properties:
-        id:
-          type: string
+        index:
+          type: integer
         label:
           type: string
-        segment_count:
-          type: integer
-        total_speech_duration:
+        score:
           type: number
-    schema.ElevenLabsSoundGenerationRequest:
-      type: object
-      properties:
-        bpm:
-          type: integer
-        caption:
-          type: string
-        do_sample:
-          type: boolean
-        duration_seconds:
-          type: number
-        instrumental:
-          description: 'Simple mode: use text as description; optional instrumental / vocal_language'
-          type: boolean
-        keyscale:
-          type: string
-        language:
-          type: string
-        lyrics:
-          type: string
-        model_id:
-          type: string
-        prompt_influence:
-          type: number
-        text:
-          type: string
-        think:
-          description: Advanced mode
-          type: boolean
-        timesignature:
-          type: string
-        vocal_language:
-          type: string
     schema.TTSRequest:
       description: TTS request body
       type: object
@@ -580,20 +575,71 @@ components:
         voice:
           description: voice audio file or speaker id
           type: string
-    schema.DiarizationSegment:
+    schema.APIError:
       type: object
       properties:
-        end:
-          type: number
+        code: {}
+        message:
+          type: string
+        param:
+          type: string
+        type:
+          type: string
+    localai.VoiceProfileListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/voiceprofile.Profile'
+    schema.DiarizationSpeaker:
+      type: object
+      properties:
         id:
-          type: integer
+          type: string
         label:
           type: string
-        speaker:
+        segment_count:
+          type: integer
+        total_speech_duration:
+          type: number
+    schema.ErrorResponse:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/schema.APIError'
+    schema.ElevenLabsSoundGenerationRequest:
+      type: object
+      properties:
+        bpm:
+          type: integer
+        caption:
           type: string
-        start:
+        do_sample:
+          type: boolean
+        duration_seconds:
+          type: number
+        instrumental:
+          description: 'Simple mode: use text as description; optional instrumental / vocal_language'
+          type: boolean
+        keyscale:
+          type: string
+        language:
+          type: string
+        lyrics:
+          type: string
+        model_id:
+          type: string
+        prompt_influence:
           type: number
         text:
+          type: string
+        think:
+          description: Advanced mode
+          type: boolean
+        timesignature:
+          type: string
+        vocal_language:
           type: string
     voiceprofile.AudioMetadata:
       type: object
@@ -610,11 +656,6 @@ components:
           type: integer
         size_bytes:
           type: integer
-    schema.ErrorResponse:
-      type: object
-      properties:
-        error:
-          $ref: '#/components/schemas/schema.APIError'
     schema.DiarizationResult:
       type: object
       properties:
@@ -633,34 +674,6 @@ components:
           items:
             $ref: '#/components/schemas/schema.DiarizationSpeaker'
         task:
-          type: string
-    proto.VADSegment:
-      type: object
-      properties:
-        end:
-          type: number
-        start:
-          type: number
-    schema.APIError:
-      type: object
-      properties:
-        code: {}
-        message:
-          type: string
-        param:
-          type: string
-        type:
-          type: string
-    schema.VADRequest:
-      description: VAD request body
-      type: object
-      properties:
-        audio:
-          description: raw audio samples as float32 PCM
-          type: array
-          items:
-            type: number
-        model:
           type: string
     voiceprofile.Profile:
       type: object
@@ -685,15 +698,6 @@ components:
           type: string
         voice:
           type: string
-    schema.SoundClassification:
-      type: object
-      properties:
-        index:
-          type: integer
-        label:
-          type: string
-        score:
-          type: number
     schema.SoundClassificationResult:
       type: object
       properties:
@@ -703,13 +707,39 @@ components:
             $ref: '#/components/schemas/schema.SoundClassification'
         model:
           type: string
-    localai.VoiceProfileListResponse:
+    proto.VADSegment:
       type: object
       properties:
-        data:
+        end:
+          type: number
+        start:
+          type: number
+    schema.DiarizationSegment:
+      type: object
+      properties:
+        end:
+          type: number
+        id:
+          type: integer
+        label:
+          type: string
+        speaker:
+          type: string
+        start:
+          type: number
+        text:
+          type: string
+    schema.VADRequest:
+      description: VAD request body
+      type: object
+      properties:
+        audio:
+          description: raw audio samples as float32 PCM
           type: array
           items:
-            $ref: '#/components/schemas/voiceprofile.Profile'
+            type: number
+        model:
+          type: string
     proto.VADResponse:
       type: object
       properties:

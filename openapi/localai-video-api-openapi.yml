@@ -12,13 +12,13 @@ info:
 servers:
 - url: /
 tags:
-- name: video
+- name: Video
 paths:
   /video:
     post:
       tags:
-      - video
-      summary: Creates a video from a prompt and optional image or audio conditioning.
+      - Video
+      summary: Creates a video from a prompt and optional image or audio conditioning
       responses:
         '200':
           description: Response
@@ -33,41 +33,10 @@ paths:
               $ref: '#/components/schemas/schema.VideoRequest'
         description: query params
         required: true
+      operationId: postVideo
+      x-operation-id-source: derived
 components:
   schemas:
-    schema.InputTokensDetails:
-      type: object
-      properties:
-        image_tokens:
-          type: integer
-        text_tokens:
-          type: integer
-    schema.Choice:
-      type: object
-      properties:
-        delta:
-          $ref: '#/components/schemas/schema.Message'
-        finish_reason:
-          type: string
-        index:
-          type: integer
-        logprobs:
-          $ref: '#/components/schemas/schema.Logprobs'
-        message:
-          $ref: '#/components/schemas/schema.Message'
-        text:
-          type: string
-    schema.ToolCall:
-      type: object
-      properties:
-        function:
-          $ref: '#/components/schemas/schema.FunctionCall'
-        id:
-          type: string
-        index:
-          type: integer
-        type:
-          type: string
     schema.Message:
       type: object
       properties:
@@ -90,23 +59,39 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/schema.ToolCall'
-    schema.LogprobContent:
+    schema.OpenAIResponse:
       type: object
       properties:
-        bytes:
+        choices:
           type: array
           items:
-            type: integer
-        id:
+            $ref: '#/components/schemas/schema.Choice'
+        created:
           type: integer
-        logprob:
-          type: number
-        token:
-          type: string
-        top_logprobs:
+        data:
           type: array
           items:
-            $ref: '#/components/schemas/schema.LogprobContent'
+            $ref: '#/components/schemas/schema.Item'
+        id:
+          type: string
+        model:
+          type: string
+        object:
+          type: string
+        usage:
+          description: 'Usage is intentionally a pointer with omitempty: per the OpenAI
+
+            chat-completion streaming spec, intermediate chunks must not carry
+
+            a `usage` field. Marshalling a value-typed usage would emit
+
+            `"usage":{"prompt_tokens":0,...}` on every chunk and break
+
+            OpenAI-SDK consumers that filter on a truthy `result.usage`
+
+            (continuedev/continue, Kilo Code, Roo Code, etc.).'
+          allOf:
+          - $ref: '#/components/schemas/schema.OpenAIUsage'
     schema.Item:
       type: object
       properties:
@@ -119,6 +104,46 @@ components:
         url:
           description: Images
           type: string
+    schema.CompressionMetadata:
+      type: object
+      properties:
+        compressed_tokens:
+          type: integer
+        compressor:
+          type: string
+        dropped_turns:
+          type: integer
+        original_tokens:
+          type: integer
+        overflow_recoveries:
+          type: integer
+        summary_tokens:
+          type: integer
+    schema.FunctionCall:
+      type: object
+      properties:
+        arguments:
+          type: string
+        name:
+          type: string
+    schema.ToolCall:
+      type: object
+      properties:
+        function:
+          $ref: '#/components/schemas/schema.FunctionCall'
+        id:
+          type: string
+        index:
+          type: integer
+        type:
+          type: string
+    schema.Logprobs:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.LogprobContent'
     schema.OpenAIUsage:
       type: object
       properties:
@@ -200,68 +225,45 @@ components:
         width:
           description: output width in pixels
           type: integer
-    schema.OpenAIResponse:
+    schema.Choice:
       type: object
       properties:
-        choices:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.Choice'
-        created:
+        delta:
+          $ref: '#/components/schemas/schema.Message'
+        finish_reason:
+          type: string
+        index:
           type: integer
-        data:
+        logprobs:
+          $ref: '#/components/schemas/schema.Logprobs'
+        message:
+          $ref: '#/components/schemas/schema.Message'
+        text:
+          type: string
+    schema.InputTokensDetails:
+      type: object
+      properties:
+        image_tokens:
+          type: integer
+        text_tokens:
+          type: integer
+    schema.LogprobContent:
+      type: object
+      properties:
+        bytes:
           type: array
           items:
-            $ref: '#/components/schemas/schema.Item'
+            type: integer
         id:
+          type: integer
+        logprob:
+          type: number
+        token:
           type: string
-        model:
-          type: string
-        object:
-          type: string
-        usage:
-          description: 'Usage is intentionally a pointer with omitempty: per the OpenAI
-
-            chat-completion streaming spec, intermediate chunks must not carry
-
-            a `usage` field. Marshalling a value-typed usage would emit
-
-            `"usage":{"prompt_tokens":0,...}` on every chunk and break
-
-            OpenAI-SDK consumers that filter on a truthy `result.usage`
-
-            (continuedev/continue, Kilo Code, Roo Code, etc.).'
-          allOf:
-          - $ref: '#/components/schemas/schema.OpenAIUsage'
-    schema.FunctionCall:
-      type: object
-      properties:
-        arguments:
-          type: string
-        name:
-          type: string
-    schema.Logprobs:
-      type: object
-      properties:
-        content:
+        top_logprobs:
           type: array
           items:
             $ref: '#/components/schemas/schema.LogprobContent'
-    schema.CompressionMetadata:
-      type: object
-      properties:
-        compressed_tokens:
-          type: integer
-        compressor:
-          type: string
-        dropped_turns:
-          type: integer
-        original_tokens:
-          type: integer
-        overflow_recoveries:
-          type: integer
-        summary_tokens:
-          type: integer
   securitySchemes:
     BearerAuth:
       type: apiKey

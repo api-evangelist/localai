@@ -12,13 +12,13 @@ info:
 servers:
 - url: /
 tags:
-- name: voice-profiles
+- name: Voice Profiles
 paths:
   /api/voice-profiles:
     get:
       description: List saved voice-cloning references without exposing filesystem paths.
       tags:
-      - voice-profiles
+      - Voice Profiles
       summary: List voice profiles
       responses:
         '200':
@@ -33,10 +33,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/schema.ErrorResponse'
+      operationId: getApiVoiceProfiles
+      x-operation-id-source: derived
     post:
       description: Save a consent-confirmed PCM WAV reference clip and exact transcript for voice cloning. Admin-only.
       tags:
-      - voice-profiles
+      - Voice Profiles
       summary: Create a voice profile
       responses:
         '201':
@@ -115,11 +117,13 @@ paths:
               - transcript
               - consent_confirmed
               - audio
+      operationId: postApiVoiceProfiles
+      x-operation-id-source: derived
   /api/voice-profiles/{id}:
     delete:
       description: Permanently remove a saved voice-cloning profile. Admin-only.
       tags:
-      - voice-profiles
+      - Voice Profiles
       summary: Delete a voice profile
       parameters:
       - description: Voice profile UUID
@@ -137,11 +141,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/schema.ErrorResponse'
+      operationId: deleteApiVoiceProfilesById
+      x-operation-id-source: derived
   /api/voice-profiles/{id}/audio:
     get:
       description: Stream the saved reference WAV for an authenticated TTS user.
       tags:
-      - voice-profiles
+      - Voice Profiles
       summary: Preview voice profile audio
       parameters:
       - description: Voice profile UUID
@@ -163,8 +169,22 @@ paths:
             audio/x-wav:
               schema:
                 $ref: '#/components/schemas/schema.ErrorResponse'
+      operationId: getApiVoiceProfilesByIdAudio
+      x-operation-id-source: derived
 components:
   schemas:
+    localai.VoiceProfileListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/voiceprofile.Profile'
+    schema.ErrorResponse:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/schema.APIError'
     voiceprofile.AudioMetadata:
       type: object
       properties:
@@ -180,21 +200,6 @@ components:
           type: integer
         size_bytes:
           type: integer
-    schema.ErrorResponse:
-      type: object
-      properties:
-        error:
-          $ref: '#/components/schemas/schema.APIError'
-    schema.APIError:
-      type: object
-      properties:
-        code: {}
-        message:
-          type: string
-        param:
-          type: string
-        type:
-          type: string
     voiceprofile.Profile:
       type: object
       properties:
@@ -218,13 +223,16 @@ components:
           type: string
         voice:
           type: string
-    localai.VoiceProfileListResponse:
+    schema.APIError:
       type: object
       properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/voiceprofile.Profile'
+        code: {}
+        message:
+          type: string
+        param:
+          type: string
+        type:
+          type: string
   securitySchemes:
     BearerAuth:
       type: apiKey

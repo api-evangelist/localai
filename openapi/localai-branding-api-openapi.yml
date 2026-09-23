@@ -12,13 +12,13 @@ info:
 servers:
 - url: /
 tags:
-- name: branding
+- name: Branding
 paths:
   /api/branding:
     get:
       description: Returns the configured instance name, tagline, and asset URLs. Public — no authentication required.
       tags:
-      - branding
+      - Branding
       summary: Get instance branding
       responses:
         '200':
@@ -27,11 +27,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/localai.BrandingResponse'
+      operationId: getApiBranding
+      x-operation-id-source: derived
   /api/branding/asset/{kind}:
     post:
       description: Upload a custom logo, horizontal logo, or favicon. The file replaces any previous override for that kind.
       tags:
-      - branding
+      - Branding
       summary: Upload a branding asset
       parameters:
       - description: 'Asset kind: logo, logo_horizontal, or favicon'
@@ -67,10 +69,12 @@ paths:
                   format: binary
               required:
               - file
+      operationId: postApiBrandingAssetByKind
+      x-operation-id-source: derived
     delete:
       description: Remove a custom branding asset; the UI falls back to the bundled LocalAI default.
       tags:
-      - branding
+      - Branding
       summary: Reset a branding asset to default
       parameters:
       - description: 'Asset kind: logo, logo_horizontal, or favicon'
@@ -86,11 +90,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/localai.BrandingResponse'
+      operationId: deleteApiBrandingAssetByKind
+      x-operation-id-source: derived
   /branding/asset/{kind}:
     get:
       description: Serves the admin-uploaded logo, horizontal logo, or favicon. 404 when no override is set.
       tags:
-      - branding
+      - Branding
       summary: Serve a custom branding asset
       parameters:
       - description: 'Asset kind: logo, logo_horizontal, or favicon'
@@ -104,6 +110,8 @@ paths:
           description: OK
         '404':
           description: Not Found
+      operationId: getBrandingAssetByKind
+      x-operation-id-source: derived
 components:
   schemas:
     localai.BrandingResponse:

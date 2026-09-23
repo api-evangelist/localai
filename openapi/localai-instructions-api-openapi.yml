@@ -12,13 +12,13 @@ info:
 servers:
 - url: /
 tags:
-- name: instructions
+- name: Instructions
 paths:
   /api/instructions:
     get:
       description: Returns a compact list of instruction areas with descriptions and URLs for detailed guides
       tags:
-      - instructions
+      - Instructions
       summary: List available API instruction areas
       responses:
         '200':
@@ -28,11 +28,13 @@ paths:
               schema:
                 type: object
                 additionalProperties: true
+      operationId: getApiInstructions
+      x-operation-id-source: derived
   /api/instructions/{name}:
     get:
       description: Returns a markdown guide (default) or filtered OpenAPI fragment (format=json) for a named instruction
       tags:
-      - instructions
+      - Instructions
       summary: Get an instruction's API guide or OpenAPI fragment
       parameters:
       - description: Instruction name (e.g. chat-inference, config-management)
@@ -69,6 +71,8 @@ paths:
                 type: object
                 additionalProperties:
                   type: string
+      operationId: getApiInstructionsByName
+      x-operation-id-source: derived
 components:
   schemas:
     localai.APIInstructionResponse:
