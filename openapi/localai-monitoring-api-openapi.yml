@@ -364,6 +364,11 @@ components:
             format: int64
         total:
           type: integer
+    schema.BackendMonitorRequest:
+      type: object
+      properties:
+        model:
+          type: string
     proto.StatusResponse:
       type: object
       properties:
@@ -371,6 +376,26 @@ components:
           $ref: '#/components/schemas/proto.MemoryUsageData'
         state:
           $ref: '#/components/schemas/proto.StatusResponse_State'
+    middleware.TraceSummary:
+      type: object
+      properties:
+        buckets:
+          type: array
+          items:
+            $ref: '#/components/schemas/middleware.TraceBucket'
+        errors:
+          type: integer
+        p95_ms:
+          type: integer
+        total:
+          type: integer
+        window_hours:
+          type: integer
+    schema.ModelLoadRequest:
+      type: object
+      properties:
+        model:
+          type: string
     middleware.TraceBucket:
       type: object
       properties:
@@ -380,42 +405,23 @@ components:
           type: integer
         start:
           type: string
-    schema.SystemInformationResponse:
+    schema.SysInfoModel:
       type: object
       properties:
-        backends:
-          description: available backend engines
-          type: array
-          items:
-            type: string
-        loaded_models:
-          description: currently loaded models
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.SysInfoModel'
+        backend:
+          description: 'Backend is the engine serving this model. The loader knows only the ID,
+
+            so it is resolved from the model''s config; empty when the model was
+
+            loaded without one (a loose file, or a config since removed).'
+          type: string
+        id:
+          type: string
     schema.ErrorResponse:
       type: object
       properties:
         error:
           $ref: '#/components/schemas/schema.APIError'
-    schema.ModelLoadResponse:
-      type: object
-      properties:
-        loaded:
-          description: 'Loaded lists the model names actually resident in memory after the call.
-
-            For a pipeline model these are its sub-models, not the pipeline name.'
-          type: array
-          items:
-            type: string
-        message:
-          description: Message is a short human-readable status ("model loaded", or an error).
-          type: string
-    schema.ModelLoadRequest:
-      type: object
-      properties:
-        model:
-          type: string
     model.BackendLogLine:
       type: object
       properties:
@@ -439,25 +445,18 @@ components:
       - StatusResponse_BUSY
       - StatusResponse_READY
       - StatusResponse_ERROR
-    middleware.TraceSummary:
+    schema.ModelLoadResponse:
       type: object
       properties:
-        buckets:
+        loaded:
+          description: 'Loaded lists the model names actually resident in memory after the call.
+
+            For a pipeline model these are its sub-models, not the pipeline name.'
           type: array
           items:
-            $ref: '#/components/schemas/middleware.TraceBucket'
-        errors:
-          type: integer
-        p95_ms:
-          type: integer
-        total:
-          type: integer
-        window_hours:
-          type: integer
-    schema.BackendMonitorRequest:
-      type: object
-      properties:
-        model:
+            type: string
+        message:
+          description: Message is a short human-readable status ("model loaded", or an error).
           type: string
     schema.APIError:
       type: object
@@ -469,18 +468,19 @@ components:
           type: string
         type:
           type: string
-    schema.SysInfoModel:
+    schema.SystemInformationResponse:
       type: object
       properties:
-        backend:
-          description: 'Backend is the engine serving this model. The loader knows only the ID,
-
-            so it is resolved from the model''s config; empty when the model was
-
-            loaded without one (a loose file, or a config since removed).'
-          type: string
-        id:
-          type: string
+        backends:
+          description: available backend engines
+          type: array
+          items:
+            type: string
+        loaded_models:
+          description: currently loaded models
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.SysInfoModel'
   securitySchemes:
     BearerAuth:
       type: apiKey

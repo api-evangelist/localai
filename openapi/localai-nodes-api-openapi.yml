@@ -178,12 +178,12 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    localai.UpdateVRAMBudgetRequest:
+    localai.UpdateMaxReplicasPerModelRequest:
       type: object
       properties:
         value:
-          description: Value is the VRAM cap ("80%" or "12GB"). Empty string clears the cap.
-          type: string
+          description: Value is the new per-model replica cap on this node. Must be >= 1.
+          type: integer
     nodes.NodeModel:
       type: object
       properties:
@@ -226,12 +226,12 @@ components:
           type: string
         updated_at:
           type: string
-    localai.UpdateMaxReplicasPerModelRequest:
+    localai.UpdateVRAMBudgetRequest:
       type: object
       properties:
         value:
-          description: Value is the new per-model replica cap on this node. Must be >= 1.
-          type: integer
+          description: Value is the VRAM cap ("80%" or "12GB"). Empty string clears the cap.
+          type: string
   securitySchemes:
     BearerAuth:
       type: apiKey

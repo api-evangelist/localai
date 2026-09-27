@@ -37,26 +37,6 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    schema.JINARerankRequest:
-      type: object
-      properties:
-        backend:
-          type: string
-        documents:
-          type: array
-          items:
-            type: string
-        model:
-          type: string
-        query:
-          type: string
-        top_n:
-          type: integer
-    schema.JINAText:
-      type: object
-      properties:
-        text:
-          type: string
     schema.JINAUsageInfo:
       type: object
       properties:
@@ -73,6 +53,26 @@ components:
           type: integer
         relevance_score:
           type: number
+    schema.JINAText:
+      type: object
+      properties:
+        text:
+          type: string
+    schema.JINARerankRequest:
+      type: object
+      properties:
+        backend:
+          type: string
+        documents:
+          type: array
+          items:
+            type: string
+        model:
+          type: string
+        query:
+          type: string
+        top_n:
+          type: integer
     schema.JINARerankResponse:
       type: object
       properties:

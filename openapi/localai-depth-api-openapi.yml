@@ -37,6 +37,40 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    schema.DepthRequest:
+      type: object
+      properties:
+        dst:
+          description: optional output directory for exports (glb/colmap)
+          type: string
+        exports:
+          description: 'requested exports: "glb", "colmap"'
+          type: array
+          items:
+            type: string
+        image:
+          description: URL or base64-encoded image to analyze
+          type: string
+        include_confidence:
+          description: return the per-pixel confidence map (DualDPT)
+          type: boolean
+        include_depth:
+          description: return the per-pixel depth map
+          type: boolean
+        include_points:
+          description: back-project to a 3D point cloud (DualDPT)
+          type: boolean
+        include_pose:
+          description: return camera extrinsics/intrinsics (DualDPT)
+          type: boolean
+        include_sky:
+          description: return the per-pixel sky map (mono models)
+          type: boolean
+        model:
+          type: string
+        points_conf_thresh:
+          description: keep points with confidence >= this threshold
+          type: number
     schema.DepthResponse:
       type: object
       properties:
@@ -88,40 +122,6 @@ components:
             type: number
         width:
           type: integer
-    schema.DepthRequest:
-      type: object
-      properties:
-        dst:
-          description: optional output directory for exports (glb/colmap)
-          type: string
-        exports:
-          description: 'requested exports: "glb", "colmap"'
-          type: array
-          items:
-            type: string
-        image:
-          description: URL or base64-encoded image to analyze
-          type: string
-        include_confidence:
-          description: return the per-pixel confidence map (DualDPT)
-          type: boolean
-        include_depth:
-          description: return the per-pixel depth map
-          type: boolean
-        include_points:
-          description: back-project to a 3D point cloud (DualDPT)
-          type: boolean
-        include_pose:
-          description: return camera extrinsics/intrinsics (DualDPT)
-          type: boolean
-        include_sky:
-          description: return the per-pixel sky map (mono models)
-          type: boolean
-        model:
-          type: string
-        points_conf_thresh:
-          description: keep points with confidence >= this threshold
-          type: number
   securitySchemes:
     BearerAuth:
       type: apiKey

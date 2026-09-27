@@ -96,14 +96,6 @@ components:
           type: array
           items:
             type: integer
-    schema.TokenizeResponse:
-      type: object
-      properties:
-        tokens:
-          description: token IDs
-          type: array
-          items:
-            type: integer
     schema.TokenizeRequest:
       type: object
       properties:
@@ -112,6 +104,14 @@ components:
           type: string
         model:
           type: string
+    schema.TokenizeResponse:
+      type: object
+      properties:
+        tokens:
+          description: token IDs
+          type: array
+          items:
+            type: integer
     schema.DetokenizeResponse:
       type: object
       properties:

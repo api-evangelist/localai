@@ -205,28 +205,17 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    gallery.UpgradeInfo:
+    gallery.NodeDriftInfo:
       type: object
       properties:
-        available_digest:
+        digest:
           type: string
-        available_version:
+        node_id:
           type: string
-        backend_name:
+        node_name:
           type: string
-        installed_digest:
+        version:
           type: string
-        installed_version:
-          type: string
-        node_drift:
-          description: 'NodeDrift lists nodes whose installed version or digest differs from
-
-            the cluster majority. Non-empty means the cluster has diverged and an
-
-            upgrade will realign it. Empty in single-node mode.'
-          type: array
-          items:
-            $ref: '#/components/schemas/gallery.NodeDriftInfo'
     gallery.File:
       type: object
       properties:
@@ -235,6 +224,42 @@ components:
         sha256:
           type: string
         uri:
+          type: string
+    schema.KnownBackend:
+      type: object
+      properties:
+        auto_detect:
+          type: boolean
+        description:
+          type: string
+        installed:
+          description: 'Installed is true when the backend is currently present on disk — i.e. it
+
+            appears in gallery.ListSystemBackends(systemState). Importer-registered or
+
+            curated pref-only backends default to false unless they also show up on
+
+            disk. The import form uses this to warn users that submitting an import
+
+            may trigger an automatic backend download.'
+          type: boolean
+        modality:
+          type: string
+        name:
+          type: string
+    config.GalleryVerification:
+      type: object
+      properties:
+        identity:
+          type: string
+        identity_regex:
+          type: string
+        issuer:
+          type: string
+        issuer_regex:
+          type: string
+        not_before:
+          description: NotBefore is an RFC3339 timestamp. Empty disables the time check.
           type: string
     gallery.GalleryBackend:
       type: object
@@ -298,60 +323,55 @@ components:
             type: string
         version:
           type: string
-    config.GalleryVerification:
+    gallery.UpgradeInfo:
       type: object
       properties:
-        identity:
+        available_digest:
           type: string
-        identity_regex:
+        available_version:
           type: string
-        issuer:
+        backend_name:
           type: string
-        issuer_regex:
+        installed_digest:
           type: string
-        not_before:
-          description: NotBefore is an RFC3339 timestamp. Empty disables the time check.
+        installed_version:
           type: string
-    schema.KnownBackend:
-      type: object
-      properties:
-        auto_detect:
-          type: boolean
-        description:
-          type: string
-        installed:
-          description: 'Installed is true when the backend is currently present on disk — i.e. it
+        node_drift:
+          description: 'NodeDrift lists nodes whose installed version or digest differs from
 
-            appears in gallery.ListSystemBackends(systemState). Importer-registered or
+            the cluster majority. Non-empty means the cluster has diverged and an
 
-            curated pref-only backends default to false unless they also show up on
-
-            disk. The import form uses this to warn users that submitting an import
-
-            may trigger an automatic backend download.'
-          type: boolean
-        modality:
-          type: string
-        name:
-          type: string
-    localai.GalleryBackend:
-      type: object
-      properties:
-        force:
-          description: 'Force reinstalls the backend even when it is already installed and
-
-            runnable. Off by default so apply stays idempotent for supervising
-
-            apps that ensure their backend on every boot.'
-          type: boolean
-        id:
-          type: string
+            upgrade will realign it. Empty in single-node mode.'
+          type: array
+          items:
+            $ref: '#/components/schemas/gallery.NodeDriftInfo'
     schema.BackendResponse:
       type: object
       properties:
         id:
           type: string
         status_url:
+          type: string
+    galleryop.NodeProgress:
+      type: object
+      properties:
+        current:
+          type: string
+        error:
+          type: string
+        file_name:
+          type: string
+        node_id:
+          type: string
+        node_name:
+          type: string
+        percentage:
+          type: number
+        phase:
+          type: string
+        status:
+          type: string
+        total:
           type: string
     config.Gallery:
       type: object
@@ -375,6 +395,18 @@ components:
           type: string
         verification:
           $ref: '#/components/schemas/config.GalleryVerification'
+    localai.GalleryBackend:
+      type: object
+      properties:
+        force:
+          description: 'Force reinstalls the backend even when it is already installed and
+
+            runnable. Off by default so apply stays idempotent for supervising
+
+            apps that ensure their backend on every boot.'
+          type: boolean
+        id:
+          type: string
     galleryop.OpStatus:
       type: object
       properties:
@@ -420,38 +452,6 @@ components:
           type: number
         total_bytes:
           type: integer
-    galleryop.NodeProgress:
-      type: object
-      properties:
-        current:
-          type: string
-        error:
-          type: string
-        file_name:
-          type: string
-        node_id:
-          type: string
-        node_name:
-          type: string
-        percentage:
-          type: number
-        phase:
-          type: string
-        status:
-          type: string
-        total:
-          type: string
-    gallery.NodeDriftInfo:
-      type: object
-      properties:
-        digest:
-          type: string
-        node_id:
-          type: string
-        node_name:
-          type: string
-        version:
-          type: string
   securitySchemes:
     BearerAuth:
       type: apiKey

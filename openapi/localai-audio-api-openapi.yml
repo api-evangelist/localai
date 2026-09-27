@@ -521,6 +521,71 @@ components:
           type: string
         score:
           type: number
+    voiceprofile.AudioMetadata:
+      type: object
+      properties:
+        bit_depth:
+          type: integer
+        channels:
+          type: integer
+        duration_ms:
+          type: integer
+        mime_type:
+          type: string
+        sample_rate:
+          type: integer
+        size_bytes:
+          type: integer
+    schema.VADRequest:
+      description: VAD request body
+      type: object
+      properties:
+        audio:
+          description: raw audio samples as float32 PCM
+          type: array
+          items:
+            type: number
+        model:
+          type: string
+    schema.DiarizationSpeaker:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        segment_count:
+          type: integer
+        total_speech_duration:
+          type: number
+    schema.DiarizationResult:
+      type: object
+      properties:
+        duration:
+          type: number
+        language:
+          type: string
+        num_speakers:
+          type: integer
+        segments:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.DiarizationSegment'
+        speakers:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.DiarizationSpeaker'
+        task:
+          type: string
+    schema.SoundClassificationResult:
+      type: object
+      properties:
+        detections:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.SoundClassification'
+        model:
+          type: string
     schema.TTSRequest:
       description: TTS request body
       type: object
@@ -575,15 +640,25 @@ components:
         voice:
           description: voice audio file or speaker id
           type: string
-    schema.APIError:
+    schema.ErrorResponse:
       type: object
       properties:
-        code: {}
-        message:
+        error:
+          $ref: '#/components/schemas/schema.APIError'
+    schema.DiarizationSegment:
+      type: object
+      properties:
+        end:
+          type: number
+        id:
+          type: integer
+        label:
           type: string
-        param:
+        speaker:
           type: string
-        type:
+        start:
+          type: number
+        text:
           type: string
     localai.VoiceProfileListResponse:
       type: object
@@ -592,22 +667,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/voiceprofile.Profile'
-    schema.DiarizationSpeaker:
+    proto.VADSegment:
       type: object
       properties:
-        id:
-          type: string
-        label:
-          type: string
-        segment_count:
-          type: integer
-        total_speech_duration:
+        end:
           type: number
-    schema.ErrorResponse:
-      type: object
-      properties:
-        error:
-          $ref: '#/components/schemas/schema.APIError'
+        start:
+          type: number
     schema.ElevenLabsSoundGenerationRequest:
       type: object
       properties:
@@ -641,40 +707,6 @@ components:
           type: string
         vocal_language:
           type: string
-    voiceprofile.AudioMetadata:
-      type: object
-      properties:
-        bit_depth:
-          type: integer
-        channels:
-          type: integer
-        duration_ms:
-          type: integer
-        mime_type:
-          type: string
-        sample_rate:
-          type: integer
-        size_bytes:
-          type: integer
-    schema.DiarizationResult:
-      type: object
-      properties:
-        duration:
-          type: number
-        language:
-          type: string
-        num_speakers:
-          type: integer
-        segments:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.DiarizationSegment'
-        speakers:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.DiarizationSpeaker'
-        task:
-          type: string
     voiceprofile.Profile:
       type: object
       properties:
@@ -698,47 +730,15 @@ components:
           type: string
         voice:
           type: string
-    schema.SoundClassificationResult:
+    schema.APIError:
       type: object
       properties:
-        detections:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.SoundClassification'
-        model:
+        code: {}
+        message:
           type: string
-    proto.VADSegment:
-      type: object
-      properties:
-        end:
-          type: number
-        start:
-          type: number
-    schema.DiarizationSegment:
-      type: object
-      properties:
-        end:
-          type: number
-        id:
-          type: integer
-        label:
+        param:
           type: string
-        speaker:
-          type: string
-        start:
-          type: number
-        text:
-          type: string
-    schema.VADRequest:
-      description: VAD request body
-      type: object
-      properties:
-        audio:
-          description: raw audio samples as float32 PCM
-          type: array
-          items:
-            type: number
-        model:
+        type:
           type: string
     proto.VADResponse:
       type: object

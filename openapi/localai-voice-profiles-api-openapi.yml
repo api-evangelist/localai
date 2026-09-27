@@ -173,18 +173,6 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    localai.VoiceProfileListResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/voiceprofile.Profile'
-    schema.ErrorResponse:
-      type: object
-      properties:
-        error:
-          $ref: '#/components/schemas/schema.APIError'
     voiceprofile.AudioMetadata:
       type: object
       properties:
@@ -200,6 +188,11 @@ components:
           type: integer
         size_bytes:
           type: integer
+    schema.ErrorResponse:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/schema.APIError'
     voiceprofile.Profile:
       type: object
       properties:
@@ -233,6 +226,13 @@ components:
           type: string
         type:
           type: string
+    localai.VoiceProfileListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/voiceprofile.Profile'
   securitySchemes:
     BearerAuth:
       type: apiKey

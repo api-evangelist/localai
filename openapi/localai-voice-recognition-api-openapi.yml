@@ -155,50 +155,13 @@ components:
           type: boolean
         name:
           type: string
-    schema.VoiceForgetRequest:
+    schema.VoiceIdentifyResponse:
       type: object
       properties:
-        id:
-          type: string
-        model:
-          type: string
-        store:
-          type: string
-    schema.VoiceVerifyResponse:
-      type: object
-      properties:
-        confidence:
-          type: number
-        distance:
-          type: number
-        model:
-          type: string
-        processing_time_ms:
-          type: number
-        threshold:
-          type: number
-        verified:
-          type: boolean
-    schema.VoiceVerifyRequest:
-      type: object
-      properties:
-        anti_spoofing:
-          type: boolean
-        audio1:
-          type: string
-        audio2:
-          type: string
-        model:
-          type: string
-        threshold:
-          type: number
-    schema.VoiceEmbedRequest:
-      type: object
-      properties:
-        audio:
-          type: string
-        model:
-          type: string
+        matches:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.VoiceIdentifyMatch'
     schema.VoiceAnalysis:
       type: object
       properties:
@@ -222,6 +185,35 @@ components:
             format: float32
         start:
           type: number
+    schema.VoiceForgetRequest:
+      type: object
+      properties:
+        id:
+          type: string
+        model:
+          type: string
+        store:
+          type: string
+    schema.VoiceVerifyRequest:
+      type: object
+      properties:
+        anti_spoofing:
+          type: boolean
+        audio1:
+          type: string
+        audio2:
+          type: string
+        model:
+          type: string
+        threshold:
+          type: number
+    schema.VoiceEmbedRequest:
+      type: object
+      properties:
+        audio:
+          type: string
+        model:
+          type: string
     schema.VoiceEmbedResponse:
       type: object
       properties:
@@ -248,13 +240,21 @@ components:
           type: string
         store:
           type: string
-    schema.VoiceIdentifyResponse:
+    schema.VoiceVerifyResponse:
       type: object
       properties:
-        matches:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.VoiceIdentifyMatch'
+        confidence:
+          type: number
+        distance:
+          type: number
+        model:
+          type: string
+        processing_time_ms:
+          type: number
+        threshold:
+          type: number
+        verified:
+          type: boolean
     schema.VoiceIdentifyRequest:
       type: object
       properties:
@@ -268,6 +268,22 @@ components:
           type: number
         top_k:
           type: integer
+    schema.VoiceAnalyzeResponse:
+      type: object
+      properties:
+        segments:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.VoiceAnalysis'
+    schema.VoiceRegisterResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        registered_at:
+          type: string
     schema.VoiceAnalyzeRequest:
       type: object
       properties:
@@ -280,22 +296,6 @@ components:
           type: string
         model:
           type: string
-    schema.VoiceRegisterResponse:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        registered_at:
-          type: string
-    schema.VoiceAnalyzeResponse:
-      type: object
-      properties:
-        segments:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.VoiceAnalysis'
   securitySchemes:
     BearerAuth:
       type: apiKey

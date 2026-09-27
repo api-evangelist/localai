@@ -71,6 +71,18 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    schema.Item:
+      type: object
+      properties:
+        b64_json:
+          type: string
+        index:
+          type: integer
+        object:
+          type: string
+        url:
+          description: Images
+          type: string
     schema.Message:
       type: object
       properties:
@@ -93,6 +105,101 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/schema.ToolCall'
+    schema.LogprobContent:
+      type: object
+      properties:
+        bytes:
+          type: array
+          items:
+            type: integer
+        id:
+          type: integer
+        logprob:
+          type: number
+        token:
+          type: string
+        top_logprobs:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.LogprobContent'
+    schema.ToolCall:
+      type: object
+      properties:
+        function:
+          $ref: '#/components/schemas/schema.FunctionCall'
+        id:
+          type: string
+        index:
+          type: integer
+        type:
+          type: string
+    schema.Choice:
+      type: object
+      properties:
+        delta:
+          $ref: '#/components/schemas/schema.Message'
+        finish_reason:
+          type: string
+        index:
+          type: integer
+        logprobs:
+          $ref: '#/components/schemas/schema.Logprobs'
+        message:
+          $ref: '#/components/schemas/schema.Message'
+        text:
+          type: string
+    schema.InputTokensDetails:
+      type: object
+      properties:
+        image_tokens:
+          type: integer
+        text_tokens:
+          type: integer
+    schema.OpenAIUsage:
+      type: object
+      properties:
+        completion_tokens:
+          type: integer
+        compression_meta:
+          $ref: '#/components/schemas/schema.CompressionMetadata'
+        input_tokens:
+          description: Fields for image generation API compatibility
+          type: integer
+        input_tokens_details:
+          $ref: '#/components/schemas/schema.InputTokensDetails'
+        output_tokens:
+          type: integer
+        prompt_tokens:
+          type: integer
+        timing_prompt_processing:
+          description: Extra timing data, disabled by default as is't not a part of OpenAI specification
+          type: number
+        timing_token_generation:
+          type: number
+        total_tokens:
+          type: integer
+    schema.CompressionMetadata:
+      type: object
+      properties:
+        compressed_tokens:
+          type: integer
+        compressor:
+          type: string
+        dropped_turns:
+          type: integer
+        original_tokens:
+          type: integer
+        overflow_recoveries:
+          type: integer
+        summary_tokens:
+          type: integer
+    schema.Logprobs:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.LogprobContent'
     schema.OpenAIResponse:
       type: object
       properties:
@@ -126,18 +233,6 @@ components:
             (continuedev/continue, Kilo Code, Roo Code, etc.).'
           allOf:
           - $ref: '#/components/schemas/schema.OpenAIUsage'
-    schema.Item:
-      type: object
-      properties:
-        b64_json:
-          type: string
-        index:
-          type: integer
-        object:
-          type: string
-        url:
-          description: Images
-          type: string
     schema.Model3DRequest:
       description: 3D asset generation request body. Generation is image-conditioned
       type: object
@@ -173,21 +268,6 @@ components:
         texture_steps:
           description: texture flow sampling steps (backend default 12)
           type: integer
-    schema.CompressionMetadata:
-      type: object
-      properties:
-        compressed_tokens:
-          type: integer
-        compressor:
-          type: string
-        dropped_turns:
-          type: integer
-        original_tokens:
-          type: integer
-        overflow_recoveries:
-          type: integer
-        summary_tokens:
-          type: integer
     schema.FunctionCall:
       type: object
       properties:
@@ -195,86 +275,6 @@ components:
           type: string
         name:
           type: string
-    schema.ToolCall:
-      type: object
-      properties:
-        function:
-          $ref: '#/components/schemas/schema.FunctionCall'
-        id:
-          type: string
-        index:
-          type: integer
-        type:
-          type: string
-    schema.Logprobs:
-      type: object
-      properties:
-        content:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.LogprobContent'
-    schema.OpenAIUsage:
-      type: object
-      properties:
-        completion_tokens:
-          type: integer
-        compression_meta:
-          $ref: '#/components/schemas/schema.CompressionMetadata'
-        input_tokens:
-          description: Fields for image generation API compatibility
-          type: integer
-        input_tokens_details:
-          $ref: '#/components/schemas/schema.InputTokensDetails'
-        output_tokens:
-          type: integer
-        prompt_tokens:
-          type: integer
-        timing_prompt_processing:
-          description: Extra timing data, disabled by default as is't not a part of OpenAI specification
-          type: number
-        timing_token_generation:
-          type: number
-        total_tokens:
-          type: integer
-    schema.Choice:
-      type: object
-      properties:
-        delta:
-          $ref: '#/components/schemas/schema.Message'
-        finish_reason:
-          type: string
-        index:
-          type: integer
-        logprobs:
-          $ref: '#/components/schemas/schema.Logprobs'
-        message:
-          $ref: '#/components/schemas/schema.Message'
-        text:
-          type: string
-    schema.InputTokensDetails:
-      type: object
-      properties:
-        image_tokens:
-          type: integer
-        text_tokens:
-          type: integer
-    schema.LogprobContent:
-      type: object
-      properties:
-        bytes:
-          type: array
-          items:
-            type: integer
-        id:
-          type: integer
-        logprob:
-          type: number
-        token:
-          type: string
-        top_logprobs:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.LogprobContent'
   securitySchemes:
     BearerAuth:
       type: apiKey

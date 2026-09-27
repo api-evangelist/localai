@@ -379,73 +379,33 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    schema.Job:
+    schema.JobStatus:
+      type: string
+      enum:
+      - pending
+      - running
+      - completed
+      - failed
+      - cancelled
+      x-enum-varnames:
+      - JobStatusPending
+      - JobStatusRunning
+      - JobStatusCompleted
+      - JobStatusFailed
+      - JobStatusCancelled
+    schema.MultimediaSourceConfig:
       type: object
       properties:
-        audios:
-          description: List of audio URLs or base64 strings
-          type: array
-          items:
-            type: string
-        completed_at:
-          type: string
-        created_at:
-          type: string
-        error:
-          description: Error message if failed
-          type: string
-        files:
-          description: List of file URLs or base64 strings
-          type: array
-          items:
-            type: string
-        id:
-          description: UUID
-          type: string
-        images:
-          description: 'Multimedia content (for manual execution)
-
-            Can contain URLs or base64-encoded data URIs'
-          type: array
-          items:
-            type: string
-        parameters:
-          description: Template parameters
+        headers:
+          description: Custom headers for HTTP request (e.g., Authorization)
           type: object
           additionalProperties:
             type: string
-        result:
-          description: Agent response
+        type:
+          description: '"image", "video", "audio", "file"'
           type: string
-        started_at:
-          type: string
-        status:
-          description: pending, running, completed, failed, cancelled
-          allOf:
-          - $ref: '#/components/schemas/schema.JobStatus'
-        task_id:
-          description: Reference to Task
-          type: string
-        traces:
-          description: Execution traces (reasoning, tool calls, tool results)
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.JobTrace'
-        triggered_by:
-          description: '"manual", "cron", "api"'
-          type: string
-        videos:
-          description: List of video URLs or base64 strings
-          type: array
-          items:
-            type: string
-        webhook_error:
-          description: Error if webhook failed
-          type: string
-        webhook_sent:
-          description: Webhook delivery tracking
-          type: boolean
-        webhook_sent_at:
+        url:
+          description: URL to fetch from
           type: string
     schema.Task:
       type: object
@@ -514,70 +474,6 @@ components:
         url:
           description: URL to poll for job status
           type: string
-    schema.JobTrace:
-      type: object
-      properties:
-        arguments:
-          description: Tool arguments or result data
-          type: object
-          additionalProperties: {}
-        content:
-          description: The actual trace content
-          type: string
-        timestamp:
-          description: When this trace occurred
-          type: string
-        tool_name:
-          description: Tool name (for tool_call/tool_result)
-          type: string
-        type:
-          description: '"reasoning", "tool_call", "tool_result", "status"'
-          type: string
-    schema.JobStatus:
-      type: string
-      enum:
-      - pending
-      - running
-      - completed
-      - failed
-      - cancelled
-      x-enum-varnames:
-      - JobStatusPending
-      - JobStatusRunning
-      - JobStatusCompleted
-      - JobStatusFailed
-      - JobStatusCancelled
-    schema.WebhookConfig:
-      type: object
-      properties:
-        headers:
-          description: Custom headers (e.g., Authorization)
-          type: object
-          additionalProperties:
-            type: string
-        method:
-          description: 'HTTP method (POST, PUT, PATCH) - default: POST'
-          type: string
-        payload_template:
-          description: Optional template for payload
-          type: string
-        url:
-          description: Webhook endpoint URL
-          type: string
-    schema.MultimediaSourceConfig:
-      type: object
-      properties:
-        headers:
-          description: Custom headers for HTTP request (e.g., Authorization)
-          type: object
-          additionalProperties:
-            type: string
-        type:
-          description: '"image", "video", "audio", "file"'
-          type: string
-        url:
-          description: URL to fetch from
-          type: string
     schema.JobExecutionRequest:
       type: object
       properties:
@@ -611,6 +507,110 @@ components:
           type: array
           items:
             type: string
+    schema.WebhookConfig:
+      type: object
+      properties:
+        headers:
+          description: Custom headers (e.g., Authorization)
+          type: object
+          additionalProperties:
+            type: string
+        method:
+          description: 'HTTP method (POST, PUT, PATCH) - default: POST'
+          type: string
+        payload_template:
+          description: Optional template for payload
+          type: string
+        url:
+          description: Webhook endpoint URL
+          type: string
+    schema.JobTrace:
+      type: object
+      properties:
+        arguments:
+          description: Tool arguments or result data
+          type: object
+          additionalProperties: {}
+        content:
+          description: The actual trace content
+          type: string
+        timestamp:
+          description: When this trace occurred
+          type: string
+        tool_name:
+          description: Tool name (for tool_call/tool_result)
+          type: string
+        type:
+          description: '"reasoning", "tool_call", "tool_result", "status"'
+          type: string
+    schema.Job:
+      type: object
+      properties:
+        audios:
+          description: List of audio URLs or base64 strings
+          type: array
+          items:
+            type: string
+        completed_at:
+          type: string
+        created_at:
+          type: string
+        error:
+          description: Error message if failed
+          type: string
+        files:
+          description: List of file URLs or base64 strings
+          type: array
+          items:
+            type: string
+        id:
+          description: UUID
+          type: string
+        images:
+          description: 'Multimedia content (for manual execution)
+
+            Can contain URLs or base64-encoded data URIs'
+          type: array
+          items:
+            type: string
+        parameters:
+          description: Template parameters
+          type: object
+          additionalProperties:
+            type: string
+        result:
+          description: Agent response
+          type: string
+        started_at:
+          type: string
+        status:
+          description: pending, running, completed, failed, cancelled
+          allOf:
+          - $ref: '#/components/schemas/schema.JobStatus'
+        task_id:
+          description: Reference to Task
+          type: string
+        traces:
+          description: Execution traces (reasoning, tool calls, tool results)
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.JobTrace'
+        triggered_by:
+          description: '"manual", "cron", "api"'
+          type: string
+        videos:
+          description: List of video URLs or base64 strings
+          type: array
+          items:
+            type: string
+        webhook_error:
+          description: Error if webhook failed
+          type: string
+        webhook_sent:
+          description: Webhook delivery tracking
+          type: boolean
+        webhook_sent_at:
+          type: string
   securitySchemes:
     BearerAuth:
       type: apiKey

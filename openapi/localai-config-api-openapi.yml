@@ -215,6 +215,17 @@ components:
           type: integer
         vram_display:
           type: string
+    modeladmin.VRAMRequest:
+      type: object
+      properties:
+        context_size:
+          type: integer
+        gpu_layers:
+          type: integer
+        kv_quant_bits:
+          type: integer
+        model:
+          type: string
     localai.ModelResponse:
       type: object
       properties:
@@ -235,17 +246,6 @@ components:
           type: integer
         success:
           type: boolean
-    modeladmin.VRAMRequest:
-      type: object
-      properties:
-        context_size:
-          type: integer
-        gpu_layers:
-          type: integer
-        kv_quant_bits:
-          type: integer
-        model:
-          type: string
   securitySchemes:
     BearerAuth:
       type: apiKey

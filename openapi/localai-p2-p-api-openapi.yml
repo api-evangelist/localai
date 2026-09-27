@@ -46,19 +46,6 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    schema.NodeData:
-      type: object
-      properties:
-        id:
-          type: string
-        lastSeen:
-          type: string
-        name:
-          type: string
-        serviceID:
-          type: string
-        tunnelAddress:
-          type: string
     schema.P2PNodesResponse:
       type: object
       properties:
@@ -74,6 +61,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/schema.NodeData'
+    schema.NodeData:
+      type: object
+      properties:
+        id:
+          type: string
+        lastSeen:
+          type: string
+        name:
+          type: string
+        serviceID:
+          type: string
+        tunnelAddress:
+          type: string
   securitySchemes:
     BearerAuth:
       type: apiKey

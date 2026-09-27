@@ -18,16 +18,22 @@ url: https://raw.githubusercontent.com/api-evangelist/localai/refs/heads/main/ap
 x-type: company
 x-source: harvest:self-hosted-agent-stack
 deliveryModel:
-  model: unknown
-  open_source: unknown
+  model: open-core
+  license: MIT
+  license_evidence:
+    repo: mudler/localai
+    spdx: MIT
+    stars: 49265
+  open_source: true
   commercial: true
   callable_host: false
-  label: Delivery model not determined — needs a product licence on record
-  confidence: low
+  label: Open core · an OSS project plus a commercial hosted product
+  confidence: medium
   source:
+  - openapi
   - pricing
-  - repository-unlicensed
-  generated: '2026-08-28'
+  - repository-license
+  generated: '2026-09-25'
   method: derived
 accessModel:
   pricing: unknown
@@ -50,17 +56,18 @@ modified: '2026-08-27'
 image: https://raw.githubusercontent.com/mudler/LocalAI/master/core/http/static/logo_horizontal.png
 tags:
 - Artificial Intelligence
-- Machine-Learning
+- Machine Learning
 - LLM
 - Inference
 - Self-Hosted
-- Open-Source
+- Open Source
 - Agents
 - MCP
 - Speech
-- Computer-Vision
+- Computer Vision
 - Embeddings
 - Edge Computing
+- Real-Time
 tags_raw:
 - Artificial Intelligence
 - Machine Learning
@@ -74,6 +81,10 @@ tags_raw:
 - Computer Vision
 - Embeddings
 - Edge Computing
+- Machine-Learning
+- Open-Source
+- Computer-Vision
+- Real-Time
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
@@ -756,8 +767,6 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
-  - 3D
-  tags_raw:
   - 3 D
   properties:
   - type: OpenAPI
@@ -784,8 +793,6 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
-  - P2P
-  tags_raw:
   - P2 P
   properties:
   - type: OpenAPI
