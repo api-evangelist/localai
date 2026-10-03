@@ -75,6 +75,34 @@ components:
           type: boolean
         redacted_text:
           type: string
+    schema.PIIAnalyzeResponse:
+      type: object
+      properties:
+        blocked:
+          type: boolean
+        correlation_id:
+          type: string
+        entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.PIIEntity'
+    schema.PIIEntity:
+      type: object
+      properties:
+        action:
+          type: string
+        end:
+          type: integer
+        entity_type:
+          type: string
+        hash_prefix:
+          type: string
+        score:
+          type: number
+        source:
+          type: string
+        start:
+          type: integer
     schema.PIIAnalyzeRequest:
       type: object
       properties:
@@ -104,34 +132,6 @@ components:
 
             body limit.'
           type: string
-    schema.PIIAnalyzeResponse:
-      type: object
-      properties:
-        blocked:
-          type: boolean
-        correlation_id:
-          type: string
-        entities:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.PIIEntity'
-    schema.PIIEntity:
-      type: object
-      properties:
-        action:
-          type: string
-        end:
-          type: integer
-        entity_type:
-          type: string
-        hash_prefix:
-          type: string
-        score:
-          type: number
-        source:
-          type: string
-        start:
-          type: integer
   securitySchemes:
     BearerAuth:
       type: apiKey

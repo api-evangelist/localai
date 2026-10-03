@@ -86,6 +86,20 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    schema.DetokenizeResponse:
+      type: object
+      properties:
+        content:
+          description: detokenized text
+          type: string
+    schema.TokenizeRequest:
+      type: object
+      properties:
+        content:
+          description: text to tokenize
+          type: string
+        model:
+          type: string
     schema.DetokenizeRequest:
       type: object
       properties:
@@ -96,14 +110,6 @@ components:
           type: array
           items:
             type: integer
-    schema.TokenizeRequest:
-      type: object
-      properties:
-        content:
-          description: text to tokenize
-          type: string
-        model:
-          type: string
     schema.TokenizeResponse:
       type: object
       properties:
@@ -112,12 +118,6 @@ components:
           type: array
           items:
             type: integer
-    schema.DetokenizeResponse:
-      type: object
-      properties:
-        content:
-          description: detokenized text
-          type: string
   securitySchemes:
     BearerAuth:
       type: apiKey

@@ -138,6 +138,31 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    schema.FaceForgetRequest:
+      type: object
+      properties:
+        id:
+          type: string
+        model:
+          type: string
+        store:
+          type: string
+    schema.FaceRegisterRequest:
+      type: object
+      properties:
+        img:
+          type: string
+        labels:
+          type: object
+          additionalProperties:
+            type: string
+        model:
+          type: string
+        name:
+          type: string
+        store:
+          description: vector store model; empty = local-store default
+          type: string
     schema.FaceAnalysis:
       type: object
       properties:
@@ -173,45 +198,37 @@ components:
             format: float32
         region:
           $ref: '#/components/schemas/schema.FacialArea'
-    schema.FaceIdentifyMatch:
+    schema.FacialArea:
       type: object
       properties:
-        confidence:
+        h:
           type: number
-        distance:
+        w:
           type: number
-        id:
-          type: string
-        labels:
-          type: object
-          additionalProperties:
-            type: string
-        match:
-          description: true when distance <= threshold
-          type: boolean
-        name:
-          type: string
-    schema.FaceAnalyzeResponse:
+        x:
+          type: number
+        y:
+          type: number
+    schema.FaceEmbedRequest:
       type: object
       properties:
-        faces:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.FaceAnalysis'
-    schema.FaceAnalyzeRequest:
-      type: object
-      properties:
-        actions:
-          description: subset of {"age","gender","emotion","race"}
-          type: array
-          items:
-            type: string
-        anti_spoofing:
-          type: boolean
         img:
           type: string
         model:
           type: string
+    schema.FaceVerifyRequest:
+      type: object
+      properties:
+        anti_spoofing:
+          type: boolean
+        img1:
+          type: string
+        img2:
+          type: string
+        model:
+          type: string
+        threshold:
+          type: number
     schema.FaceVerifyResponse:
       type: object
       properties:
@@ -262,17 +279,13 @@ components:
           type: number
         top_k:
           type: integer
-    schema.FacialArea:
+    schema.FaceAnalyzeResponse:
       type: object
       properties:
-        h:
-          type: number
-        w:
-          type: number
-        x:
-          type: number
-        y:
-          type: number
+        faces:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.FaceAnalysis'
     schema.FaceRegisterResponse:
       type: object
       properties:
@@ -282,41 +295,44 @@ components:
           type: string
         registered_at:
           type: string
-    schema.FaceVerifyRequest:
+    schema.FaceIdentifyResponse:
       type: object
       properties:
+        matches:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.FaceIdentifyMatch'
+    schema.FaceAnalyzeRequest:
+      type: object
+      properties:
+        actions:
+          description: subset of {"age","gender","emotion","race"}
+          type: array
+          items:
+            type: string
         anti_spoofing:
           type: boolean
-        img1:
-          type: string
-        img2:
+        img:
           type: string
         model:
           type: string
-        threshold:
-          type: number
-    schema.FaceRegisterRequest:
+    schema.FaceIdentifyMatch:
       type: object
       properties:
-        img:
+        confidence:
+          type: number
+        distance:
+          type: number
+        id:
           type: string
         labels:
           type: object
           additionalProperties:
             type: string
-        model:
-          type: string
+        match:
+          description: true when distance <= threshold
+          type: boolean
         name:
-          type: string
-        store:
-          description: vector store model; empty = local-store default
-          type: string
-    schema.FaceEmbedRequest:
-      type: object
-      properties:
-        img:
-          type: string
-        model:
           type: string
     schema.FaceEmbedResponse:
       type: object
@@ -328,22 +344,6 @@ components:
           items:
             type: number
         model:
-          type: string
-    schema.FaceIdentifyResponse:
-      type: object
-      properties:
-        matches:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.FaceIdentifyMatch'
-    schema.FaceForgetRequest:
-      type: object
-      properties:
-        id:
-          type: string
-        model:
-          type: string
-        store:
           type: string
   securitySchemes:
     BearerAuth:

@@ -231,37 +231,6 @@ components:
         total:
           description: Total is the corpus size after the call.
           type: integer
-    schema.RouterCorpusStatsResponse:
-      type: object
-      properties:
-        embedding_model:
-          type: string
-        embedding_models:
-          description: 'EmbeddingModels lists the embedder fingerprints present in the
-
-            persisted corpus; more than one means part of the corpus is
-
-            pending re-embedding on the next load.'
-          type: array
-          items:
-            type: string
-        label_counts:
-          type: object
-          additionalProperties:
-            type: integer
-        router:
-          type: string
-        store_name:
-          type: string
-        total:
-          type: integer
-    schema.RouterCorpusClearResponse:
-      type: object
-      properties:
-        cleared:
-          type: integer
-        router:
-          type: string
     schema.RouterCorpusEntry:
       type: object
       properties:
@@ -271,13 +240,6 @@ components:
             type: string
         text:
           type: string
-    schema.RouterCorpusAddRequest:
-      type: object
-      properties:
-        entries:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.RouterCorpusEntry'
     schema.RouterDecideResponse:
       type: object
       properties:
@@ -342,6 +304,24 @@ components:
 
             classifier-side confidence signal).'
           type: number
+    schema.RouterCorpusClearResponse:
+      type: object
+      properties:
+        cleared:
+          type: integer
+        router:
+          type: string
+    schema.RouterDecideNeighbor:
+      type: object
+      properties:
+        id:
+          type: string
+        labels:
+          type: array
+          items:
+            type: string
+        similarity:
+          type: number
     schema.RouterDecideRequest:
       type: object
       properties:
@@ -359,17 +339,37 @@ components:
 
             `router:` block). Required.'
           type: string
-    schema.RouterDecideNeighbor:
+    schema.RouterCorpusStatsResponse:
       type: object
       properties:
-        id:
+        embedding_model:
           type: string
-        labels:
+        embedding_models:
+          description: 'EmbeddingModels lists the embedder fingerprints present in the
+
+            persisted corpus; more than one means part of the corpus is
+
+            pending re-embedding on the next load.'
           type: array
           items:
             type: string
-        similarity:
-          type: number
+        label_counts:
+          type: object
+          additionalProperties:
+            type: integer
+        router:
+          type: string
+        store_name:
+          type: string
+        total:
+          type: integer
+    schema.RouterCorpusAddRequest:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.RouterCorpusEntry'
   securitySchemes:
     BearerAuth:
       type: apiKey

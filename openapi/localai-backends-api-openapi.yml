@@ -205,25 +205,26 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    gallery.NodeDriftInfo:
+    galleryop.NodeProgress:
       type: object
       properties:
-        digest:
+        current:
+          type: string
+        error:
+          type: string
+        file_name:
           type: string
         node_id:
           type: string
         node_name:
           type: string
-        version:
+        percentage:
+          type: number
+        phase:
           type: string
-    gallery.File:
-      type: object
-      properties:
-        filename:
+        status:
           type: string
-        sha256:
-          type: string
-        uri:
+        total:
           type: string
     schema.KnownBackend:
       type: object
@@ -246,20 +247,6 @@ components:
         modality:
           type: string
         name:
-          type: string
-    config.GalleryVerification:
-      type: object
-      properties:
-        identity:
-          type: string
-        identity_regex:
-          type: string
-        issuer:
-          type: string
-        issuer_regex:
-          type: string
-        not_before:
-          description: NotBefore is an RFC3339 timestamp. Empty disables the time check.
           type: string
     gallery.GalleryBackend:
       type: object
@@ -323,6 +310,17 @@ components:
             type: string
         version:
           type: string
+    gallery.NodeDriftInfo:
+      type: object
+      properties:
+        digest:
+          type: string
+        node_id:
+          type: string
+        node_name:
+          type: string
+        version:
+          type: string
     gallery.UpgradeInfo:
       type: object
       properties:
@@ -352,26 +350,19 @@ components:
           type: string
         status_url:
           type: string
-    galleryop.NodeProgress:
+    config.GalleryVerification:
       type: object
       properties:
-        current:
+        identity:
           type: string
-        error:
+        identity_regex:
           type: string
-        file_name:
+        issuer:
           type: string
-        node_id:
+        issuer_regex:
           type: string
-        node_name:
-          type: string
-        percentage:
-          type: number
-        phase:
-          type: string
-        status:
-          type: string
-        total:
+        not_before:
+          description: NotBefore is an RFC3339 timestamp. Empty disables the time check.
           type: string
     config.Gallery:
       type: object
@@ -395,18 +386,6 @@ components:
           type: string
         verification:
           $ref: '#/components/schemas/config.GalleryVerification'
-    localai.GalleryBackend:
-      type: object
-      properties:
-        force:
-          description: 'Force reinstalls the backend even when it is already installed and
-
-            runnable. Off by default so apply stays idempotent for supervising
-
-            apps that ensure their backend on every boot.'
-          type: boolean
-        id:
-          type: string
     galleryop.OpStatus:
       type: object
       properties:
@@ -452,6 +431,27 @@ components:
           type: number
         total_bytes:
           type: integer
+    gallery.File:
+      type: object
+      properties:
+        filename:
+          type: string
+        sha256:
+          type: string
+        uri:
+          type: string
+    localai.GalleryBackend:
+      type: object
+      properties:
+        force:
+          description: 'Force reinstalls the backend even when it is already installed and
+
+            runnable. Off by default so apply stays idempotent for supervising
+
+            apps that ensure their backend on every boot.'
+          type: boolean
+        id:
+          type: string
   securitySchemes:
     BearerAuth:
       type: apiKey

@@ -138,6 +138,46 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    schema.VoiceRegisterRequest:
+      type: object
+      properties:
+        audio:
+          type: string
+        labels:
+          type: object
+          additionalProperties:
+            type: string
+        model:
+          type: string
+        name:
+          type: string
+        store:
+          type: string
+    schema.VoiceAnalyzeRequest:
+      type: object
+      properties:
+        actions:
+          description: subset of {"age","gender","emotion"}
+          type: array
+          items:
+            type: string
+        audio:
+          type: string
+        model:
+          type: string
+    schema.VoiceIdentifyRequest:
+      type: object
+      properties:
+        audio:
+          type: string
+        model:
+          type: string
+        store:
+          type: string
+        threshold:
+          type: number
+        top_k:
+          type: integer
     schema.VoiceIdentifyMatch:
       type: object
       properties:
@@ -155,13 +195,15 @@ components:
           type: boolean
         name:
           type: string
-    schema.VoiceIdentifyResponse:
+    schema.VoiceForgetRequest:
       type: object
       properties:
-        matches:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.VoiceIdentifyMatch'
+        id:
+          type: string
+        model:
+          type: string
+        store:
+          type: string
     schema.VoiceAnalysis:
       type: object
       properties:
@@ -185,28 +227,6 @@ components:
             format: float32
         start:
           type: number
-    schema.VoiceForgetRequest:
-      type: object
-      properties:
-        id:
-          type: string
-        model:
-          type: string
-        store:
-          type: string
-    schema.VoiceVerifyRequest:
-      type: object
-      properties:
-        anti_spoofing:
-          type: boolean
-        audio1:
-          type: string
-        audio2:
-          type: string
-        model:
-          type: string
-        threshold:
-          type: number
     schema.VoiceEmbedRequest:
       type: object
       properties:
@@ -214,6 +234,13 @@ components:
           type: string
         model:
           type: string
+    schema.VoiceIdentifyResponse:
+      type: object
+      properties:
+        matches:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.VoiceIdentifyMatch'
     schema.VoiceEmbedResponse:
       type: object
       properties:
@@ -224,21 +251,6 @@ components:
           items:
             type: number
         model:
-          type: string
-    schema.VoiceRegisterRequest:
-      type: object
-      properties:
-        audio:
-          type: string
-        labels:
-          type: object
-          additionalProperties:
-            type: string
-        model:
-          type: string
-        name:
-          type: string
-        store:
           type: string
     schema.VoiceVerifyResponse:
       type: object
@@ -255,26 +267,19 @@ components:
           type: number
         verified:
           type: boolean
-    schema.VoiceIdentifyRequest:
+    schema.VoiceVerifyRequest:
       type: object
       properties:
-        audio:
+        anti_spoofing:
+          type: boolean
+        audio1:
+          type: string
+        audio2:
           type: string
         model:
           type: string
-        store:
-          type: string
         threshold:
           type: number
-        top_k:
-          type: integer
-    schema.VoiceAnalyzeResponse:
-      type: object
-      properties:
-        segments:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.VoiceAnalysis'
     schema.VoiceRegisterResponse:
       type: object
       properties:
@@ -284,18 +289,13 @@ components:
           type: string
         registered_at:
           type: string
-    schema.VoiceAnalyzeRequest:
+    schema.VoiceAnalyzeResponse:
       type: object
       properties:
-        actions:
-          description: subset of {"age","gender","emotion"}
+        segments:
           type: array
           items:
-            type: string
-        audio:
-          type: string
-        model:
-          type: string
+            $ref: '#/components/schemas/schema.VoiceAnalysis'
   securitySchemes:
     BearerAuth:
       type: apiKey

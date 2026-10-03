@@ -37,13 +37,6 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    schema.JINAUsageInfo:
-      type: object
-      properties:
-        prompt_tokens:
-          type: integer
-        total_tokens:
-          type: integer
     schema.JINADocumentResult:
       type: object
       properties:
@@ -53,11 +46,6 @@ components:
           type: integer
         relevance_score:
           type: number
-    schema.JINAText:
-      type: object
-      properties:
-        text:
-          type: string
     schema.JINARerankRequest:
       type: object
       properties:
@@ -84,6 +72,18 @@ components:
             $ref: '#/components/schemas/schema.JINADocumentResult'
         usage:
           $ref: '#/components/schemas/schema.JINAUsageInfo'
+    schema.JINAText:
+      type: object
+      properties:
+        text:
+          type: string
+    schema.JINAUsageInfo:
+      type: object
+      properties:
+        prompt_tokens:
+          type: integer
+        total_tokens:
+          type: integer
   securitySchemes:
     BearerAuth:
       type: apiKey
