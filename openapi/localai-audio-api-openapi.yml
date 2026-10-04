@@ -512,24 +512,61 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    localai.VoiceProfileListResponse:
+    voiceprofile.Profile:
       type: object
       properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/voiceprofile.Profile'
-    schema.DiarizationSpeaker:
-      type: object
-      properties:
+        audio:
+          $ref: '#/components/schemas/voiceprofile.AudioMetadata'
+        consent_confirmed_at:
+          type: string
+        created_at:
+          type: string
+        description:
+          type: string
         id:
           type: string
-        label:
+        language:
           type: string
-        segment_count:
+        name:
+          type: string
+        transcript:
+          type: string
+        updated_at:
+          type: string
+        voice:
+          type: string
+    voiceprofile.AudioMetadata:
+      type: object
+      properties:
+        bit_depth:
           type: integer
-        total_speech_duration:
+        channels:
+          type: integer
+        duration_ms:
+          type: integer
+        mime_type:
+          type: string
+        sample_rate:
+          type: integer
+        size_bytes:
+          type: integer
+    proto.VADSegment:
+      type: object
+      properties:
+        end:
           type: number
+        start:
+          type: number
+    schema.APIError:
+      type: object
+      properties:
+        code: {}
+        message:
+          type: string
+        param:
+          type: string
+        type:
+          type: string
     schema.DiarizationSegment:
       type: object
       properties:
@@ -545,55 +582,6 @@ components:
           type: number
         text:
           type: string
-    schema.SoundClassificationResult:
-      type: object
-      properties:
-        detections:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.SoundClassification'
-        model:
-          type: string
-    schema.ElevenLabsSoundGenerationRequest:
-      type: object
-      properties:
-        bpm:
-          type: integer
-        caption:
-          type: string
-        do_sample:
-          type: boolean
-        duration_seconds:
-          type: number
-        instrumental:
-          description: 'Simple mode: use text as description; optional instrumental / vocal_language'
-          type: boolean
-        keyscale:
-          type: string
-        language:
-          type: string
-        lyrics:
-          type: string
-        model_id:
-          type: string
-        prompt_influence:
-          type: number
-        text:
-          type: string
-        think:
-          description: Advanced mode
-          type: boolean
-        timesignature:
-          type: string
-        vocal_language:
-          type: string
-    proto.VADResponse:
-      type: object
-      properties:
-        segments:
-          type: array
-          items:
-            $ref: '#/components/schemas/proto.VADSegment'
     schema.TTSRequest:
       description: TTS request body
       type: object
@@ -648,37 +636,6 @@ components:
         voice:
           description: voice audio file or speaker id
           type: string
-    schema.SoundClassification:
-      type: object
-      properties:
-        index:
-          type: integer
-        label:
-          type: string
-        score:
-          type: number
-    proto.VADSegment:
-      type: object
-      properties:
-        end:
-          type: number
-        start:
-          type: number
-    voiceprofile.AudioMetadata:
-      type: object
-      properties:
-        bit_depth:
-          type: integer
-        channels:
-          type: integer
-        duration_ms:
-          type: integer
-        mime_type:
-          type: string
-        sample_rate:
-          type: integer
-        size_bytes:
-          type: integer
     schema.VADRequest:
       description: VAD request body
       type: object
@@ -690,16 +647,13 @@ components:
             type: number
         model:
           type: string
-    schema.APIError:
+    localai.VoiceProfileListResponse:
       type: object
       properties:
-        code: {}
-        message:
-          type: string
-        param:
-          type: string
-        type:
-          type: string
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/voiceprofile.Profile'
     schema.DiarizationResult:
       type: object
       properties:
@@ -719,33 +673,79 @@ components:
             $ref: '#/components/schemas/schema.DiarizationSpeaker'
         task:
           type: string
+    schema.ElevenLabsSoundGenerationRequest:
+      type: object
+      properties:
+        bpm:
+          type: integer
+        caption:
+          type: string
+        do_sample:
+          type: boolean
+        duration_seconds:
+          type: number
+        instrumental:
+          description: 'Simple mode: use text as description; optional instrumental / vocal_language'
+          type: boolean
+        keyscale:
+          type: string
+        language:
+          type: string
+        lyrics:
+          type: string
+        model_id:
+          type: string
+        prompt_influence:
+          type: number
+        text:
+          type: string
+        think:
+          description: Advanced mode
+          type: boolean
+        timesignature:
+          type: string
+        vocal_language:
+          type: string
+    schema.SoundClassification:
+      type: object
+      properties:
+        index:
+          type: integer
+        label:
+          type: string
+        score:
+          type: number
+    schema.DiarizationSpeaker:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        segment_count:
+          type: integer
+        total_speech_duration:
+          type: number
     schema.ErrorResponse:
       type: object
       properties:
         error:
           $ref: '#/components/schemas/schema.APIError'
-    voiceprofile.Profile:
+    proto.VADResponse:
       type: object
       properties:
-        audio:
-          $ref: '#/components/schemas/voiceprofile.AudioMetadata'
-        consent_confirmed_at:
-          type: string
-        created_at:
-          type: string
-        description:
-          type: string
-        id:
-          type: string
-        language:
-          type: string
-        name:
-          type: string
-        transcript:
-          type: string
-        updated_at:
-          type: string
-        voice:
+        segments:
+          type: array
+          items:
+            $ref: '#/components/schemas/proto.VADSegment'
+    schema.SoundClassificationResult:
+      type: object
+      properties:
+        detections:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.SoundClassification'
+        model:
           type: string
   securitySchemes:
     BearerAuth:

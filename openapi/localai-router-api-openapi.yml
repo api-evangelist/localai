@@ -210,35 +210,22 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    schema.RouterCorpusAddResponse:
+    schema.RouterDecideRequest:
       type: object
       properties:
-        added:
-          description: Added is how many entries were embedded, persisted, and indexed.
-          type: integer
-        label_counts:
-          description: LabelCounts is the per-label exemplar count after the call.
-          type: object
-          additionalProperties:
-            type: integer
-        router:
-          type: string
-        skipped:
-          description: 'Skipped counts entries whose text was already in the corpus —
+        input:
+          description: 'Input is the user-visible prompt text to classify. Required.
 
-            duplicates are rejected rather than double-weighted.'
-          type: integer
-        total:
-          description: Total is the corpus size after the call.
-          type: integer
-    schema.RouterCorpusEntry:
-      type: object
-      properties:
-        labels:
-          type: array
-          items:
-            type: string
-        text:
+            Schema-shape extraction (chat-message concatenation, etc.) is
+
+            the caller''s responsibility — matches the Probe contract used
+
+            by the in-band middleware.'
+          type: string
+        router:
+          description: 'Router is the name of the router model (a ModelConfig with a
+
+            `router:` block). Required.'
           type: string
     schema.RouterDecideResponse:
       type: object
@@ -304,13 +291,6 @@ components:
 
             classifier-side confidence signal).'
           type: number
-    schema.RouterCorpusClearResponse:
-      type: object
-      properties:
-        cleared:
-          type: integer
-        router:
-          type: string
     schema.RouterDecideNeighbor:
       type: object
       properties:
@@ -322,22 +302,42 @@ components:
             type: string
         similarity:
           type: number
-    schema.RouterDecideRequest:
+    schema.RouterCorpusClearResponse:
       type: object
       properties:
-        input:
-          description: 'Input is the user-visible prompt text to classify. Required.
-
-            Schema-shape extraction (chat-message concatenation, etc.) is
-
-            the caller''s responsibility — matches the Probe contract used
-
-            by the in-band middleware.'
-          type: string
+        cleared:
+          type: integer
         router:
-          description: 'Router is the name of the router model (a ModelConfig with a
+          type: string
+    schema.RouterCorpusAddResponse:
+      type: object
+      properties:
+        added:
+          description: Added is how many entries were embedded, persisted, and indexed.
+          type: integer
+        label_counts:
+          description: LabelCounts is the per-label exemplar count after the call.
+          type: object
+          additionalProperties:
+            type: integer
+        router:
+          type: string
+        skipped:
+          description: 'Skipped counts entries whose text was already in the corpus —
 
-            `router:` block). Required.'
+            duplicates are rejected rather than double-weighted.'
+          type: integer
+        total:
+          description: Total is the corpus size after the call.
+          type: integer
+    schema.RouterCorpusEntry:
+      type: object
+      properties:
+        labels:
+          type: array
+          items:
+            type: string
+        text:
           type: string
     schema.RouterCorpusStatsResponse:
       type: object

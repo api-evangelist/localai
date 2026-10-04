@@ -59,80 +59,6 @@ components:
           type: integer
         summary_tokens:
           type: integer
-    schema.OpenAIResponse:
-      type: object
-      properties:
-        choices:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.Choice'
-        created:
-          type: integer
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.Item'
-        id:
-          type: string
-        model:
-          type: string
-        object:
-          type: string
-        usage:
-          description: 'Usage is intentionally a pointer with omitempty: per the OpenAI
-
-            chat-completion streaming spec, intermediate chunks must not carry
-
-            a `usage` field. Marshalling a value-typed usage would emit
-
-            `"usage":{"prompt_tokens":0,...}` on every chunk and break
-
-            OpenAI-SDK consumers that filter on a truthy `result.usage`
-
-            (continuedev/continue, Kilo Code, Roo Code, etc.).'
-          allOf:
-          - $ref: '#/components/schemas/schema.OpenAIUsage'
-    schema.Logprobs:
-      type: object
-      properties:
-        content:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.LogprobContent'
-    schema.Message:
-      type: object
-      properties:
-        content:
-          description: The message content
-        function_call:
-          description: A result of a function call
-        name:
-          description: The message name (used for tools calls)
-          type: string
-        reasoning:
-          description: Reasoning content extracted from <thinking>...</thinking> tags
-          type: string
-        role:
-          description: The message role
-          type: string
-        tool_call_id:
-          type: string
-        tool_calls:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.ToolCall'
-    schema.Item:
-      type: object
-      properties:
-        b64_json:
-          type: string
-        index:
-          type: integer
-        object:
-          type: string
-        url:
-          description: Images
-          type: string
     schema.VideoRequest:
       type: object
       properties:
@@ -191,38 +117,6 @@ components:
         width:
           description: output width in pixels
           type: integer
-    schema.LogprobContent:
-      type: object
-      properties:
-        bytes:
-          type: array
-          items:
-            type: integer
-        id:
-          type: integer
-        logprob:
-          type: number
-        token:
-          type: string
-        top_logprobs:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.LogprobContent'
-    schema.Choice:
-      type: object
-      properties:
-        delta:
-          $ref: '#/components/schemas/schema.Message'
-        finish_reason:
-          type: string
-        index:
-          type: integer
-        logprobs:
-          $ref: '#/components/schemas/schema.Logprobs'
-        message:
-          $ref: '#/components/schemas/schema.Message'
-        text:
-          type: string
     schema.OpenAIUsage:
       type: object
       properties:
@@ -246,13 +140,68 @@ components:
           type: number
         total_tokens:
           type: integer
-    schema.FunctionCall:
+    schema.Logprobs:
       type: object
       properties:
-        arguments:
-          type: string
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.LogprobContent'
+    schema.Message:
+      type: object
+      properties:
+        content:
+          description: The message content
+        function_call:
+          description: A result of a function call
         name:
+          description: The message name (used for tools calls)
           type: string
+        reasoning:
+          description: Reasoning content extracted from <thinking>...</thinking> tags
+          type: string
+        role:
+          description: The message role
+          type: string
+        tool_call_id:
+          type: string
+        tool_calls:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.ToolCall'
+    schema.OpenAIResponse:
+      type: object
+      properties:
+        choices:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.Choice'
+        created:
+          type: integer
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.Item'
+        id:
+          type: string
+        model:
+          type: string
+        object:
+          type: string
+        usage:
+          description: 'Usage is intentionally a pointer with omitempty: per the OpenAI
+
+            chat-completion streaming spec, intermediate chunks must not carry
+
+            a `usage` field. Marshalling a value-typed usage would emit
+
+            `"usage":{"prompt_tokens":0,...}` on every chunk and break
+
+            OpenAI-SDK consumers that filter on a truthy `result.usage`
+
+            (continuedev/continue, Kilo Code, Roo Code, etc.).'
+          allOf:
+          - $ref: '#/components/schemas/schema.OpenAIUsage'
     schema.ToolCall:
       type: object
       properties:
@@ -264,6 +213,57 @@ components:
           type: integer
         type:
           type: string
+    schema.Item:
+      type: object
+      properties:
+        b64_json:
+          type: string
+        index:
+          type: integer
+        object:
+          type: string
+        url:
+          description: Images
+          type: string
+    schema.Choice:
+      type: object
+      properties:
+        delta:
+          $ref: '#/components/schemas/schema.Message'
+        finish_reason:
+          type: string
+        index:
+          type: integer
+        logprobs:
+          $ref: '#/components/schemas/schema.Logprobs'
+        message:
+          $ref: '#/components/schemas/schema.Message'
+        text:
+          type: string
+    schema.FunctionCall:
+      type: object
+      properties:
+        arguments:
+          type: string
+        name:
+          type: string
+    schema.LogprobContent:
+      type: object
+      properties:
+        bytes:
+          type: array
+          items:
+            type: integer
+        id:
+          type: integer
+        logprob:
+          type: number
+        token:
+          type: string
+        top_logprobs:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.LogprobContent'
   securitySchemes:
     BearerAuth:
       type: apiKey

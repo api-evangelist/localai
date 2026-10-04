@@ -138,21 +138,115 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    schema.VoiceRegisterRequest:
+    schema.VoiceAnalyzeResponse:
       type: object
       properties:
-        audio:
+        segments:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.VoiceAnalysis'
+    schema.VoiceRegisterResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        registered_at:
+          type: string
+    schema.VoiceVerifyResponse:
+      type: object
+      properties:
+        confidence:
+          type: number
+        distance:
+          type: number
+        model:
+          type: string
+        processing_time_ms:
+          type: number
+        threshold:
+          type: number
+        verified:
+          type: boolean
+    schema.VoiceIdentifyMatch:
+      type: object
+      properties:
+        confidence:
+          type: number
+        distance:
+          type: number
+        id:
           type: string
         labels:
           type: object
           additionalProperties:
             type: string
-        model:
-          type: string
+        match:
+          type: boolean
         name:
           type: string
-        store:
+    schema.VoiceVerifyRequest:
+      type: object
+      properties:
+        anti_spoofing:
+          type: boolean
+        audio1:
           type: string
+        audio2:
+          type: string
+        model:
+          type: string
+        threshold:
+          type: number
+    schema.VoiceEmbedResponse:
+      type: object
+      properties:
+        dim:
+          type: integer
+        embedding:
+          type: array
+          items:
+            type: number
+        model:
+          type: string
+    schema.VoiceEmbedRequest:
+      type: object
+      properties:
+        audio:
+          type: string
+        model:
+          type: string
+    schema.VoiceIdentifyResponse:
+      type: object
+      properties:
+        matches:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.VoiceIdentifyMatch'
+    schema.VoiceAnalysis:
+      type: object
+      properties:
+        age:
+          type: number
+        dominant_emotion:
+          type: string
+        dominant_gender:
+          type: string
+        emotion:
+          type: object
+          additionalProperties:
+            type: number
+            format: float32
+        end:
+          type: number
+        gender:
+          type: object
+          additionalProperties:
+            type: number
+            format: float32
+        start:
+          type: number
     schema.VoiceAnalyzeRequest:
       type: object
       properties:
@@ -178,22 +272,20 @@ components:
           type: number
         top_k:
           type: integer
-    schema.VoiceIdentifyMatch:
+    schema.VoiceRegisterRequest:
       type: object
       properties:
-        confidence:
-          type: number
-        distance:
-          type: number
-        id:
+        audio:
           type: string
         labels:
           type: object
           additionalProperties:
             type: string
-        match:
-          type: boolean
+        model:
+          type: string
         name:
+          type: string
+        store:
           type: string
     schema.VoiceForgetRequest:
       type: object
@@ -204,98 +296,6 @@ components:
           type: string
         store:
           type: string
-    schema.VoiceAnalysis:
-      type: object
-      properties:
-        age:
-          type: number
-        dominant_emotion:
-          type: string
-        dominant_gender:
-          type: string
-        emotion:
-          type: object
-          additionalProperties:
-            type: number
-            format: float32
-        end:
-          type: number
-        gender:
-          type: object
-          additionalProperties:
-            type: number
-            format: float32
-        start:
-          type: number
-    schema.VoiceEmbedRequest:
-      type: object
-      properties:
-        audio:
-          type: string
-        model:
-          type: string
-    schema.VoiceIdentifyResponse:
-      type: object
-      properties:
-        matches:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.VoiceIdentifyMatch'
-    schema.VoiceEmbedResponse:
-      type: object
-      properties:
-        dim:
-          type: integer
-        embedding:
-          type: array
-          items:
-            type: number
-        model:
-          type: string
-    schema.VoiceVerifyResponse:
-      type: object
-      properties:
-        confidence:
-          type: number
-        distance:
-          type: number
-        model:
-          type: string
-        processing_time_ms:
-          type: number
-        threshold:
-          type: number
-        verified:
-          type: boolean
-    schema.VoiceVerifyRequest:
-      type: object
-      properties:
-        anti_spoofing:
-          type: boolean
-        audio1:
-          type: string
-        audio2:
-          type: string
-        model:
-          type: string
-        threshold:
-          type: number
-    schema.VoiceRegisterResponse:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        registered_at:
-          type: string
-    schema.VoiceAnalyzeResponse:
-      type: object
-      properties:
-        segments:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.VoiceAnalysis'
   securitySchemes:
     BearerAuth:
       type: apiKey

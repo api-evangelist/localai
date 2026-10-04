@@ -767,8 +767,6 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
-  - 3D
-  tags_raw:
   - 3 D
   properties:
   - type: OpenAPI
@@ -795,8 +793,6 @@ apis:
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
-  - P2P
-  tags_raw:
   - P2 P
   properties:
   - type: OpenAPI

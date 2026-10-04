@@ -203,271 +203,12 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    schema.AnthropicMessage:
+    schema.ORInputTokensDetails:
       type: object
       properties:
-        content: {}
-        role:
-          type: string
-    schema.OpenResponsesRequest:
-      type: object
-      properties:
-        allowed_tools:
-          description: Restrict which tools can be invoked
-          type: array
-          items:
-            type: string
-        background:
-          description: Run request in background
-          type: boolean
-        frequency_penalty:
-          description: Frequency penalty (-2.0 to 2.0)
-          type: number
-        include:
-          description: What to include in response
-          type: array
-          items:
-            type: string
-        input:
-          description: string or []ORItemParam
-        instructions:
-          type: string
-        logit_bias:
-          description: OpenAI-compatible extensions (not in Open Responses spec)
-          type: object
-          additionalProperties:
-            type: number
-            format: float64
-        max_output_tokens:
+        cached_tokens:
+          description: Always include, even if 0
           type: integer
-        max_tool_calls:
-          description: Maximum number of tool calls
-          type: integer
-        metadata:
-          type: object
-          additionalProperties:
-            type: string
-        model:
-          type: string
-        parallel_tool_calls:
-          description: Allow parallel tool calls
-          type: boolean
-        presence_penalty:
-          description: Presence penalty (-2.0 to 2.0)
-          type: number
-        previous_response_id:
-          type: string
-        reasoning:
-          $ref: '#/components/schemas/schema.ORReasoningParam'
-        service_tier:
-          description: '"auto"|"default"|priority hint'
-          type: string
-        store:
-          description: Whether to store the response
-          type: boolean
-        stream:
-          type: boolean
-        temperature:
-          type: number
-        text_format:
-          description: Additional parameters from spec
-        tool_choice:
-          description: '"auto"|"required"|"none"|{type:"function",name:"..."}'
-        tools:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.ORFunctionTool'
-        top_logprobs:
-          description: Number of top logprobs to return
-          type: integer
-        top_p:
-          type: number
-        truncation:
-          description: '"auto"|"disabled"'
-          type: string
-    schema.Logprobs:
-      type: object
-      properties:
-        content:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.LogprobContent'
-    schema.ORError:
-      type: object
-      properties:
-        code:
-          type: string
-        message:
-          type: string
-        param:
-          type: string
-        type:
-          description: invalid_request|not_found|server_error|model_error|too_many_requests
-          type: string
-    schema.ORTextFormat:
-      type: object
-      properties:
-        type:
-          description: '"text" or "json_schema"'
-          type: string
-    schema.LogprobsValue:
-      type: object
-      properties:
-        enabled:
-          description: true if logprobs should be returned
-          type: boolean
-    functions.Tool:
-      type: object
-      properties:
-        function:
-          $ref: '#/components/schemas/functions.Function'
-        type:
-          type: string
-    schema.ORReasoningParam:
-      type: object
-      properties:
-        effort:
-          description: '"none"|"low"|"medium"|"high"|"xhigh"'
-          type: string
-        summary:
-          description: '"auto"|"concise"|"detailed"'
-          type: string
-    functions.Item:
-      type: object
-      properties:
-        properties:
-          type: object
-          additionalProperties: {}
-        type:
-          type: string
-    schema.AnthropicUsage:
-      type: object
-      properties:
-        input_tokens:
-          type: integer
-        output_tokens:
-          type: integer
-    schema.AnthropicRequest:
-      type: object
-      properties:
-        max_tokens:
-          type: integer
-        messages:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.AnthropicMessage'
-        metadata:
-          type: object
-          additionalProperties:
-            type: string
-        model:
-          type: string
-        stop_sequences:
-          type: array
-          items:
-            type: string
-        stream:
-          type: boolean
-        system:
-          type: string
-        temperature:
-          type: number
-        thinking:
-          description: 'Thinking gates extended-thinking output. We only surface thinking
-
-            content blocks when the client explicitly opts in, matching Anthropic''s
-
-            API where thinking is off unless requested.'
-          allOf:
-          - $ref: '#/components/schemas/schema.AnthropicThinkingParam'
-        tool_choice: {}
-        tools:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.AnthropicTool'
-        top_k:
-          type: integer
-        top_p:
-          type: number
-    schema.StreamOptions:
-      type: object
-      properties:
-        include_usage:
-          type: boolean
-    schema.AnthropicThinkingParam:
-      type: object
-      properties:
-        budget_tokens:
-          type: integer
-        type:
-          description: '"enabled" | "disabled"'
-          type: string
-    schema.ORContentPart:
-      type: object
-      properties:
-        annotations:
-          description: REQUIRED for output_text - must always be present (use [])
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.ORAnnotation'
-        detail:
-          description: low|high|auto for images
-          type: string
-        file_data:
-          type: string
-        file_url:
-          type: string
-        filename:
-          type: string
-        image_url:
-          type: string
-        logprobs:
-          description: REQUIRED for output_text - must always be present (use [])
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.ORLogProb'
-        refusal:
-          type: string
-        text:
-          description: REQUIRED for output_text - must always be present (even if empty)
-          type: string
-        type:
-          description: input_text|input_image|input_file|output_text|refusal
-          type: string
-    schema.ORLogProb:
-      type: object
-      properties:
-        bytes:
-          type: array
-          items:
-            type: integer
-        logprob:
-          type: number
-        token:
-          type: string
-        top_logprobs:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.ORTopLogProb'
-    schema.AnthropicImageSource:
-      type: object
-      properties:
-        data:
-          type: string
-        media_type:
-          type: string
-        type:
-          type: string
-    schema.AnthropicTool:
-      type: object
-      properties:
-        description:
-          type: string
-        input_schema:
-          type: object
-          additionalProperties: {}
-        name:
-          type: string
     schema.OpenAIRequest:
       type: object
       required:
@@ -674,59 +415,46 @@ components:
           type: string
         usage:
           $ref: '#/components/schemas/schema.AnthropicUsage'
-    schema.ToolCall:
+    schema.AnthropicTool:
       type: object
       properties:
-        function:
-          $ref: '#/components/schemas/schema.FunctionCall'
-        id:
+        description:
           type: string
-        index:
-          type: integer
-        type:
+        input_schema:
+          type: object
+          additionalProperties: {}
+        name:
           type: string
-    schema.ORTopLogProb:
+    schema.ORTextConfig:
+      type: object
+      properties:
+        format:
+          $ref: '#/components/schemas/schema.ORTextFormat'
+    schema.Logprobs:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.LogprobContent'
+    schema.ORIncompleteDetails:
+      type: object
+      properties:
+        reason:
+          type: string
+    schema.LogprobsValue:
+      type: object
+      properties:
+        enabled:
+          description: true if logprobs should be returned
+          type: boolean
+    schema.ORLogProb:
       type: object
       properties:
         bytes:
           type: array
           items:
             type: integer
-        logprob:
-          type: number
-        token:
-          type: string
-    schema.CompressionMetadata:
-      type: object
-      properties:
-        compressed_tokens:
-          type: integer
-        compressor:
-          type: string
-        dropped_turns:
-          type: integer
-        original_tokens:
-          type: integer
-        overflow_recoveries:
-          type: integer
-        summary_tokens:
-          type: integer
-    schema.ORReasoning:
-      type: object
-      properties:
-        effort:
-          type: string
-        summary:
-          type: string
-    schema.LogprobContent:
-      type: object
-      properties:
-        bytes:
-          type: array
-          items:
-            type: integer
-        id:
-          type: integer
         logprob:
           type: number
         token:
@@ -734,215 +462,83 @@ components:
         top_logprobs:
           type: array
           items:
-            $ref: '#/components/schemas/schema.LogprobContent'
-    functions.Function:
+            $ref: '#/components/schemas/schema.ORTopLogProb'
+    schema.OpenResponsesRequest:
       type: object
       properties:
-        description:
-          type: string
-        name:
-          type: string
-        parameters:
-          type: object
-          additionalProperties: {}
-        strict:
+        allowed_tools:
+          description: Restrict which tools can be invoked
+          type: array
+          items:
+            type: string
+        background:
+          description: Run request in background
           type: boolean
-    schema.Item:
-      type: object
-      properties:
-        b64_json:
-          type: string
-        index:
-          type: integer
-        object:
-          type: string
-        url:
-          description: Images
-          type: string
-    schema.AnthropicContentBlock:
-      type: object
-      properties:
-        content: {}
-        id:
-          type: string
+        frequency_penalty:
+          description: Frequency penalty (-2.0 to 2.0)
+          type: number
+        include:
+          description: What to include in response
+          type: array
+          items:
+            type: string
         input:
+          description: string or []ORItemParam
+        instructions:
+          type: string
+        logit_bias:
+          description: OpenAI-compatible extensions (not in Open Responses spec)
           type: object
-          additionalProperties: {}
-        is_error:
+          additionalProperties:
+            type: number
+            format: float64
+        max_output_tokens:
+          type: integer
+        max_tool_calls:
+          description: Maximum number of tool calls
+          type: integer
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+        model:
+          type: string
+        parallel_tool_calls:
+          description: Allow parallel tool calls
           type: boolean
-        name:
-          type: string
-        signature:
-          type: string
-        source:
-          $ref: '#/components/schemas/schema.AnthropicImageSource'
-        text:
-          type: string
-        thinking:
-          type: string
-        tool_use_id:
-          type: string
-        type:
-          type: string
-    schema.Choice:
-      type: object
-      properties:
-        delta:
-          $ref: '#/components/schemas/schema.Message'
-        finish_reason:
-          type: string
-        index:
-          type: integer
-        logprobs:
-          $ref: '#/components/schemas/schema.Logprobs'
-        message:
-          $ref: '#/components/schemas/schema.Message'
-        text:
-          type: string
-    schema.ORItemField:
-      type: object
-      properties:
-        arguments:
-          type: string
-        call_id:
-          description: Function call fields
-          type: string
-        content:
-          description: string or []ORContentPart for messages
-        encrypted_content:
-          description: Provider-specific encrypted content
-          type: string
-        id:
-          description: Present for all output items
-          type: string
-        name:
-          type: string
-        output:
-          description: Function call output fields
-        role:
-          description: Message fields
-          type: string
-        status:
-          description: in_progress|completed|incomplete
-          type: string
-        summary:
-          description: Reasoning fields (for type == "reasoning")
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.ORContentPart'
-        type:
-          description: message|function_call|function_call_output|reasoning|item_reference
-          type: string
-    schema.OpenAIUsage:
-      type: object
-      properties:
-        completion_tokens:
-          type: integer
-        compression_meta:
-          $ref: '#/components/schemas/schema.CompressionMetadata'
-        input_tokens:
-          description: Fields for image generation API compatibility
-          type: integer
-        input_tokens_details:
-          $ref: '#/components/schemas/schema.InputTokensDetails'
-        output_tokens:
-          type: integer
-        prompt_tokens:
-          type: integer
-        timing_prompt_processing:
-          description: Extra timing data, disabled by default as is't not a part of OpenAI specification
+        presence_penalty:
+          description: Presence penalty (-2.0 to 2.0)
           type: number
-        timing_token_generation:
-          type: number
-        total_tokens:
-          type: integer
-    schema.FunctionCall:
-      type: object
-      properties:
-        arguments:
+        previous_response_id:
           type: string
-        name:
+        reasoning:
+          $ref: '#/components/schemas/schema.ORReasoningParam'
+        service_tier:
+          description: '"auto"|"default"|priority hint'
           type: string
-    functions.JSONFunctionStructure:
-      type: object
-      properties:
-        $defs:
-          type: object
-          additionalProperties: {}
-        anyOf:
-          type: array
-          items:
-            $ref: '#/components/schemas/functions.Item'
-        oneOf:
-          type: array
-          items:
-            $ref: '#/components/schemas/functions.Item'
-    schema.InputTokensDetails:
-      type: object
-      properties:
-        image_tokens:
-          type: integer
-        text_tokens:
-          type: integer
-    schema.ORAnnotation:
-      type: object
-      properties:
-        end_index:
-          type: integer
-        start_index:
-          type: integer
-        title:
-          type: string
-        type:
-          description: url_citation
-          type: string
-        url:
-          type: string
-    schema.ORUsage:
-      type: object
-      properties:
-        input_tokens:
-          type: integer
-        input_tokens_details:
-          description: Always present
-          allOf:
-          - $ref: '#/components/schemas/schema.ORInputTokensDetails'
-        output_tokens:
-          type: integer
-        output_tokens_details:
-          description: Always present
-          allOf:
-          - $ref: '#/components/schemas/schema.OROutputTokensDetails'
-        total_tokens:
-          type: integer
-    schema.ORFunctionTool:
-      type: object
-      properties:
-        description:
-          type: string
-        name:
-          type: string
-        parameters:
-          type: object
-          additionalProperties: {}
-        strict:
-          description: Always include in response
+        store:
+          description: Whether to store the response
           type: boolean
-        type:
-          description: always "function"
+        stream:
+          type: boolean
+        temperature:
+          type: number
+        text_format:
+          description: Additional parameters from spec
+        tool_choice:
+          description: '"auto"|"required"|"none"|{type:"function",name:"..."}'
+        tools:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.ORFunctionTool'
+        top_logprobs:
+          description: Number of top logprobs to return
+          type: integer
+        top_p:
+          type: number
+        truncation:
+          description: '"auto"|"disabled"'
           type: string
-    schema.OROutputTokensDetails:
-      type: object
-      properties:
-        reasoning_tokens:
-          description: Always include, even if 0
-          type: integer
-    schema.ORInputTokensDetails:
-      type: object
-      properties:
-        cached_tokens:
-          description: Always include, even if 0
-          type: integer
     schema.OpenAIResponse:
       type: object
       properties:
@@ -976,28 +572,159 @@ components:
             (continuedev/continue, Kilo Code, Roo Code, etc.).'
           allOf:
           - $ref: '#/components/schemas/schema.OpenAIUsage'
-    schema.Message:
+    schema.ToolCall:
       type: object
       properties:
-        content:
-          description: The message content
-        function_call:
-          description: A result of a function call
-        name:
-          description: The message name (used for tools calls)
+        function:
+          $ref: '#/components/schemas/schema.FunctionCall'
+        id:
           type: string
-        reasoning:
-          description: Reasoning content extracted from <thinking>...</thinking> tags
+        index:
+          type: integer
+        type:
           type: string
-        role:
-          description: The message role
+    schema.ORError:
+      type: object
+      properties:
+        code:
           type: string
-        tool_call_id:
+        message:
           type: string
-        tool_calls:
+        param:
+          type: string
+        type:
+          description: invalid_request|not_found|server_error|model_error|too_many_requests
+          type: string
+    functions.JSONFunctionStructure:
+      type: object
+      properties:
+        $defs:
+          type: object
+          additionalProperties: {}
+        anyOf:
           type: array
           items:
-            $ref: '#/components/schemas/schema.ToolCall'
+            $ref: '#/components/schemas/functions.Item'
+        oneOf:
+          type: array
+          items:
+            $ref: '#/components/schemas/functions.Item'
+    schema.Choice:
+      type: object
+      properties:
+        delta:
+          $ref: '#/components/schemas/schema.Message'
+        finish_reason:
+          type: string
+        index:
+          type: integer
+        logprobs:
+          $ref: '#/components/schemas/schema.Logprobs'
+        message:
+          $ref: '#/components/schemas/schema.Message'
+        text:
+          type: string
+    schema.AnthropicThinkingParam:
+      type: object
+      properties:
+        budget_tokens:
+          type: integer
+        type:
+          description: '"enabled" | "disabled"'
+          type: string
+    schema.InputTokensDetails:
+      type: object
+      properties:
+        image_tokens:
+          type: integer
+        text_tokens:
+          type: integer
+    schema.AnthropicContentBlock:
+      type: object
+      properties:
+        content: {}
+        id:
+          type: string
+        input:
+          type: object
+          additionalProperties: {}
+        is_error:
+          type: boolean
+        name:
+          type: string
+        signature:
+          type: string
+        source:
+          $ref: '#/components/schemas/schema.AnthropicImageSource'
+        text:
+          type: string
+        thinking:
+          type: string
+        tool_use_id:
+          type: string
+        type:
+          type: string
+    functions.Item:
+      type: object
+      properties:
+        properties:
+          type: object
+          additionalProperties: {}
+        type:
+          type: string
+    schema.ORTextFormat:
+      type: object
+      properties:
+        type:
+          description: '"text" or "json_schema"'
+          type: string
+    schema.ORContentPart:
+      type: object
+      properties:
+        annotations:
+          description: REQUIRED for output_text - must always be present (use [])
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.ORAnnotation'
+        detail:
+          description: low|high|auto for images
+          type: string
+        file_data:
+          type: string
+        file_url:
+          type: string
+        filename:
+          type: string
+        image_url:
+          type: string
+        logprobs:
+          description: REQUIRED for output_text - must always be present (use [])
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.ORLogProb'
+        refusal:
+          type: string
+        text:
+          description: REQUIRED for output_text - must always be present (even if empty)
+          type: string
+        type:
+          description: input_text|input_image|input_file|output_text|refusal
+          type: string
+    schema.CompressionMetadata:
+      type: object
+      properties:
+        compressed_tokens:
+          type: integer
+        compressor:
+          type: string
+        dropped_turns:
+          type: integer
+        original_tokens:
+          type: integer
+        overflow_recoveries:
+          type: integer
+        summary_tokens:
+          type: integer
     schema.ORResponseResource:
       type: object
       properties:
@@ -1089,15 +816,288 @@ components:
           description: Usage statistics
           allOf:
           - $ref: '#/components/schemas/schema.ORUsage'
-    schema.ORTextConfig:
+    schema.ORReasoningParam:
       type: object
       properties:
-        format:
-          $ref: '#/components/schemas/schema.ORTextFormat'
-    schema.ORIncompleteDetails:
+        effort:
+          description: '"none"|"low"|"medium"|"high"|"xhigh"'
+          type: string
+        summary:
+          description: '"auto"|"concise"|"detailed"'
+          type: string
+    schema.OpenAIUsage:
       type: object
       properties:
-        reason:
+        completion_tokens:
+          type: integer
+        compression_meta:
+          $ref: '#/components/schemas/schema.CompressionMetadata'
+        input_tokens:
+          description: Fields for image generation API compatibility
+          type: integer
+        input_tokens_details:
+          $ref: '#/components/schemas/schema.InputTokensDetails'
+        output_tokens:
+          type: integer
+        prompt_tokens:
+          type: integer
+        timing_prompt_processing:
+          description: Extra timing data, disabled by default as is't not a part of OpenAI specification
+          type: number
+        timing_token_generation:
+          type: number
+        total_tokens:
+          type: integer
+    schema.AnthropicMessage:
+      type: object
+      properties:
+        content: {}
+        role:
+          type: string
+    schema.ORItemField:
+      type: object
+      properties:
+        arguments:
+          type: string
+        call_id:
+          description: Function call fields
+          type: string
+        content:
+          description: string or []ORContentPart for messages
+        encrypted_content:
+          description: Provider-specific encrypted content
+          type: string
+        id:
+          description: Present for all output items
+          type: string
+        name:
+          type: string
+        output:
+          description: Function call output fields
+        role:
+          description: Message fields
+          type: string
+        status:
+          description: in_progress|completed|incomplete
+          type: string
+        summary:
+          description: Reasoning fields (for type == "reasoning")
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.ORContentPart'
+        type:
+          description: message|function_call|function_call_output|reasoning|item_reference
+          type: string
+    schema.OROutputTokensDetails:
+      type: object
+      properties:
+        reasoning_tokens:
+          description: Always include, even if 0
+          type: integer
+    functions.Function:
+      type: object
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        parameters:
+          type: object
+          additionalProperties: {}
+        strict:
+          type: boolean
+    schema.StreamOptions:
+      type: object
+      properties:
+        include_usage:
+          type: boolean
+    schema.AnthropicUsage:
+      type: object
+      properties:
+        input_tokens:
+          type: integer
+        output_tokens:
+          type: integer
+    schema.Item:
+      type: object
+      properties:
+        b64_json:
+          type: string
+        index:
+          type: integer
+        object:
+          type: string
+        url:
+          description: Images
+          type: string
+    schema.ORTopLogProb:
+      type: object
+      properties:
+        bytes:
+          type: array
+          items:
+            type: integer
+        logprob:
+          type: number
+        token:
+          type: string
+    schema.ORUsage:
+      type: object
+      properties:
+        input_tokens:
+          type: integer
+        input_tokens_details:
+          description: Always present
+          allOf:
+          - $ref: '#/components/schemas/schema.ORInputTokensDetails'
+        output_tokens:
+          type: integer
+        output_tokens_details:
+          description: Always present
+          allOf:
+          - $ref: '#/components/schemas/schema.OROutputTokensDetails'
+        total_tokens:
+          type: integer
+    schema.ORReasoning:
+      type: object
+      properties:
+        effort:
+          type: string
+        summary:
+          type: string
+    schema.LogprobContent:
+      type: object
+      properties:
+        bytes:
+          type: array
+          items:
+            type: integer
+        id:
+          type: integer
+        logprob:
+          type: number
+        token:
+          type: string
+        top_logprobs:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.LogprobContent'
+    schema.ORFunctionTool:
+      type: object
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        parameters:
+          type: object
+          additionalProperties: {}
+        strict:
+          description: Always include in response
+          type: boolean
+        type:
+          description: always "function"
+          type: string
+    schema.Message:
+      type: object
+      properties:
+        content:
+          description: The message content
+        function_call:
+          description: A result of a function call
+        name:
+          description: The message name (used for tools calls)
+          type: string
+        reasoning:
+          description: Reasoning content extracted from <thinking>...</thinking> tags
+          type: string
+        role:
+          description: The message role
+          type: string
+        tool_call_id:
+          type: string
+        tool_calls:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.ToolCall'
+    schema.AnthropicImageSource:
+      type: object
+      properties:
+        data:
+          type: string
+        media_type:
+          type: string
+        type:
+          type: string
+    schema.ORAnnotation:
+      type: object
+      properties:
+        end_index:
+          type: integer
+        start_index:
+          type: integer
+        title:
+          type: string
+        type:
+          description: url_citation
+          type: string
+        url:
+          type: string
+    schema.FunctionCall:
+      type: object
+      properties:
+        arguments:
+          type: string
+        name:
+          type: string
+    schema.AnthropicRequest:
+      type: object
+      properties:
+        max_tokens:
+          type: integer
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.AnthropicMessage'
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+        model:
+          type: string
+        stop_sequences:
+          type: array
+          items:
+            type: string
+        stream:
+          type: boolean
+        system:
+          type: string
+        temperature:
+          type: number
+        thinking:
+          description: 'Thinking gates extended-thinking output. We only surface thinking
+
+            content blocks when the client explicitly opts in, matching Anthropic''s
+
+            API where thinking is off unless requested.'
+          allOf:
+          - $ref: '#/components/schemas/schema.AnthropicThinkingParam'
+        tool_choice: {}
+        tools:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.AnthropicTool'
+        top_k:
+          type: integer
+        top_p:
+          type: number
+    functions.Tool:
+      type: object
+      properties:
+        function:
+          $ref: '#/components/schemas/functions.Function'
+        type:
           type: string
   securitySchemes:
     BearerAuth:

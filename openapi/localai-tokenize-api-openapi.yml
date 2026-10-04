@@ -86,12 +86,14 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    schema.DetokenizeResponse:
+    schema.TokenizeResponse:
       type: object
       properties:
-        content:
-          description: detokenized text
-          type: string
+        tokens:
+          description: token IDs
+          type: array
+          items:
+            type: integer
     schema.TokenizeRequest:
       type: object
       properties:
@@ -100,6 +102,12 @@ components:
           type: string
         model:
           type: string
+    schema.DetokenizeResponse:
+      type: object
+      properties:
+        content:
+          description: detokenized text
+          type: string
     schema.DetokenizeRequest:
       type: object
       properties:
@@ -107,14 +115,6 @@ components:
           type: string
         tokens:
           description: token IDs to convert back to text
-          type: array
-          items:
-            type: integer
-    schema.TokenizeResponse:
-      type: object
-      properties:
-        tokens:
-          description: token IDs
           type: array
           items:
             type: integer

@@ -37,6 +37,17 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    schema.JINARerankResponse:
+      type: object
+      properties:
+        model:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.JINADocumentResult'
+        usage:
+          $ref: '#/components/schemas/schema.JINAUsageInfo'
     schema.JINADocumentResult:
       type: object
       properties:
@@ -61,22 +72,6 @@ components:
           type: string
         top_n:
           type: integer
-    schema.JINARerankResponse:
-      type: object
-      properties:
-        model:
-          type: string
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.JINADocumentResult'
-        usage:
-          $ref: '#/components/schemas/schema.JINAUsageInfo'
-    schema.JINAText:
-      type: object
-      properties:
-        text:
-          type: string
     schema.JINAUsageInfo:
       type: object
       properties:
@@ -84,6 +79,11 @@ components:
           type: integer
         total_tokens:
           type: integer
+    schema.JINAText:
+      type: object
+      properties:
+        text:
+          type: string
   securitySchemes:
     BearerAuth:
       type: apiKey

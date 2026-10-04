@@ -37,6 +37,31 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    schema.DetectionResponse:
+      type: object
+      properties:
+        detections:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.Detection'
+    schema.Detection:
+      type: object
+      properties:
+        class_name:
+          type: string
+        confidence:
+          type: number
+        height:
+          type: number
+        mask:
+          description: base64-encoded PNG segmentation mask
+          type: string
+        width:
+          type: number
+        x:
+          type: number
+        y:
+          type: number
     schema.DetectionRequest:
       type: object
       properties:
@@ -61,31 +86,6 @@ components:
         threshold:
           description: Detection confidence threshold
           type: number
-    schema.Detection:
-      type: object
-      properties:
-        class_name:
-          type: string
-        confidence:
-          type: number
-        height:
-          type: number
-        mask:
-          description: base64-encoded PNG segmentation mask
-          type: string
-        width:
-          type: number
-        x:
-          type: number
-        y:
-          type: number
-    schema.DetectionResponse:
-      type: object
-      properties:
-        detections:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.Detection'
   securitySchemes:
     BearerAuth:
       type: apiKey

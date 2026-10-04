@@ -218,17 +218,6 @@ components:
           type: integer
         success:
           type: boolean
-    modeladmin.VRAMRequest:
-      type: object
-      properties:
-        context_size:
-          type: integer
-        gpu_layers:
-          type: integer
-        kv_quant_bits:
-          type: integer
-        model:
-          type: string
     modeladmin.VRAMResponse:
       type: object
       properties:
@@ -245,6 +234,17 @@ components:
         vram_bytes:
           type: integer
         vram_display:
+          type: string
+    modeladmin.VRAMRequest:
+      type: object
+      properties:
+        context_size:
+          type: integer
+        gpu_layers:
+          type: integer
+        kv_quant_bits:
+          type: integer
+        model:
           type: string
   securitySchemes:
     BearerAuth:

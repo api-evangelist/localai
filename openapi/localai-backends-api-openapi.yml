@@ -205,26 +205,17 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    galleryop.NodeProgress:
+    localai.GalleryBackend:
       type: object
       properties:
-        current:
-          type: string
-        error:
-          type: string
-        file_name:
-          type: string
-        node_id:
-          type: string
-        node_name:
-          type: string
-        percentage:
-          type: number
-        phase:
-          type: string
-        status:
-          type: string
-        total:
+        force:
+          description: 'Force reinstalls the backend even when it is already installed and
+
+            runnable. Off by default so apply stays idempotent for supervising
+
+            apps that ensure their backend on every boot.'
+          type: boolean
+        id:
           type: string
     schema.KnownBackend:
       type: object
@@ -247,6 +238,135 @@ components:
         modality:
           type: string
         name:
+          type: string
+    galleryop.OpStatus:
+      type: object
+      properties:
+        cancellable:
+          description: Cancellable is true if the operation can be cancelled
+          type: boolean
+        cancelled:
+          description: Cancelled is true if the operation was cancelled
+          type: boolean
+        current_bytes:
+          type: integer
+        deletion:
+          description: Deletion is true if the operation is a deletion
+          type: boolean
+        downloaded_size:
+          type: string
+        file_name:
+          type: string
+        file_size:
+          type: string
+        gallery_element_name:
+          type: string
+        message:
+          type: string
+        nodes:
+          description: 'Nodes is the per-node breakdown for a fanned-out backend install.
+
+            Populated by DistributedBackendManager (per-node terminal status)
+
+            and by the Phase 2 progress bridge (per-byte ticks). The
+
+            /api/operations handler surfaces this so the UI can render an
+
+            expandable per-node view of an in-flight install.'
+          type: array
+          items:
+            $ref: '#/components/schemas/galleryop.NodeProgress'
+        phase:
+          type: string
+        processed:
+          type: boolean
+        progress:
+          type: number
+        total_bytes:
+          type: integer
+    gallery.File:
+      type: object
+      properties:
+        filename:
+          type: string
+        sha256:
+          type: string
+        uri:
+          type: string
+    schema.BackendResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        status_url:
+          type: string
+    config.GalleryVerification:
+      type: object
+      properties:
+        identity:
+          type: string
+        identity_regex:
+          type: string
+        issuer:
+          type: string
+        issuer_regex:
+          type: string
+        not_before:
+          description: NotBefore is an RFC3339 timestamp. Empty disables the time check.
+          type: string
+    gallery.UpgradeInfo:
+      type: object
+      properties:
+        available_digest:
+          type: string
+        available_version:
+          type: string
+        backend_name:
+          type: string
+        installed_digest:
+          type: string
+        installed_version:
+          type: string
+        node_drift:
+          description: 'NodeDrift lists nodes whose installed version or digest differs from
+
+            the cluster majority. Non-empty means the cluster has diverged and an
+
+            upgrade will realign it. Empty in single-node mode.'
+          type: array
+          items:
+            $ref: '#/components/schemas/gallery.NodeDriftInfo'
+    galleryop.NodeProgress:
+      type: object
+      properties:
+        current:
+          type: string
+        error:
+          type: string
+        file_name:
+          type: string
+        node_id:
+          type: string
+        node_name:
+          type: string
+        percentage:
+          type: number
+        phase:
+          type: string
+        status:
+          type: string
+        total:
+          type: string
+    gallery.NodeDriftInfo:
+      type: object
+      properties:
+        digest:
+          type: string
+        node_id:
+          type: string
+        node_name:
+          type: string
+        version:
           type: string
     gallery.GalleryBackend:
       type: object
@@ -310,60 +430,6 @@ components:
             type: string
         version:
           type: string
-    gallery.NodeDriftInfo:
-      type: object
-      properties:
-        digest:
-          type: string
-        node_id:
-          type: string
-        node_name:
-          type: string
-        version:
-          type: string
-    gallery.UpgradeInfo:
-      type: object
-      properties:
-        available_digest:
-          type: string
-        available_version:
-          type: string
-        backend_name:
-          type: string
-        installed_digest:
-          type: string
-        installed_version:
-          type: string
-        node_drift:
-          description: 'NodeDrift lists nodes whose installed version or digest differs from
-
-            the cluster majority. Non-empty means the cluster has diverged and an
-
-            upgrade will realign it. Empty in single-node mode.'
-          type: array
-          items:
-            $ref: '#/components/schemas/gallery.NodeDriftInfo'
-    schema.BackendResponse:
-      type: object
-      properties:
-        id:
-          type: string
-        status_url:
-          type: string
-    config.GalleryVerification:
-      type: object
-      properties:
-        identity:
-          type: string
-        identity_regex:
-          type: string
-        issuer:
-          type: string
-        issuer_regex:
-          type: string
-        not_before:
-          description: NotBefore is an RFC3339 timestamp. Empty disables the time check.
-          type: string
     config.Gallery:
       type: object
       properties:
@@ -386,72 +452,6 @@ components:
           type: string
         verification:
           $ref: '#/components/schemas/config.GalleryVerification'
-    galleryop.OpStatus:
-      type: object
-      properties:
-        cancellable:
-          description: Cancellable is true if the operation can be cancelled
-          type: boolean
-        cancelled:
-          description: Cancelled is true if the operation was cancelled
-          type: boolean
-        current_bytes:
-          type: integer
-        deletion:
-          description: Deletion is true if the operation is a deletion
-          type: boolean
-        downloaded_size:
-          type: string
-        file_name:
-          type: string
-        file_size:
-          type: string
-        gallery_element_name:
-          type: string
-        message:
-          type: string
-        nodes:
-          description: 'Nodes is the per-node breakdown for a fanned-out backend install.
-
-            Populated by DistributedBackendManager (per-node terminal status)
-
-            and by the Phase 2 progress bridge (per-byte ticks). The
-
-            /api/operations handler surfaces this so the UI can render an
-
-            expandable per-node view of an in-flight install.'
-          type: array
-          items:
-            $ref: '#/components/schemas/galleryop.NodeProgress'
-        phase:
-          type: string
-        processed:
-          type: boolean
-        progress:
-          type: number
-        total_bytes:
-          type: integer
-    gallery.File:
-      type: object
-      properties:
-        filename:
-          type: string
-        sha256:
-          type: string
-        uri:
-          type: string
-    localai.GalleryBackend:
-      type: object
-      properties:
-        force:
-          description: 'Force reinstalls the backend even when it is already installed and
-
-            runnable. Off by default so apply stays idempotent for supervising
-
-            apps that ensure their backend on every boot.'
-          type: boolean
-        id:
-          type: string
   securitySchemes:
     BearerAuth:
       type: apiKey

@@ -37,6 +37,26 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    schema.ModerationResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        model:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.ModerationResult'
+    schema.ModerationRequest:
+      type: object
+      properties:
+        input:
+          type: array
+          items:
+            type: string
+        model:
+          type: string
     schema.ModerationResult:
       type: object
       properties:
@@ -57,26 +77,6 @@ components:
             format: float64
         flagged:
           type: boolean
-    schema.ModerationRequest:
-      type: object
-      properties:
-        input:
-          type: array
-          items:
-            type: string
-        model:
-          type: string
-    schema.ModerationResponse:
-      type: object
-      properties:
-        id:
-          type: string
-        model:
-          type: string
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.ModerationResult'
   securitySchemes:
     BearerAuth:
       type: apiKey

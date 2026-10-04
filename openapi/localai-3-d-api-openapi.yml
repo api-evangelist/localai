@@ -93,6 +93,58 @@ components:
           type: integer
         summary_tokens:
           type: integer
+    schema.OpenAIUsage:
+      type: object
+      properties:
+        completion_tokens:
+          type: integer
+        compression_meta:
+          $ref: '#/components/schemas/schema.CompressionMetadata'
+        input_tokens:
+          description: Fields for image generation API compatibility
+          type: integer
+        input_tokens_details:
+          $ref: '#/components/schemas/schema.InputTokensDetails'
+        output_tokens:
+          type: integer
+        prompt_tokens:
+          type: integer
+        timing_prompt_processing:
+          description: Extra timing data, disabled by default as is't not a part of OpenAI specification
+          type: number
+        timing_token_generation:
+          type: number
+        total_tokens:
+          type: integer
+    schema.Logprobs:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.LogprobContent'
+    schema.Message:
+      type: object
+      properties:
+        content:
+          description: The message content
+        function_call:
+          description: A result of a function call
+        name:
+          description: The message name (used for tools calls)
+          type: string
+        reasoning:
+          description: Reasoning content extracted from <thinking>...</thinking> tags
+          type: string
+        role:
+          description: The message role
+          type: string
+        tool_call_id:
+          type: string
+        tool_calls:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.ToolCall'
     schema.Model3DRequest:
       description: 3D asset generation request body. Generation is image-conditioned
       type: object
@@ -161,35 +213,17 @@ components:
             (continuedev/continue, Kilo Code, Roo Code, etc.).'
           allOf:
           - $ref: '#/components/schemas/schema.OpenAIUsage'
-    schema.Logprobs:
+    schema.ToolCall:
       type: object
       properties:
-        content:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.LogprobContent'
-    schema.Message:
-      type: object
-      properties:
-        content:
-          description: The message content
-        function_call:
-          description: A result of a function call
-        name:
-          description: The message name (used for tools calls)
+        function:
+          $ref: '#/components/schemas/schema.FunctionCall'
+        id:
           type: string
-        reasoning:
-          description: Reasoning content extracted from <thinking>...</thinking> tags
+        index:
+          type: integer
+        type:
           type: string
-        role:
-          description: The message role
-          type: string
-        tool_call_id:
-          type: string
-        tool_calls:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.ToolCall'
     schema.Item:
       type: object
       properties:
@@ -201,6 +235,28 @@ components:
           type: string
         url:
           description: Images
+          type: string
+    schema.Choice:
+      type: object
+      properties:
+        delta:
+          $ref: '#/components/schemas/schema.Message'
+        finish_reason:
+          type: string
+        index:
+          type: integer
+        logprobs:
+          $ref: '#/components/schemas/schema.Logprobs'
+        message:
+          $ref: '#/components/schemas/schema.Message'
+        text:
+          type: string
+    schema.FunctionCall:
+      type: object
+      properties:
+        arguments:
+          type: string
+        name:
           type: string
     schema.LogprobContent:
       type: object
@@ -219,62 +275,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/schema.LogprobContent'
-    schema.Choice:
-      type: object
-      properties:
-        delta:
-          $ref: '#/components/schemas/schema.Message'
-        finish_reason:
-          type: string
-        index:
-          type: integer
-        logprobs:
-          $ref: '#/components/schemas/schema.Logprobs'
-        message:
-          $ref: '#/components/schemas/schema.Message'
-        text:
-          type: string
-    schema.OpenAIUsage:
-      type: object
-      properties:
-        completion_tokens:
-          type: integer
-        compression_meta:
-          $ref: '#/components/schemas/schema.CompressionMetadata'
-        input_tokens:
-          description: Fields for image generation API compatibility
-          type: integer
-        input_tokens_details:
-          $ref: '#/components/schemas/schema.InputTokensDetails'
-        output_tokens:
-          type: integer
-        prompt_tokens:
-          type: integer
-        timing_prompt_processing:
-          description: Extra timing data, disabled by default as is't not a part of OpenAI specification
-          type: number
-        timing_token_generation:
-          type: number
-        total_tokens:
-          type: integer
-    schema.FunctionCall:
-      type: object
-      properties:
-        arguments:
-          type: string
-        name:
-          type: string
-    schema.ToolCall:
-      type: object
-      properties:
-        function:
-          $ref: '#/components/schemas/schema.FunctionCall'
-        id:
-          type: string
-        index:
-          type: integer
-        type:
-          type: string
   securitySchemes:
     BearerAuth:
       type: apiKey
