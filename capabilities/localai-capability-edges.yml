@@ -1,0 +1,56 @@
+slug: localai
+provider: LocalAI
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Software & Technology
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 4
+edges:
+- tag: Models
+  spec_file: localai-models-api-openapi.yml
+  capability_id: BC-610.60
+  capability_id_l1: BC-610
+  capability_name: Artificial Intelligence Management
+  confidence: 0.8
+  evidence: POST /models/apply — "Install models to LocalAI"; "Report the progress of an in-flight model
+    load"; "List installable models"
+  reason: Install, delete, list, gallery and load-status operations over ML models are squarely AI/ML
+    model lifecycle / MLOps, which is what BC-610.60 Artificial Intelligence Management covers.
+- tag: Inference
+  spec_file: localai-inference-api-openapi.yml
+  capability_id: BC-610.60
+  capability_id_l1: BC-610
+  capability_name: Artificial Intelligence Management
+  confidence: 0.75
+  evidence: POST /v1/chat/completions — "Generate a chat completions for a given prompt and model"; schema.AnthropicRequest,
+    schema.OpenResponsesRequest
+  reason: Core LLM inference surface (completions, messages, responses). This realises AI/ML capability
+    delivery — Artificial Intelligence Management — rather than any line-of-business process.
+- tag: Audio
+  spec_file: localai-audio-api-openapi.yml
+  capability_id: BC-610.60
+  capability_id_l1: BC-610
+  capability_name: Artificial Intelligence Management
+  confidence: 0.7
+  evidence: POST /v1/audio/transcriptions  postV1AudioTranscriptions  Transcribes audio into the input
+    language; POST /v1/audio/diarization  Identify speakers in audio (who spoke when)
+  reason: Speech-to-text, text-to-speech, audio classification and diarization served by model backends
+    — AI/ML inference capability. Maps to Artificial Intelligence Management; it is not contact-centre
+    or media capability since the operations are raw model inference.
+- tag: Embeddings
+  spec_file: localai-embeddings-api-openapi.yml
+  capability_id: BC-610.60
+  capability_id_l1: BC-610
+  capability_name: Artificial Intelligence Management
+  confidence: 0.7
+  evidence: POST /v1/embeddings  Get a vector representation of a given input that can be easily consumed
+    by…
+  reason: Vector embedding generation by an ML model — an AI inference capability of the self-hosted engine,
+    mapping to Artificial Intelligence Management.
