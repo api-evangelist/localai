@@ -52,7 +52,7 @@ accessModel:
   method: derived
 specificationVersion: '0.20'
 created: '2026-08-27'
-modified: '2026-08-27'
+modified: '2026-10-06'
 image: https://raw.githubusercontent.com/mudler/LocalAI/master/core/http/static/logo_horizontal.png
 tags:
 - Artificial Intelligence
@@ -814,6 +814,8 @@ apis:
   - type: Protobuf
     url: grpc/localai-backend.proto
 common:
+- url: https://localai.io/blog/index.xml
+  type: BlogRSS
 - type: CapabilityMap
   url: capabilities/localai-capability-edges.yml
   name: LocalAI Business Capability Map
