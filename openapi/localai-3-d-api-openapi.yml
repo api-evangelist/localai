@@ -71,58 +71,6 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    schema.InputTokensDetails:
-      type: object
-      properties:
-        image_tokens:
-          type: integer
-        text_tokens:
-          type: integer
-    schema.CompressionMetadata:
-      type: object
-      properties:
-        compressed_tokens:
-          type: integer
-        compressor:
-          type: string
-        dropped_turns:
-          type: integer
-        original_tokens:
-          type: integer
-        overflow_recoveries:
-          type: integer
-        summary_tokens:
-          type: integer
-    schema.OpenAIUsage:
-      type: object
-      properties:
-        completion_tokens:
-          type: integer
-        compression_meta:
-          $ref: '#/components/schemas/schema.CompressionMetadata'
-        input_tokens:
-          description: Fields for image generation API compatibility
-          type: integer
-        input_tokens_details:
-          $ref: '#/components/schemas/schema.InputTokensDetails'
-        output_tokens:
-          type: integer
-        prompt_tokens:
-          type: integer
-        timing_prompt_processing:
-          description: Extra timing data, disabled by default as is't not a part of OpenAI specification
-          type: number
-        timing_token_generation:
-          type: number
-        total_tokens:
-          type: integer
-    schema.Logprobs:
-      type: object
-      properties:
-        content:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.LogprobContent'
     schema.Message:
       type: object
       properties:
@@ -145,6 +93,115 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/schema.ToolCall'
+    schema.Logprobs:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.LogprobContent'
+    schema.OpenAIResponse:
+      type: object
+      properties:
+        choices:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.Choice'
+        created:
+          type: integer
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.Item'
+        id:
+          type: string
+        model:
+          type: string
+        object:
+          type: string
+        usage:
+          description: 'Usage is intentionally a pointer with omitempty: per the OpenAI
+
+            chat-completion streaming spec, intermediate chunks must not carry
+
+            a `usage` field. Marshalling a value-typed usage would emit
+
+            `"usage":{"prompt_tokens":0,...}` on every chunk and break
+
+            OpenAI-SDK consumers that filter on a truthy `result.usage`
+
+            (continuedev/continue, Kilo Code, Roo Code, etc.).'
+          allOf:
+          - $ref: '#/components/schemas/schema.OpenAIUsage'
+    schema.Choice:
+      type: object
+      properties:
+        delta:
+          $ref: '#/components/schemas/schema.Message'
+        finish_reason:
+          type: string
+        index:
+          type: integer
+        logprobs:
+          $ref: '#/components/schemas/schema.Logprobs'
+        message:
+          $ref: '#/components/schemas/schema.Message'
+        text:
+          type: string
+    schema.LogprobContent:
+      type: object
+      properties:
+        bytes:
+          type: array
+          items:
+            type: integer
+        id:
+          type: integer
+        logprob:
+          type: number
+        token:
+          type: string
+        top_logprobs:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.LogprobContent'
+    schema.FunctionCall:
+      type: object
+      properties:
+        arguments:
+          type: string
+        name:
+          type: string
+    schema.ToolCall:
+      type: object
+      properties:
+        function:
+          $ref: '#/components/schemas/schema.FunctionCall'
+        id:
+          type: string
+        index:
+          type: integer
+        type:
+          type: string
+    schema.Item:
+      type: object
+      properties:
+        b64_json:
+          type: string
+        index:
+          type: integer
+        object:
+          type: string
+        url:
+          description: Images
+          type: string
+    schema.InputTokensDetails:
+      type: object
+      properties:
+        image_tokens:
+          type: integer
+        text_tokens:
+          type: integer
     schema.Model3DRequest:
       description: 3D asset generation request body. Generation is image-conditioned
       type: object
@@ -180,101 +237,44 @@ components:
         texture_steps:
           description: texture flow sampling steps (backend default 12)
           type: integer
-    schema.OpenAIResponse:
+    schema.OpenAIUsage:
       type: object
       properties:
-        choices:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.Choice'
-        created:
+        completion_tokens:
           type: integer
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.Item'
-        id:
-          type: string
-        model:
-          type: string
-        object:
-          type: string
-        usage:
-          description: 'Usage is intentionally a pointer with omitempty: per the OpenAI
-
-            chat-completion streaming spec, intermediate chunks must not carry
-
-            a `usage` field. Marshalling a value-typed usage would emit
-
-            `"usage":{"prompt_tokens":0,...}` on every chunk and break
-
-            OpenAI-SDK consumers that filter on a truthy `result.usage`
-
-            (continuedev/continue, Kilo Code, Roo Code, etc.).'
-          allOf:
-          - $ref: '#/components/schemas/schema.OpenAIUsage'
-    schema.ToolCall:
-      type: object
-      properties:
-        function:
-          $ref: '#/components/schemas/schema.FunctionCall'
-        id:
-          type: string
-        index:
+        compression_meta:
+          $ref: '#/components/schemas/schema.CompressionMetadata'
+        input_tokens:
+          description: Fields for image generation API compatibility
           type: integer
-        type:
-          type: string
-    schema.Item:
-      type: object
-      properties:
-        b64_json:
-          type: string
-        index:
+        input_tokens_details:
+          $ref: '#/components/schemas/schema.InputTokensDetails'
+        output_tokens:
           type: integer
-        object:
-          type: string
-        url:
-          description: Images
-          type: string
-    schema.Choice:
-      type: object
-      properties:
-        delta:
-          $ref: '#/components/schemas/schema.Message'
-        finish_reason:
-          type: string
-        index:
+        prompt_tokens:
           type: integer
-        logprobs:
-          $ref: '#/components/schemas/schema.Logprobs'
-        message:
-          $ref: '#/components/schemas/schema.Message'
-        text:
-          type: string
-    schema.FunctionCall:
-      type: object
-      properties:
-        arguments:
-          type: string
-        name:
-          type: string
-    schema.LogprobContent:
-      type: object
-      properties:
-        bytes:
-          type: array
-          items:
-            type: integer
-        id:
-          type: integer
-        logprob:
+        timing_prompt_processing:
+          description: Extra timing data, disabled by default as is't not a part of OpenAI specification
           type: number
-        token:
+        timing_token_generation:
+          type: number
+        total_tokens:
+          type: integer
+    schema.CompressionMetadata:
+      type: object
+      properties:
+        compressed_tokens:
+          type: integer
+        compressor:
           type: string
-        top_logprobs:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.LogprobContent'
+        dropped_turns:
+          type: integer
+        original_tokens:
+          type: integer
+        overflow_recoveries:
+          type: integer
+        summary_tokens:
+          type: integer
   securitySchemes:
     BearerAuth:
       type: apiKey

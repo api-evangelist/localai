@@ -211,6 +211,11 @@ components:
           type: integer
         size_bytes:
           type: integer
+    schema.ErrorResponse:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/schema.APIError'
     localai.VoiceProfileListResponse:
       type: object
       properties:
@@ -228,11 +233,6 @@ components:
           type: string
         type:
           type: string
-    schema.ErrorResponse:
-      type: object
-      properties:
-        error:
-          $ref: '#/components/schemas/schema.APIError'
   securitySchemes:
     BearerAuth:
       type: apiKey

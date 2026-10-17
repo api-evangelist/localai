@@ -178,12 +178,6 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    localai.UpdateMaxReplicasPerModelRequest:
-      type: object
-      properties:
-        value:
-          description: Value is the new per-model replica cap on this node. Must be >= 1.
-          type: integer
     nodes.NodeModel:
       type: object
       properties:
@@ -226,6 +220,12 @@ components:
           type: string
         updated_at:
           type: string
+    localai.UpdateMaxReplicasPerModelRequest:
+      type: object
+      properties:
+        value:
+          description: Value is the new per-model replica cap on this node. Must be >= 1.
+          type: integer
     localai.UpdateVRAMBudgetRequest:
       type: object
       properties:

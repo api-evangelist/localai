@@ -12,12 +12,12 @@ info:
 servers:
 - url: /
 tags:
-- name: P2 P
+- name: P2P
 paths:
   /api/p2p:
     get:
       tags:
-      - P2 P
+      - P2P
       summary: Returns available P2P nodes
       responses:
         '200':
@@ -33,7 +33,7 @@ paths:
   /api/p2p/token:
     get:
       tags:
-      - P2 P
+      - P2P
       summary: Show the P2P token
       responses:
         '200':

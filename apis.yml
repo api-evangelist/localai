@@ -761,16 +761,16 @@ apis:
     url: asyncapi/localai-realtime-asyncapi.yml
   - type: Protobuf
     url: grpc/localai-backend.proto
-- aid: localai:localai-3-d-api
-  name: LocalAI 3 D API
-  description: The 3 D API from LocalAI — 2 operation(s) for 3 d.
+- aid: localai:localai-p2p-api
+  name: LocalAI P2p API
+  description: The p2p API from LocalAI — 2 operation(s) for p2p.
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
-  - 3 D
+  - p2p
   properties:
   - type: OpenAPI
-    url: openapi/localai-3-d-api-openapi.yml
+    url: openapi/localai-p2p-api-openapi.yml
   - type: Swagger
     url: openapi/_original/localai-openapi.json
   - type: Documentation
@@ -787,16 +787,16 @@ apis:
     url: asyncapi/localai-realtime-asyncapi.yml
   - type: Protobuf
     url: grpc/localai-backend.proto
-- aid: localai:localai-p2-p-api
-  name: LocalAI P2 P API
-  description: The P2 P API from LocalAI — 2 operation(s) for p2 p.
+- aid: localai:localai-3-d-api
+  name: LocalAI 3 D API
+  description: The 3 D API from LocalAI — 2 operation(s) for 3 d.
   humanURL: https://localai.io/docs/reference/
   baseURL: http://{localai-host}:8080
   tags:
-  - P2 P
+  - 3 D
   properties:
   - type: OpenAPI
-    url: openapi/localai-p2-p-api-openapi.yml
+    url: openapi/localai-3-d-api-openapi.yml
   - type: Swagger
     url: openapi/_original/localai-openapi.json
   - type: Documentation

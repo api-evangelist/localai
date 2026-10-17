@@ -354,6 +354,55 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    schema.SysInfoModel:
+      type: object
+      properties:
+        backend:
+          description: 'Backend is the engine serving this model. The loader knows only the ID,
+
+            so it is resolved from the model''s config; empty when the model was
+
+            loaded without one (a loose file, or a config since removed).'
+          type: string
+        id:
+          type: string
+    schema.ModelLoadResponse:
+      type: object
+      properties:
+        loaded:
+          description: 'Loaded lists the model names actually resident in memory after the call.
+
+            For a pipeline model these are its sub-models, not the pipeline name.'
+          type: array
+          items:
+            type: string
+        message:
+          description: Message is a short human-readable status ("model loaded", or an error).
+          type: string
+    middleware.TraceBucket:
+      type: object
+      properties:
+        count:
+          type: integer
+        errors:
+          type: integer
+        start:
+          type: string
+    schema.ErrorResponse:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/schema.APIError'
+    schema.ModelLoadRequest:
+      type: object
+      properties:
+        model:
+          type: string
+    schema.BackendMonitorRequest:
+      type: object
+      properties:
+        model:
+          type: string
     proto.StatusResponse_State:
       type: integer
       format: int32
@@ -367,22 +416,30 @@ components:
       - StatusResponse_BUSY
       - StatusResponse_READY
       - StatusResponse_ERROR
-    schema.ModelLoadRequest:
+    middleware.TraceSummary:
       type: object
       properties:
-        model:
-          type: string
-    schema.SysInfoModel:
+        buckets:
+          type: array
+          items:
+            $ref: '#/components/schemas/middleware.TraceBucket'
+        errors:
+          type: integer
+        p95_ms:
+          type: integer
+        total:
+          type: integer
+        window_hours:
+          type: integer
+    schema.APIError:
       type: object
       properties:
-        backend:
-          description: 'Backend is the engine serving this model. The loader knows only the ID,
-
-            so it is resolved from the model''s config; empty when the model was
-
-            loaded without one (a loose file, or a config since removed).'
+        code: {}
+        message:
           type: string
-        id:
+        param:
+          type: string
+        type:
           type: string
     schema.SystemInformationResponse:
       type: object
@@ -407,20 +464,13 @@ components:
             format: int64
         total:
           type: integer
-    schema.BackendMonitorRequest:
+    proto.StatusResponse:
       type: object
       properties:
-        model:
-          type: string
-    middleware.TraceBucket:
-      type: object
-      properties:
-        count:
-          type: integer
-        errors:
-          type: integer
-        start:
-          type: string
+        memory:
+          $ref: '#/components/schemas/proto.MemoryUsageData'
+        state:
+          $ref: '#/components/schemas/proto.StatusResponse_State'
     model.BackendLogLine:
       type: object
       properties:
@@ -430,56 +480,6 @@ components:
         text:
           type: string
         timestamp:
-          type: string
-    schema.APIError:
-      type: object
-      properties:
-        code: {}
-        message:
-          type: string
-        param:
-          type: string
-        type:
-          type: string
-    middleware.TraceSummary:
-      type: object
-      properties:
-        buckets:
-          type: array
-          items:
-            $ref: '#/components/schemas/middleware.TraceBucket'
-        errors:
-          type: integer
-        p95_ms:
-          type: integer
-        total:
-          type: integer
-        window_hours:
-          type: integer
-    schema.ErrorResponse:
-      type: object
-      properties:
-        error:
-          $ref: '#/components/schemas/schema.APIError'
-    proto.StatusResponse:
-      type: object
-      properties:
-        memory:
-          $ref: '#/components/schemas/proto.MemoryUsageData'
-        state:
-          $ref: '#/components/schemas/proto.StatusResponse_State'
-    schema.ModelLoadResponse:
-      type: object
-      properties:
-        loaded:
-          description: 'Loaded lists the model names actually resident in memory after the call.
-
-            For a pipeline model these are its sub-models, not the pipeline name.'
-          type: array
-          items:
-            type: string
-        message:
-          description: Message is a short human-readable status ("model loaded", or an error).
           type: string
   securitySchemes:
     BearerAuth:

@@ -138,6 +138,43 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    schema.FaceAnalyzeResponse:
+      type: object
+      properties:
+        faces:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.FaceAnalysis'
+    schema.FaceIdentifyRequest:
+      type: object
+      properties:
+        img:
+          type: string
+        model:
+          type: string
+        store:
+          type: string
+        threshold:
+          description: optional cutoff on distance
+          type: number
+        top_k:
+          type: integer
+    schema.FaceRegisterRequest:
+      type: object
+      properties:
+        img:
+          type: string
+        labels:
+          type: object
+          additionalProperties:
+            type: string
+        model:
+          type: string
+        name:
+          type: string
+        store:
+          description: vector store model; empty = local-store default
+          type: string
     schema.FaceRegisterResponse:
       type: object
       properties:
@@ -146,13 +183,6 @@ components:
         name:
           type: string
         registered_at:
-          type: string
-    schema.FaceEmbedRequest:
-      type: object
-      properties:
-        img:
-          type: string
-        model:
           type: string
     schema.FaceForgetRequest:
       type: object
@@ -177,6 +207,13 @@ components:
           type: string
         model:
           type: string
+    schema.FaceIdentifyResponse:
+      type: object
+      properties:
+        matches:
+          type: array
+          items:
+            $ref: '#/components/schemas/schema.FaceIdentifyMatch'
     schema.FaceIdentifyMatch:
       type: object
       properties:
@@ -195,54 +232,6 @@ components:
           type: boolean
         name:
           type: string
-    schema.FaceIdentifyResponse:
-      type: object
-      properties:
-        matches:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.FaceIdentifyMatch'
-    schema.FaceRegisterRequest:
-      type: object
-      properties:
-        img:
-          type: string
-        labels:
-          type: object
-          additionalProperties:
-            type: string
-        model:
-          type: string
-        name:
-          type: string
-        store:
-          description: vector store model; empty = local-store default
-          type: string
-    schema.FaceIdentifyRequest:
-      type: object
-      properties:
-        img:
-          type: string
-        model:
-          type: string
-        store:
-          type: string
-        threshold:
-          description: optional cutoff on distance
-          type: number
-        top_k:
-          type: integer
-    schema.FacialArea:
-      type: object
-      properties:
-        h:
-          type: number
-        w:
-          type: number
-        x:
-          type: number
-        y:
-          type: number
     schema.FaceAnalysis:
       type: object
       properties:
@@ -278,6 +267,13 @@ components:
             format: float32
         region:
           $ref: '#/components/schemas/schema.FacialArea'
+    schema.FaceEmbedRequest:
+      type: object
+      properties:
+        img:
+          type: string
+        model:
+          type: string
     schema.FaceVerifyRequest:
       type: object
       properties:
@@ -291,13 +287,6 @@ components:
           type: string
         threshold:
           type: number
-    schema.FaceAnalyzeResponse:
-      type: object
-      properties:
-        faces:
-          type: array
-          items:
-            $ref: '#/components/schemas/schema.FaceAnalysis'
     schema.FaceEmbedResponse:
       type: object
       properties:
@@ -309,6 +298,17 @@ components:
             type: number
         model:
           type: string
+    schema.FacialArea:
+      type: object
+      properties:
+        h:
+          type: number
+        w:
+          type: number
+        x:
+          type: number
+        y:
+          type: number
     schema.FaceVerifyResponse:
       type: object
       properties:
