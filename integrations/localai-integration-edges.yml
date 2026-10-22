@@ -1,23 +1,4 @@
 edges:
-- partner_name: OpenAI
-  partner: openai
-  partner_match: domain
-  type: contract
-  channel: provider-built
-  relationship: compatible
-  direction: provider-built
-  evidence: https://github.com/api-evangelist/localai/blob/main/openapi/localai-inference-api-openapi.yml#L490
-  contract_reference:
-    repo: localai
-    spec_file: localai-inference-api-openapi.yml
-    property: description
-    value: OpenAI-compatible
-    note: 'localai declares OpenAI compatibility: ''description: OpenAI-compatible extensions (not in Open Responses
-      spec)'''
-    detected_by: sweep-model-routing.py
-    detected: '2026-10-15'
-  detected_by: sweep-model-routing.py
-  first_seen: '2026-10-13'
 - partner_name: Go module proxy
   partner: null
   partner_match: null
@@ -48,6 +29,25 @@ edges:
     detected: '2026-10-18'
   detected_by: sweep-official-sdks.py
   first_seen: '2026-10-18'
+- partner_name: OpenAI
+  partner: openai
+  partner_match: domain
+  type: contract
+  channel: provider-built
+  relationship: compatible
+  direction: provider-built
+  evidence: https://github.com/api-evangelist/localai/blob/main/openapi/localai-inference-api-openapi.yml#L421
+  contract_reference:
+    repo: localai
+    spec_file: localai-inference-api-openapi.yml
+    property: description
+    value: OpenAI-compatible
+    note: 'localai declares OpenAI compatibility: ''description: OpenAI-compatible extensions (not in Open Responses
+      spec)'''
+    detected_by: sweep-model-routing.py
+    detected: '2026-10-19'
+  detected_by: sweep-model-routing.py
+  first_seen: '2026-10-13'
 generated: '2026-10-13'
 method: searched
 checked:
@@ -59,10 +59,10 @@ checked:
 - https://repo1.maven.org/maven2
 - https://rubygems.org/api/v1
 source:
-- https://api.nuget.org/v3
-- https://crates.io/api/v1
-- https://proxy.golang.org
-- https://pypi.org/pypi
 - https://registry.npmjs.org
-- https://repo1.maven.org/maven2
+- https://pypi.org/pypi
 - https://rubygems.org/api/v1
+- https://crates.io/api/v1
+- https://repo1.maven.org/maven2
+- https://api.nuget.org/v3
+- https://proxy.golang.org
